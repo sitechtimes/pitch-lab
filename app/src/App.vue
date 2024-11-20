@@ -1,23 +1,18 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
+import AudioRecorder from "./components/AudioRecorder.vue";
 </script>
 
 <template>
-  <header>
-    <img
-      alt="Vue logo"
-      class="logo"
-      src="@/assets/logo.svg"
-      width="125"
-      height="125"
-    />
-
-    <div class="wrapper">
-      <nav></nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div>
+    <header>
+      <div class="wrapper">
+        <nav></nav>
+      </div>
+    </header>
+    <AudioRecorder />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
