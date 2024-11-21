@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "pinia": "^2.2.6",
-    "pitch": "^0.0.0",
+    "pitchy": "^4.1.0",
     "tone": "^15.0.4",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5",
