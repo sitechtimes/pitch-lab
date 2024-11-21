@@ -51,7 +51,6 @@
 import { settingsStore } from "@/stores/deviceStore";
 import { onMounted } from "vue";
 
-// Accessing the Pinia store directly
 const store = settingsStore();
 
 // Fetch devices when the modal is shown
@@ -62,7 +61,7 @@ onMounted(() => {
 });
 
 const closeModal = () => {
-  store.toggleModal(); // Close modal
+  store.toggleModal();
 };
 
 const updateMicrophone = () => {
