@@ -1,7 +1,9 @@
-<script setup></script>
+<script setup>
+import AudioRecorder from "../components/AudioRecorder.vue";
+</script>
 
 <template>
   <main>
-    <TheWelcome />
+    <AudioRecorder />
   </main>
 </template>

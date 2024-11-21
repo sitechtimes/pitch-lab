@@ -1,6 +1,5 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
-import AudioRecorder from "./components/AudioRecorder.vue";
 </script>
 
 <template>
@@ -10,7 +9,7 @@ import AudioRecorder from "./components/AudioRecorder.vue";
         <nav></nav>
       </div>
     </header>
-    <AudioRecorder />
+
     <RouterView />
   </div>
 </template>
