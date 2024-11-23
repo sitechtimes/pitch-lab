@@ -20,64 +20,47 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 
-export default {
-  name: "AudioRecorder",
-  setup() {
-    const isRecording = ref(false); // Track if we're recording
-    const audioUrl = ref(null); // Store the audio URL for playback
-    let mediaRecorder = null; // The MediaRecorder instance
-    let audioChunks = []; // Array to store audio data chunks
+const isRecording = ref(false);
+const audioUrl = ref(null);
+let mediaRecorder = null;
+let audioChunks = [];
 
-    // Start recording function
-    const startRecording = async () => {
-      try {
-        // Get access to the microphone
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
+const startRecording = async () => {
+  try {
+    // Get access to the microphone
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
 
-        // Initialize the MediaRecorder
-        mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder = new MediaRecorder(stream);
 
-        // Collect audio data chunks as they become available
-        mediaRecorder.ondataavailable = (event) => {
-          audioChunks.push(event.data);
-        };
-
-        // Once recording stops, create a Blob from the audio chunks
-        mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-          audioUrl.value = URL.createObjectURL(audioBlob); // Create audio URL for playback
-        };
-
-        // Start recording
-        mediaRecorder.start();
-        isRecording.value = true; // Update state to reflect recording
-      } catch (err) {
-        console.error("Error accessing microphone:", err);
-        alert("Could not access microphone. Please check permissions.");
-      }
+    mediaRecorder.ondataavailable = (event) => {
+      audioChunks.push(event.data);
     };
 
-    // Stop recording function
-    const stopRecording = () => {
-      if (mediaRecorder) {
-        mediaRecorder.stop(); // Stop recording
-        isRecording.value = false; // Update state to reflect recording stopped
-      }
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+      audioUrl.value = URL.createObjectURL(audioBlob); // Create audio URL for playback
     };
 
-    // Expose the functions and reactive state to the template
-    return {
-      isRecording,
-      audioUrl,
-      startRecording,
-      stopRecording,
-    };
-  },
+    // Start recording
+    mediaRecorder.start();
+    isRecording.value = true;
+  } catch (err) {
+    console.error("Error accessing microphone:", err);
+    alert("Could not access microphone. Please check permissions.");
+  }
+};
+
+// Stop recording function
+const stopRecording = () => {
+  if (mediaRecorder) {
+    mediaRecorder.stop();
+    isRecording.value = false;
+  }
 };
 </script>
 
