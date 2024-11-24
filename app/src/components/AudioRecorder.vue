@@ -21,21 +21,56 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { settingsStore } from "@/stores/settings";
 
+const settings = settingsStore();
 const isRecording = ref(false);
 const audioUrl = ref(null);
+const inputVolume = ref(settings.inputVolume);
+const outputVolume = ref(settings.outputVolume);
+
 let mediaRecorder = null;
 let audioChunks = [];
+let audioContext = null;
+let inputGainNode = null;
+let outputGainNode = null;
+let microphoneSource = null;
+
+watch(inputVolume, (newVolume) => {
+  if (inputGainNode) {
+    inputGainNode.gain.value = newVolume;
+  }
+});
+
+watch(outputVolume, (newVolume) => {
+  if (outputGainNode) {
+    outputGainNode.gain.value = newVolume;
+  }
+});
 
 const startRecording = async () => {
   try {
-    // Get access to the microphone
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      inputGainNode = audioContext.createGain();
+      outputGainNode = audioContext.createGain();
+
+      inputGainNode.gain.value = settings.inputVolume;
+      outputGainNode.gain.value = settings.outputVolume;
+    }
+
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
 
+    microphoneSource = audioContext.createMediaStreamSource(stream);
+    microphoneSource.connect(inputGainNode);
+    inputGainNode.connect(audioContext.destination);
+
     mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
 
     mediaRecorder.ondataavailable = (event) => {
       audioChunks.push(event.data);
@@ -43,10 +78,9 @@ const startRecording = async () => {
 
     mediaRecorder.onstop = () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-      audioUrl.value = URL.createObjectURL(audioBlob); // Create audio URL for playback
+      audioUrl.value = URL.createObjectURL(audioBlob);
     };
 
-    // Start recording
     mediaRecorder.start();
     isRecording.value = true;
   } catch (err) {
@@ -55,11 +89,14 @@ const startRecording = async () => {
   }
 };
 
-// Stop recording function
 const stopRecording = () => {
   if (mediaRecorder) {
     mediaRecorder.stop();
     isRecording.value = false;
+  }
+
+  if (microphoneSource) {
+    microphoneSource.disconnect();
   }
 };
 </script>

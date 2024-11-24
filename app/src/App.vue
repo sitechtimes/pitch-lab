@@ -4,6 +4,7 @@ import { RouterLink, RouterView } from "vue-router";
 import AudioRecorder from "./components/AudioRecorder.vue";
 import DeviceSelector from "./components/DeviceSelector.vue";
 import { settingsStore } from "./stores/settings.js";
+import AudioController from "./components/AudioController.vue";
 
 const settings = settingsStore();
 </script>
@@ -16,6 +17,7 @@ const settings = settingsStore();
       </div>
     </header>
     <AudioRecorder />
+    <AudioController />
     <RouterView />
     <button @click="settings.showModal = !settings.showModal">HIIIIII</button>
     <DeviceSelector v-if="settings.showModal" />

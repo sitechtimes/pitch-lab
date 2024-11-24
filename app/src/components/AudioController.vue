@@ -26,20 +26,14 @@
         v-model="outputVolume"
       />
     </div>
-
-    <!-- Audio Controls -->
-    <div>
-      <button @click="playAudio">Play Audio</button>
-      <button @click="pauseAudio">Pause Audio</button>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import { useSettingsStore } from "@/stores/settings";
+import { settingsStore } from "@/stores/settings";
 
-const settings = useSettingsStore();
+const settings = settingsStore();
 
 const inputVolume = computed({
   get: () => settings.inputVolume,

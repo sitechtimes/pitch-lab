@@ -40,8 +40,8 @@
       </div>
 
       <div>
-        <button @click="saveSettings">Save</button>
-        <button @click="closeModal">Cancel</button>
+        <button @click="saveSettings()">Save</button>
+        <button @click="closeModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -70,6 +70,12 @@ const updateMicrophone = () => {
 
 const updateSpeaker = () => {
   store.updateSpeaker(store.selectedSpeaker);
+};
+
+const saveSettings = () => {
+  updateMicrophone();
+  updateSpeaker();
+  closeModal();
 };
 </script>
 

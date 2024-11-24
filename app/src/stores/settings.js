@@ -54,17 +54,17 @@ export const settingsStore = defineStore("settings", () => {
 
   // Update input (microphone) volume
   const setInputVolume = (volume) => {
-    inputVolume.value = volume;
+    inputVolume.value = Number(volume);
     if (inputGainNode) {
-      inputGainNode.gain.value = volume;
+      inputGainNode.gain.value = Number(volume);
     }
   };
 
   // Update output (speaker) volume
   const setOutputVolume = (volume) => {
-    outputVolume.value = volume;
+    outputVolume.value = Number(volume);
     if (outputGainNode) {
-      outputGainNode.gain.value = volume;
+      outputGainNode.gain.value = Number(volume);
     }
   };
 
@@ -81,6 +81,18 @@ export const settingsStore = defineStore("settings", () => {
     }
   };
 
+  const updateMicrophone = (deviceId) => {
+    selectedMicrophone.value = deviceId;
+  };
+
+  const updateSpeaker = (deviceId) => {
+    selectedSpeaker.value = deviceId;
+  };
+
+  const toggleModal = () => {
+    showModal.value = !showModal.value;
+  };
+
   return {
     microphones,
     speakers,
@@ -95,5 +107,8 @@ export const settingsStore = defineStore("settings", () => {
     initializeAudio,
     playAudio,
     pauseAudio,
+    toggleModal,
+    updateMicrophone,
+    updateSpeaker,
   };
 });
