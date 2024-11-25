@@ -73,36 +73,4 @@ const updateSpeaker = () => {
 };
 </script>
 
-<style scoped>
-.device-selector {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.device-selector .modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.device-selector .modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 5px;
-  z-index: 10;
-}
-
-.device-selector .modal-content button {
-  margin-top: 10px;
-}
-</style>
+<style scoped></style>
