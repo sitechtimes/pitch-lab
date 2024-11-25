@@ -1,12 +1,11 @@
 <script setup>
-import { setDevtoolsHook } from "vue";
-import { RouterLink, RouterView } from "vue-router";
 import AudioRecorder from "./components/AudioRecorder.vue";
 import DeviceSelector from "./components/DeviceSelector.vue";
 import { settingsStore } from "./stores/settings.js";
 import AudioController from "./components/AudioController.vue";
 
 const settings = settingsStore();
+import TunerSection from "./components/TunerSection.vue";
 </script>
 
 <template>
@@ -18,6 +17,7 @@ const settings = settingsStore();
     </header>
     <AudioRecorder />
     <AudioController />
+    <TunerSection />
     <RouterView />
     <button @click="settings.showModal = !settings.showModal">HIIIIII</button>
     <DeviceSelector v-if="settings.showModal" />
