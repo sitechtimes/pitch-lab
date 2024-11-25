@@ -1,7 +1,6 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
 import AudioRecorder from "./components/AudioRecorder.vue";
-import PitchTuner from "./components/PitchTuner.vue";
+import TunerSection from "./components/TunerSection.vue";
 </script>
 
 <template>
@@ -12,7 +11,7 @@ import PitchTuner from "./components/PitchTuner.vue";
       </div>
     </header>
     <AudioRecorder />
-    <PitchTuner />
+    <TunerSection />
     <RouterView />
   </div>
 </template>
