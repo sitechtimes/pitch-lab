@@ -1,4 +1,5 @@
 <script setup>
+<<<<<<< Updated upstream
 import { setDevtoolsHook } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 import AudioRecorder from "./components/AudioRecorder.vue";
@@ -6,6 +7,10 @@ import DeviceSelector from "./components/DeviceSelector.vue";
 import { settingsStore } from "./stores/settings.js";
 
 const settings = settingsStore();
+=======
+import AudioRecorder from "./components/AudioRecorder.vue";
+import TunerSection from "./components/TunerSection.vue";
+>>>>>>> Stashed changes
 </script>
 
 <template>
@@ -16,6 +21,10 @@ const settings = settingsStore();
       </div>
     </header>
     <AudioRecorder />
+<<<<<<< Updated upstream
+=======
+    <TunerSection />
+>>>>>>> Stashed changes
     <RouterView />
     <button @click="settings.showModal = !settings.showModal">HIIIIII</button>
     <DeviceSelector v-if="settings.showModal" />
