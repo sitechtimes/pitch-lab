@@ -4,8 +4,5 @@ import ToneJs from "@/components/ToneJs.vue";
 </script>
 
 <template>
-  <main>
-    <AudioRecorder />
-    <ToneJs />
-  </main>
+  <main></main>
 </template>
