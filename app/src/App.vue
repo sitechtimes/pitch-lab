@@ -5,7 +5,6 @@ import { settingsStore } from "./stores/settings.js";
 
 const settings = settingsStore();
 import TunerSection from "./components/TunerSection.vue";
-import TunerTwo from "./components/TunerTwo.vue";
 </script>
 
 <template>
@@ -17,7 +16,6 @@ import TunerTwo from "./components/TunerTwo.vue";
     </header>
     <AudioRecorder />
     <TunerSection />
-    <TunerTwo />
     <RouterView />
     <button @click="settings.showModal = !settings.showModal">HIIIIII</button>
     <DeviceSelector v-if="settings.showModal" />
