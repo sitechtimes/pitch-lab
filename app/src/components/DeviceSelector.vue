@@ -1,15 +1,23 @@
 <template>
-  <div class="device-selector" v-if="store.showModal">
-    <div class="modal-overlay" @click="closeModal"></div>
-    <div class="modal-content">
-      <h2>Select Devices</h2>
-      <!-- Microphone selection -->
-      <div>
-        <label for="microphone">Select Microphone:</label>
+  <div
+    class="device-selector fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    v-if="store.showModal"
+  >
+    <!-- Modal Content -->
+    <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-96 relative">
+      <!-- Modal Header -->
+      <h2 class="text-2xl text-white font-semibold mb-4">Select Devices</h2>
+
+      <!-- Microphone Selection -->
+      <div class="mb-6">
+        <label for="microphone" class="block text-white text-sm mb-2">
+          Select Microphone:
+        </label>
         <select
           id="microphone"
           v-model="store.selectedMicrophone"
           @change="updateMicrophone"
+          class="select select-bordered w-full"
         >
           <option
             v-for="device in store.microphones"
@@ -21,13 +29,16 @@
         </select>
       </div>
 
-      <!-- Speaker selection -->
-      <div>
-        <label for="speaker">Select Speaker:</label>
+      <!-- Speaker Selection -->
+      <div class="mb-6">
+        <label for="speaker" class="block text-white text-sm mb-2">
+          Select Speaker:
+        </label>
         <select
           id="speaker"
           v-model="store.selectedSpeaker"
           @change="updateSpeaker"
+          class="select select-bordered w-full"
         >
           <option
             v-for="device in store.speakers"
@@ -39,9 +50,14 @@
         </select>
       </div>
 
-      <div>
-        <button @click="saveSettings">Save</button>
-        <button @click="closeModal">Cancel</button>
+      <!-- Modal Footer -->
+      <div class="flex justify-end space-x-4">
+        <button class="btn btn-outline btn-success" @click="saveSettings">
+          Save
+        </button>
+        <button class="btn btn-outline btn-error" @click="closeModal">
+          Cancel
+        </button>
       </div>
     </div>
   </div>
