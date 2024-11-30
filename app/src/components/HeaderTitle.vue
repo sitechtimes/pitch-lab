@@ -1,5 +1,5 @@
 <template>
-  <header class="flex items-center justify-between bg-gray-900 text-white p-4">
+  <header class="flex items-center justify-between bg-gray-900 text-white">
     <h1 class="text-2xl font-bold text-blue-300">Pitch Lab</h1>
     <button class="text-gray-300 hover:text-white">
       <svg

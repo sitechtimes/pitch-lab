@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white"
-  >
+  <div class="flex flex-col items-center justify-center bg-gray-800 text-white">
     <h1 class="text-3xl font-bold text-gray-200 mb-6">Pitch Finder</h1>
     <p class="text-gray-400 mb-4">
       Click the button below to start detecting pitch.

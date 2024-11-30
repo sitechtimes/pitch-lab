@@ -1,13 +1,30 @@
 <template>
-  <div>
-    <h1>Audio Recorder</h1>
-
-    <button @click="startRecording" :disabled="isRecording">
-      Start Recording
-    </button>
-    <button @click="stopRecording" :disabled="!isRecording">
-      Stop Recording
-    </button>
+  <div class="flex justify-between">
+    <div>
+      <h1 class="text-white text-3xl">Recorder</h1>
+      <div class="mt-6">
+        <label for="note-selection" class="text-gray-400 mr-4">Tune to:</label>
+        <select class="bg-gray-700 text-white p-2 rounded">
+          History
+        </select>
+      </div>
+    </div>
+    <div class="flex w-[30%] flex-col my-2">
+      <button
+        class="bg-[#36C4E4] rounded-full"
+        @click="startRecording"
+        :disabled="isRecording"
+      >
+        Start Recording
+      </button>
+      <button
+        class="bg-[#A3D10A] rounded-full"
+        @click="stopRecording"
+        :disabled="!isRecording"
+      >
+        Stop Recording
+      </button>
+    </div>
 
     <!-- Display recorded audio playback and download link -->
     <div v-if="audioUrl">
@@ -27,6 +44,8 @@ const isRecording = ref(false);
 const audioUrl = ref(null);
 let mediaRecorder = null;
 let audioChunks = [];
+
+const pastHistory = {};
 
 const startRecording = async () => {
   try {
@@ -67,7 +86,6 @@ const stopRecording = () => {
 <style scoped>
 button {
   margin: 10px;
-  padding: 10px;
   font-size: 16px;
   cursor: pointer;
 }
