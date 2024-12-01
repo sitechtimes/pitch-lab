@@ -1,11 +1,12 @@
 <script setup>
 import AudioRecorder from "./components/AudioRecorder.vue";
 import DeviceSelector from "./components/DeviceSelector.vue";
+import TunerSection from "./components/TunerSection.vue";
+import ToneJs from "./components/ToneJs.vue";
+
 import { settingsStore } from "./stores/settings.js";
 
 const settings = settingsStore();
-import TunerSection from "./components/TunerSection.vue";
-import ToneJs from "./components/ToneJs.vue";
 </script>
 
 <template>

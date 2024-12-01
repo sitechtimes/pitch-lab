@@ -1,11 +1,19 @@
 <template>
-  <div>
-    <h1>Audio Recorder</h1>
+  <div class="p-8 px-24 border-white border-2 rounded-[25px]">
+    <h1 class="text-white">Audio Recorder</h1>
 
-    <button @click="startRecording" :disabled="isRecording">
+    <button
+      class="m-[10px] p-[10px] text-[16px] cursor-pointer border-2 border-white rounded-[25px] bg-white text-black align-middle"
+      @click="startRecording"
+      :disabled="isRecording"
+    >
       Start Recording
     </button>
-    <button @click="stopRecording" :disabled="!isRecording">
+    <button
+      class="m-[10px] p-[10px] text-[16px] cursor-pointer border-2 border-white rounded-[25px] bg-white text-black align-middle"
+      @click="stopRecording"
+      :disabled="!isRecording"
+    >
       Stop Recording
     </button>
 
@@ -13,7 +21,11 @@
     <div v-if="audioUrl">
       <h3>Recorded Audio:</h3>
       <audio :src="audioUrl" controls></audio>
-      <a :href="audioUrl" download="recorded-audio.wav">
+      <a
+        class="m-[10px] p-[10px] text-[16px] cursor-pointer border-2 border-white rounded-[25px] bg-white text-black align-middle"
+        :href="audioUrl"
+        download="recorded-audio.wav"
+      >
         <button>Download Recording</button>
       </a>
     </div>
@@ -75,10 +87,5 @@ button {
 audio {
   margin-top: 10px;
   display: block;
-}
-
-a {
-  margin-top: 10px;
-  display: inline-block;
 }
 </style>
