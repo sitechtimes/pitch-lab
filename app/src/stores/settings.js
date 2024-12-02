@@ -83,10 +83,12 @@ export const settingsStore = defineStore("settings", () => {
 
   const updateMicrophone = (deviceId) => {
     selectedMicrophone.value = deviceId;
+    initializeAudio();
   };
 
   const updateSpeaker = (deviceId) => {
     selectedSpeaker.value = deviceId;
+    initializeAudio();
   };
 
   const toggleModal = () => {
