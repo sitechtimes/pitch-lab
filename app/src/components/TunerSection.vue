@@ -32,12 +32,14 @@
     </div>
 
     <!-- Tuning Scale -->
-    <div v-if="pitch" class="mt-8">
+    <div class="mt-8">
       <div
         class="scale-container relative w-96 h-6 bg-gray-900 rounded overflow-hidden"
       >
-        <!-- Center line -->
-        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-green-500"></div>
+        <div
+          class="absolute top-0 bottom-0 left-1/2 w-0.5"
+          :class="pitch ? 'bg-green-500' : 'bg-transparent'"
+        ></div>
         <!-- Notch Lines -->
         <div v-for="i in 11" :key="i" class="absolute inset-y-0">
           <div
@@ -69,7 +71,6 @@
 import { ref } from "vue";
 import Pitchfinder from "pitchfinder";
 
-// Reactive variables
 const pitch = ref(null);
 const note = ref("");
 const detuneValue = ref(0); // The slider position
@@ -89,6 +90,16 @@ const noteFrequencies = {
   F: 349.23,
 };
 
+const normalizeToBaseOctave = (frequency) => {
+  while (frequency > 523.25) {
+    frequency /= 2;
+  }
+  while (frequency < 261.63) {
+    frequency *= 2;
+  }
+  return frequency;
+};
+
 const startPitchDetection = async () => {
   try {
     // Request microphone input
@@ -99,7 +110,7 @@ const startPitchDetection = async () => {
     analyser.fftSize = 4096;
     source.connect(analyser);
 
-    // Initialize YIN algorithm
+    // YIN algorithm
     const pitchFinder = Pitchfinder.YIN({
       sampleRate: audioContext.sampleRate,
     });
@@ -111,12 +122,17 @@ const startPitchDetection = async () => {
       const detectedPitch = pitchFinder(dataArray);
 
       if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-        const targetFrequency = selectedNote.value;
-        const detune = 1200 * Math.log2(detectedPitch / targetFrequency); // Detune in cents
+        const normalizedPitch = normalizeToBaseOctave(detectedPitch);
+        const normalizedTarget = normalizeToBaseOctave(selectedNote.value);
+
+        const detune = 1200 * Math.log2(normalizedPitch / normalizedTarget); // Detune in cents
         pitch.value = detectedPitch;
+
+        // Determine the note name for display purposes
         note.value = Object.keys(noteFrequencies).find(
-          (key) => noteFrequencies[key] === targetFrequency,
+          (key) => noteFrequencies[key] === selectedNote.value,
         );
+
         detuneValue.value = detune; // Update slider position
 
         // Determine if the pitch is sharp or flat
@@ -124,7 +140,7 @@ const startPitchDetection = async () => {
         isSharp.value = detune > 10; // Sharp if detune is more than 10 cents
 
         console.log(
-          `Pitch detected: ${detectedPitch.toFixed(2)} Hz (Target: ${note.value}, Detune: ${detune.toFixed(2)} cents)`,
+          `Pitch detected: ${detectedPitch.toFixed(2)} Hz (Normalized: ${normalizedPitch.toFixed(2)} Hz, Target: ${note.value}, Detune: ${detune.toFixed(2)} cents)`,
         );
       } else {
         pitch.value = null;
@@ -132,7 +148,6 @@ const startPitchDetection = async () => {
         detuneValue.value = 0; // Reset slider
         isFlat.value = false;
         isSharp.value = false;
-        console.log("No pitch detected.");
       }
 
       requestAnimationFrame(detect);
@@ -145,103 +160,6 @@ const startPitchDetection = async () => {
   }
 };
 </script>
-
-<!-- 
-<script setup>
-import { ref } from "vue";
-import Pitchfinder from "pitchfinder";
-
-// Reactive variables
-const pitch = ref(null);
-const note = ref("");
-const detuneValue = ref(0); // The slider position
-const isFlat = ref(false);
-const isSharp = ref(false);
-
-let audioContext = null;
-let analyser = null;
-
-// Start pitch detection
-const startPitchDetection = async () => {
-  try {
-    // Request microphone input
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(stream);
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 4096;
-    source.connect(analyser);
-
-    // Initialize YIN algorithm
-    const pitchFinder = Pitchfinder.YIN({
-      sampleRate: audioContext.sampleRate,
-    });
-
-    // Define note names
-    const noteNames = [
-      "C",
-      "C#",
-      "D",
-      "D#",
-      "E",
-      "F",
-      "F#",
-      "G",
-      "G#",
-      "A",
-      "A#",
-      "B",
-    ];
-
-    // Helper function to get note name and offset
-    const getNoteDetails = (frequency) => {
-      const A4 = 440; // Frequency of A4
-      const semitone = 12 * Math.log2(frequency / A4);
-      const noteIndex = Math.round(semitone) + 69; // MIDI note number
-      const octave = Math.floor(noteIndex / 12) - 1;
-      const note = noteNames[noteIndex % 12];
-      const detune = (semitone - Math.round(semitone)) * 100; // In cents
-      return { note: `${note}${octave}`, detune };
-    };
-
-    const dataArray = new Float32Array(analyser.fftSize);
-    const detect = () => {
-      analyser.getFloatTimeDomainData(dataArray);
-      const detectedPitch = pitchFinder(dataArray);
-
-      if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-        const { note: detectedNote, detune } = getNoteDetails(detectedPitch);
-
-        pitch.value = detectedPitch;
-        note.value = detectedNote;
-        detuneValue.value = detune; // Update slider position
-
-        // Determine if the pitch is sharp or flat
-        isFlat.value = detune < -10; // Flat if detune is less than -10 cents
-        isSharp.value = detune > 10; // Sharp if detune is more than 10 cents
-
-        console.log(
-          `Pitch detected: ${detectedPitch.toFixed(2)} Hz (Note: ${note.value}, Detune: ${detune.toFixed(2)} cents)`,
-        );
-      } else {
-        pitch.value = null;
-        note.value = "No pitch detected";
-        detuneValue.value = 0; // Reset slider
-        isFlat.value = false;
-        isSharp.value = false;
-        console.log("No pitch detected.");
-      }
-
-      requestAnimationFrame(detect);
-    };
-
-    detect();
-  } catch (err) {
-    console.error("Error accessing microphone: ", err);
-    alert("Could not access your microphone. Please allow microphone access.");
-  }
-};
-</script> -->
 
 <style scoped>
 .scale-container {
