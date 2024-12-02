@@ -3,10 +3,20 @@
     <div>
       <h1 class="text-white text-3xl">Recorder</h1>
       <div class="mt-6">
-        <label for="note-selection" class="text-gray-400 mr-4">Tune to:</label>
+        <label for="note-selection" class="text-gray-400 mr-4">History</label>
         <select class="bg-gray-700 text-white p-2 rounded">
           History
         </select>
+      </div>
+    </div>
+    <div class="flex flex-col">
+      <!-- Timer display -->
+      <div class="text-black bg-white my-4 p-2 rounded">
+        Timer: {{ formatTime(timer) }}
+      </div>
+      <div class="bg-[#120E1D] rounded-full text-white flex justify-between">
+        <p>HIIII</p>
+        <p>HIIII</p>
       </div>
     </div>
     <div class="flex w-[30%] flex-col my-2">
@@ -35,6 +45,7 @@
       </a>
     </div>
   </div>
+  <!-- Timer section -->
 </template>
 
 <script setup>
@@ -42,8 +53,10 @@ import { ref } from "vue";
 
 const isRecording = ref(false);
 const audioUrl = ref(null);
+const timer = ref(0);
 let mediaRecorder = null;
 let audioChunks = [];
+let timerInterval = null;
 
 const pastHistory = {};
 
@@ -68,6 +81,7 @@ const startRecording = async () => {
     // Start recording
     mediaRecorder.start();
     isRecording.value = true;
+    startTimer();
   } catch (err) {
     console.error("Error accessing microphone:", err);
     alert("Could not access microphone. Please check permissions.");
@@ -79,7 +93,25 @@ const stopRecording = () => {
   if (mediaRecorder) {
     mediaRecorder.stop();
     isRecording.value = false;
+    stopTimer();
   }
+};
+
+const startTimer = () => {
+  timer.value = 0;
+  timerInterval = setInterval(() => {
+    timer.value++;
+  }, 1000);
+};
+
+const stopTimer = () => {
+  clearInterval(timerInterval);
+};
+
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
 </script>
 
@@ -97,6 +129,13 @@ audio {
 
 a {
   margin-top: 10px;
-  display: inline-block;
+}
+
+.text-black {
+  color: black;
+}
+
+.bg-white {
+  background-color: white;
 }
 </style>
