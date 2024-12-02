@@ -18,11 +18,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "MoodIndicators",
-};
-</script>
+<script setup></script>
 
 <style scoped>
 /* Add custom styles if necessary */
