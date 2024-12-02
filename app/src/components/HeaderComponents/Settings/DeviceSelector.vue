@@ -66,6 +66,7 @@
 <script setup>
 import { settingsStore } from "../../../stores/settings.js";
 import { onMounted } from "vue";
+import AudioSliderController from "./AudioSliderController.vue";
 
 const store = settingsStore();
 

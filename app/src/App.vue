@@ -1,22 +1,25 @@
 <template>
   <div class="w-screen bg-[#2A283B]">
     <header class="flex justify-between">
-      <h1 class="text-white text-5xl m-6">Pitch Lab</h1>
-      <!-- HeaderTitle -->
+      <HeaderTitle />
       <SettingsIcon />
     </header>
+
     <DeviceSelector
       v-if="settings.showModal"
       name="History"
       class="absolute inset-0 bg-black/30 p-4"
     />
-    <div class="flex justify-center">
-      <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
-        <AudioRecorder class="ml-9 w-[30%]" />
+
+    <body>
+      <div class="flex justify-center">
+        <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
+          <AudioRecorder class="ml-9 w-[30%]" />
+        </div>
+        <!-- add metronome and tuner thingy here -->
       </div>
-    </div>
-    <AudioRecorder />
-    <AudioController />
+    </body>
+
     <TunerSection />
     <RouterView />
   </div>
