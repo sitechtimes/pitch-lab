@@ -21,14 +21,14 @@
 </template>
 
 <script setup>
-import AudioRecorder from "./components/AudioRecorder.vue";
-import DeviceSelector from "./components/DeviceSelector.vue";
-import SettingsIcon from "./components/SettingsIcon.vue";
+import AudioRecorder from "./components/HeaderComponents/AudioRecorder.vue";
+import DeviceSelector from "./components/HeaderComponents/Settings/DeviceSelector.vue";
+import SettingsIcon from "./components/HeaderComponents/Settings/SettingsIcon.vue";
 import { settingsStore } from "./stores/settings.js";
 
 const settings = settingsStore();
 
-import TunerSection from "./components/TunerSection.vue";
+import TunerSection from "./components/TunerComponents/TunerSection.vue";
 </script>
 
 <style scoped></style>
