@@ -1,60 +1,40 @@
-<script setup>
-import AudioRecorder from "./components/AudioRecorder.vue";
-import DeviceSelector from "./components/DeviceSelector.vue";
-import { settingsStore } from "./stores/settings.js";
-
-const settings = settingsStore();
-import TunerSection from "./components/TunerSection.vue";
-</script>
-
 <template>
-  <div>
-    <header>
-      <div class="wrapper">
-        <nav></nav>
-      </div>
+  <div class="w-screen bg-[#2A283B]">
+    <header class="flex justify-between">
+      <HeaderTitle />
+      <SettingsIcon />
     </header>
-    <AudioRecorder />
+
+    <DeviceSelector
+      v-if="settings.showModal"
+      name="History"
+      class="absolute inset-0 bg-black/30 p-4"
+    />
+
+    <body>
+      <div class="flex justify-center">
+        <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
+          <AudioRecorder class="ml-9 w-[30%]" />
+        </div>
+        <!-- add metronome and tuner thingy here -->
+      </div>
+    </body>
+
     <TunerSection />
     <RouterView />
-    <button @click="settings.showModal = !settings.showModal">HIIIIII</button>
-    <DeviceSelector v-if="settings.showModal" />
   </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<script setup>
+import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
+import AudioRecorder from "./components/BodyComponents/AudioRecorder.vue";
+import DeviceSelector from "./components/HeaderComponents/Settings/DeviceSelector.vue";
+import SettingsIcon from "./components/HeaderComponents/Settings/SettingsIcon.vue";
+import { settingsStore } from "./stores/settings.js";
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+const settings = settingsStore();
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
+import TunerSection from "./components/TunerComponents/TunerSection.vue";
+</script>
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-</style>
+<style scoped></style>

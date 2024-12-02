@@ -64,8 +64,9 @@
 </template>
 
 <script setup>
-import { settingsStore } from "../stores/settings.js";
+import { settingsStore } from "../../../stores/settings.js";
 import { onMounted } from "vue";
+import AudioSliderController from "./AudioSliderController.vue";
 
 const store = settingsStore();
 
@@ -86,6 +87,12 @@ const updateMicrophone = () => {
 
 const updateSpeaker = () => {
   store.updateSpeaker(store.selectedSpeaker);
+};
+
+const saveSettings = () => {
+  updateMicrophone();
+  updateSpeaker();
+  closeModal();
 };
 </script>
 

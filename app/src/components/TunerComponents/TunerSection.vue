@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white"
-  >
+  <div class="flex flex-col items-center justify-center bg-gray-800 text-white">
     <h1 class="text-3xl font-bold text-gray-200 mb-6">Pitch Finder</h1>
     <p class="text-gray-400 mb-4">
       Click the button below to start detecting pitch.
@@ -36,10 +34,8 @@
       <div
         class="scale-container relative w-96 h-6 bg-gray-900 rounded overflow-hidden"
       >
-        <div
-          class="absolute top-0 bottom-0 left-1/2 w-0.5"
-          :class="pitch ? 'bg-green-500' : 'bg-transparent'"
-        ></div>
+        <!-- Center line always visible -->
+        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-green-500"></div>
         <!-- Notch Lines -->
         <div v-for="i in 11" :key="i" class="absolute inset-y-0">
           <div
@@ -51,7 +47,7 @@
             class="h-full w-0.5 bg-gray-500"
           ></div>
         </div>
-        <!-- Slider -->
+        <!-- Slider for Detune Value -->
         <div
           :style="{ transform: `translateX(${detuneValue}px)` }"
           class="slider w-2 h-6 bg-blue-500 absolute top-0 left-1/2 -translate-x-1/2"
@@ -66,7 +62,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref } from "vue";
 import Pitchfinder from "pitchfinder";
@@ -142,12 +137,6 @@ const startPitchDetection = async () => {
         console.log(
           `Pitch detected: ${detectedPitch.toFixed(2)} Hz (Normalized: ${normalizedPitch.toFixed(2)} Hz, Target: ${note.value}, Detune: ${detune.toFixed(2)} cents)`,
         );
-      } else {
-        pitch.value = null;
-        note.value = "No pitch detected";
-        detuneValue.value = 0; // Reset slider
-        isFlat.value = false;
-        isSharp.value = false;
       }
 
       requestAnimationFrame(detect);
