@@ -36,7 +36,6 @@
       <div
         class="scale-container relative w-96 h-6 bg-gray-900 rounded overflow-hidden"
       >
-        <!-- Center line -->
         <div
           class="absolute top-0 bottom-0 left-1/2 w-0.5"
           :class="pitch ? 'bg-green-500' : 'bg-transparent'"
@@ -72,7 +71,6 @@
 import { ref } from "vue";
 import Pitchfinder from "pitchfinder";
 
-// Reactive variables
 const pitch = ref(null);
 const note = ref("");
 const detuneValue = ref(0); // The slider position
@@ -112,7 +110,7 @@ const startPitchDetection = async () => {
     analyser.fftSize = 4096;
     source.connect(analyser);
 
-    // Initialize YIN algorithm
+    // YIN algorithm
     const pitchFinder = Pitchfinder.YIN({
       sampleRate: audioContext.sampleRate,
     });
@@ -150,8 +148,6 @@ const startPitchDetection = async () => {
         detuneValue.value = 0; // Reset slider
         isFlat.value = false;
         isSharp.value = false;
-
-        // console.log("No pitch detected.");
       }
 
       requestAnimationFrame(detect);
