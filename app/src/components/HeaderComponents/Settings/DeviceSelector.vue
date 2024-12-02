@@ -87,6 +87,12 @@ const updateMicrophone = () => {
 const updateSpeaker = () => {
   store.updateSpeaker(store.selectedSpeaker);
 };
+
+const saveSettings = () => {
+  updateMicrophone();
+  updateSpeaker();
+  closeModal();
+};
 </script>
 
 <style scoped></style>
