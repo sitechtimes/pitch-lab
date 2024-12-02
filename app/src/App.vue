@@ -5,6 +5,16 @@
       <!-- HeaderTitle -->
       <SettingsIcon />
     </header>
+    <DeviceSelector
+      v-if="settings.showModal"
+      name="History"
+      class="absolute inset-0 bg-black/30 p-4"
+    />
+    <div class="flex justify-center">
+      <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
+        <AudioRecorder class="ml-9 w-[30%]" />
+      </div>
+    </div>
     <AudioRecorder />
     <AudioController />
     <TunerSection />

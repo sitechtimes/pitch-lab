@@ -79,6 +79,7 @@ const startRecording = async () => {
     mediaRecorder.onstop = () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
       audioUrl.value = URL.createObjectURL(audioBlob);
+      settings.pastAudio.push(audioUrl.value);
     };
 
     mediaRecorder.start();
