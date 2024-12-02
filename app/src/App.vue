@@ -11,14 +11,12 @@
       class="absolute inset-0 bg-black/30 p-4"
     />
 
-    <body>
-      <div class="flex justify-center">
-        <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
-          <AudioRecorder class="ml-9 w-[30%]" />
-        </div>
-        <!-- add metronome and tuner thingy here -->
+    <div class="flex justify-center">
+      <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
+        <AudioRecorder class="ml-9 w-[30%]" />
       </div>
-    </body>
+      <!-- add metronome and tuner thingy here -->
+    </div>
 
     <TunerSection />
     <RouterView />
