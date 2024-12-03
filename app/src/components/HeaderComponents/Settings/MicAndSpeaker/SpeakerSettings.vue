@@ -20,6 +20,23 @@
         </option>
       </select>
     </div>
+
+    <!-- slider -->
+    <div class="audio-controls">
+      <div>
+        <label for="output-volume"
+          >Output Volume (Speaker): {{ outputVolume.toFixed(2) }}</label
+        >
+        <input
+          id="output-volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          v-model="outputVolume"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -28,6 +45,11 @@ import { settingsStore } from "../../../../stores/settings.js";
 import { onMounted } from "vue";
 
 const store = settingsStore();
+
+const outputVolume = computed({
+  get: () => store.outputVolume,
+  set: (value) => store.setOutputVolume(value),
+});
 
 // Fetch devices when the modal is shown
 onMounted(() => {

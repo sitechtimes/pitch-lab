@@ -1,7 +1,6 @@
 <template>
   <div
     class="device-selector fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-    v-if="store.showModal"
   >
     <!-- Modal Header -->
     <h2 class="text-2xl text-white font-semibold mb-4">Select Devices</h2>
