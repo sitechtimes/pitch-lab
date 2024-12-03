@@ -4,7 +4,7 @@ import { ref } from "vue";
 
 const bpm = ref(120); // Default tempo
 const beatsPerMeasure = ref(4); // Default beats per measure
-const beatOptions = [2, 3, 4, 5, 6, 7, 8]; // Dropdown options for beats per measure
+const beatOptions = [2 / 4, 3 / 4, 4 / 4, 5 / 4, 3 / 8]; // Dropdown options for beats per measure
 const isPlaying = ref(false);
 let loop;
 let currentBeat = 0; // Tracks the current beat in the measure
