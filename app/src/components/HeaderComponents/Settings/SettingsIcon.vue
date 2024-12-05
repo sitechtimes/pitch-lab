@@ -1,5 +1,5 @@
 <template>
-  <button class="mr-24 text-white" @click="toggleSettings">
+  <button class="mr-24 text-white" @click="settings.toggleModal">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -22,8 +22,4 @@
 import { settingsStore } from "../../../stores/settings.js";
 
 const settings = settingsStore();
-
-const toggleSettings = () => {
-  settings.toggleModal();
-};
 </script>
