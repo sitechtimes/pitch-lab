@@ -4,8 +4,17 @@
       <h1 class="text-white text-3xl">Recorder</h1>
       <div class="mt-6">
         <label for="note-selection" class="text-gray-400 mr-4">History</label>
-        <select class="bg-gray-700 text-white p-2 rounded">
+        <select
+          class="bg-gray-700 text-white p-2 rounded"
+          v-bind="currentAudio"
+          v-for="file in store.pastAudio"
+          :key="file"
+        >
           History
+          <option :value="file.audio">
+            {{ file.name }} recorded on {{ file.date }}
+            <button>delete</button>
+          </option>
         </select>
       </div>
     </div>
@@ -37,12 +46,15 @@
     </div>
 
     <!-- Display recorded audio playback and download link -->
-    <div v-if="audioUrl">
+    <div v-if="currentAudio">
       <h3>Recorded Audio:</h3>
-      <audio :src="audioUrl" controls></audio>
-      <a :href="audioUrl" download="recorded-audio.wav">
+      <audio :src="currentAudio" controls></audio>
+      <a :href="currentAudio" download="recorded-audio.wav">
         <button>Download Recording</button>
       </a>
+
+      <input type="text" v-bind="fileName" />
+      <button @click="saveAudio">save to history</button>
     </div>
   </div>
   <!-- Timer section -->
@@ -50,15 +62,17 @@
 
 <script setup>
 import { ref } from "vue";
+import { settingsStore } from "@/stores/settings";
+const store = settingsStore();
 
+const fileName = ref(null);
+const currentAudio = ref(null);
 const isRecording = ref(false);
 const audioUrl = ref(null);
 const timer = ref(0);
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
-
-const pastHistory = {};
 
 const startRecording = async () => {
   try {
@@ -76,6 +90,7 @@ const startRecording = async () => {
     mediaRecorder.onstop = () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
       audioUrl.value = URL.createObjectURL(audioBlob); // Create audio URL for playback
+      currentAudio.value = audioUrl.value;
     };
 
     // Start recording
@@ -112,6 +127,23 @@ const formatTime = (seconds) => {
   const minutes = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+};
+
+const saveAudio = () => {
+  if (store.pastAudio.find((file) => file.audio === currentAudio.value)) {
+    store.pastAudio.find((file) => file.audio === currentAudio.value).name =
+      fileName.value;
+    fileName.value = null;
+  } else {
+    store.pastAudio.push({
+      id: store.assignedID,
+      name: fileName.value,
+      audio: currentAudio.value,
+      date: new Date().toLocaleDateString,
+    });
+    store.assignedID = store.assignedID + 1;
+    fileName.value = null;
+  }
 };
 </script>
 

@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 
 export const settingsStore = defineStore("settings", () => {
+  const assignedID = ref(0);
   const pastAudio = ref([]);
   const microphones = ref([]);
   const speakers = ref([]);
@@ -97,6 +98,7 @@ export const settingsStore = defineStore("settings", () => {
   };
 
   return {
+    assignedID,
     pastAudio,
     microphones,
     speakers,
