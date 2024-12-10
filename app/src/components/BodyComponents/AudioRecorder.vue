@@ -6,12 +6,14 @@
         <label for="note-selection" class="text-gray-400 mr-4">History</label>
         <select
           class="bg-gray-700 text-white p-2 rounded"
-          v-bind="currentAudio"
-          v-for="file in store.pastAudio"
-          :key="file"
+          v-model="currentAudio"
         >
           History
-          <option :value="file.audio">
+          <option
+            v-for="file in store.pastAudio"
+            :key="file.id"
+            :value="file.audio"
+          >
             {{ file.name }} recorded on {{ file.date }}
             <button>delete</button>
           </option>
@@ -131,15 +133,18 @@ const formatTime = (seconds) => {
 
 const saveAudio = () => {
   if (store.pastAudio.find((file) => file.audio === currentAudio.value)) {
+    console.log("found dupe maybe");
     store.pastAudio.find((file) => file.audio === currentAudio.value).name =
       fileName.value;
     fileName.value = null;
   } else {
+    console.log("creating smth new");
+    let date = new Date();
     store.pastAudio.push({
       id: store.assignedID,
       name: fileName.value,
       audio: currentAudio.value,
-      date: new Date().toLocaleDateString,
+      date: date.toLocaleDateString(),
     });
     store.assignedID = store.assignedID + 1;
     fileName.value = null;
