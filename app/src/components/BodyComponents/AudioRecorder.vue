@@ -12,10 +12,9 @@
           <option
             v-for="file in store.pastAudio"
             :key="file.id"
-            :value="file.audio"
+            :value="{ audio: file.audio, id: file.id }"
           >
             {{ file.name }} recorded on {{ file.date }}
-            <button>delete</button>
           </option>
         </select>
       </div>
@@ -50,13 +49,14 @@
     <!-- Display recorded audio playback and download link -->
     <div v-if="currentAudio">
       <h3>Recorded Audio:</h3>
-      <audio :src="currentAudio" controls></audio>
-      <a :href="currentAudio" download="recorded-audio.wav">
+      <audio :src="currentAudio.audio" controls></audio>
+      <a :href="currentAudio.audio" download="recorded-audio.wav">
         <button>Download Recording</button>
       </a>
 
       <input type="text" v-bind="fileName" />
       <button @click="saveAudio">save to history</button>
+      <button @click="deleteAudio">delete</button>
     </div>
   </div>
   <!-- Timer section -->
@@ -132,10 +132,14 @@ const formatTime = (seconds) => {
 };
 
 const saveAudio = () => {
-  if (store.pastAudio.find((file) => file.audio === currentAudio.value)) {
+  let index;
+  if (
+    (index = store.pastAudio.findIndex(
+      (file) => file.audio === currentAudio.value,
+    )) !== -1
+  ) {
     console.log("found dupe maybe");
-    store.pastAudio.find((file) => file.audio === currentAudio.value).name =
-      fileName.value;
+    store.pastAudio[index].name = fileName.value;
     fileName.value = null;
   } else {
     console.log("creating smth new");
@@ -148,6 +152,25 @@ const saveAudio = () => {
     });
     store.assignedID = store.assignedID + 1;
     fileName.value = null;
+  }
+};
+
+const deleteAudio = () => {
+  let index;
+  if (currentAudio.value.id) {
+    console.log("found it");
+    index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
+    store.recentlyDeleted.push(store.pastAudio[index]);
+    store.pastAudio.splice(index, 1);
+  } else {
+    console.log("deleting smth new");
+    let date = new Date();
+    store.recentlyDeleted.push({
+      id: store.assignedID,
+      name: fileName.value,
+      audio: currentAudio.value,
+      date: date.toLocaleDateString(),
+    });
   }
 };
 </script>

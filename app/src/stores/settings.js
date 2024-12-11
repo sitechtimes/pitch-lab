@@ -6,6 +6,7 @@ export const settingsStore = defineStore(
   () => {
     const assignedID = ref(0);
     const pastAudio = ref([]);
+    const recentlyDeleted = ref([]);
     const microphones = ref([]);
     const speakers = ref([]);
     const selectedMicrophone = ref(null);
@@ -104,6 +105,7 @@ export const settingsStore = defineStore(
     return {
       assignedID,
       pastAudio,
+      recentlyDeleted,
       microphones,
       speakers,
       selectedMicrophone,
