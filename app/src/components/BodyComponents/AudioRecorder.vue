@@ -49,12 +49,17 @@
     <!-- Display recorded audio playback and download link -->
     <div v-if="currentAudio">
       <h3>Recorded Audio:</h3>
-      <audio :src="currentAudio.audio" controls></audio>
-      <a :href="currentAudio.audio" download="recorded-audio.wav">
+      <audio
+        :src="'data:audio/wav;base64,' + currentAudio.audio"
+        controls
+      ></audio>
+      <a
+        :href="'data:audio/wav;base64,' + currentAudio.audio"
+        download="recorded-audio.wav"
+      >
         <button>Download Recording</button>
       </a>
-
-      <input type="text" v-bind="fileName" />
+      <input type="text" v-model="fileName" />
       <button @click="saveAudio">save to history</button>
       <button @click="deleteAudio">delete</button>
     </div>
@@ -70,7 +75,6 @@ const store = settingsStore();
 const fileName = ref(null);
 const currentAudio = ref(null);
 const isRecording = ref(false);
-const audioUrl = ref(null);
 const timer = ref(0);
 let mediaRecorder = null;
 let audioChunks = [];
@@ -91,8 +95,12 @@ const startRecording = async () => {
 
     mediaRecorder.onstop = () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-      audioUrl.value = URL.createObjectURL(audioBlob); // Create audio URL for playback
-      currentAudio.value = audioUrl.value;
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Audio = reader.result.split(",")[1]; // Extract the base64 part
+        currentAudio.value = { audio: base64Audio, id: Date.now() }; // Store the base64 string with id
+      };
+      reader.readAsDataURL(audioBlob); // Convert Blob to Base64 string
     };
 
     // Start recording
@@ -147,7 +155,7 @@ const saveAudio = () => {
     store.pastAudio.push({
       id: store.assignedID,
       name: fileName.value,
-      audio: currentAudio.value,
+      audio: currentAudio.value.audio,
       date: date.toLocaleDateString(),
     });
     store.assignedID = store.assignedID + 1;

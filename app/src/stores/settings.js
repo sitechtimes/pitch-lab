@@ -131,6 +131,7 @@ export const settingsStore = defineStore(
         {
           storage: localStorage, // Use localStorage to persist the state
           paths: [
+            "recentlyDeleted",
             "pastAudio",
             "microphones",
             "speakers",
