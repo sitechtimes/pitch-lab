@@ -26,7 +26,7 @@
 <script setup>
 import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
 import AudioRecorder from "./components/BodyComponents/AudioRecorder.vue";
-import DeviceSelector from "./components/HeaderComponents/Settings/DeviceSelector.vue";
+import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import { settingsStore } from "./stores/settings.js";
 
