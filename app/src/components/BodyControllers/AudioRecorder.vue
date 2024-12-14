@@ -24,10 +24,6 @@
       <div class="text-black bg-white my-4 p-2 rounded">
         Timer: {{ formatTime(timer) }}
       </div>
-      <div class="bg-[#120E1D] rounded-full text-white flex justify-between">
-        <p>HIIII</p>
-        <p>HIIII</p>
-      </div>
     </div>
     <div class="flex w-[30%] flex-col my-2">
       <button
@@ -147,11 +143,18 @@ const saveAudio = () => {
     )) !== -1
   ) {
     console.log("found dupe maybe");
-    store.pastAudio[index].name = fileName.value;
-    fileName.value = null;
+    if (fileName.value.trim() !== null && undefined) {
+      store.pastAudio[index].name = fileName.value;
+    }
   } else {
     console.log("creating smth new");
     let date = new Date();
+
+    if (fileName.value.trim() !== null && undefined) {
+    } else {
+      fileName.value = `Untitled Recording ${store.assignedID}`;
+    }
+
     store.pastAudio.push({
       id: store.assignedID,
       name: fileName.value,
@@ -159,13 +162,14 @@ const saveAudio = () => {
       date: date.toLocaleDateString(),
     });
     store.assignedID = store.assignedID + 1;
-    fileName.value = null;
   }
+  fileName.value = null;
 };
 
 const deleteAudio = () => {
   let index;
-  if (currentAudio.value.id) {
+  console.log(currentAudio.value.id);
+  if (currentAudio.value.id || currentAudio.value.id === 0) {
     console.log("found it");
     index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
     store.recentlyDeleted.push(store.pastAudio[index]);
@@ -180,6 +184,7 @@ const deleteAudio = () => {
       date: date.toLocaleDateString(),
     });
   }
+  currentAudio.value = null;
 };
 </script>
 
