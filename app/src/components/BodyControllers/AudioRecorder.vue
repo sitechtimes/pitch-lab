@@ -11,7 +11,6 @@
         >
           History
           <option
-            @click="viewingHistory = true"
             v-for="file in store.pastAudio"
             :key="file.id"
             :value="{ audio: file.audio, id: file.id }"
@@ -59,7 +58,15 @@
       </a>
       <input type="text" v-model="fileName" />
       <button @click="saveAudio" v-if="viewingHistory">Rename File</button>
-      <button @click="viewingHistory = false" v-if="viewingHistory">
+      <button
+        @click="
+          () => {
+            viewingHistory = false;
+            currentAudio = null;
+          }
+        "
+        v-if="viewingHistory"
+      >
         Exit History
       </button>
       <button @click="saveAudio" v-if="!viewingHistory">Save To History</button>
