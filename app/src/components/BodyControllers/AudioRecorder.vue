@@ -150,7 +150,7 @@ const saveAudio = () => {
     console.log("creating smth new");
     let date = new Date();
 
-    if (fileName.value.trim() !== null && undefined) {
+    if (fileName.value !== null && undefined) {
     } else {
       fileName.value = `Untitled Recording ${store.assignedID}`;
     }
