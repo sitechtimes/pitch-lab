@@ -29,14 +29,14 @@
       <button
         class="bg-[#36C4E4] rounded-full"
         @click="startRecording"
-        :disabled="isRecording"
+        v-if="!isRecording"
       >
         Start Recording
       </button>
       <button
         class="bg-[#A3D10A] rounded-full"
         @click="stopRecording"
-        :disabled="!isRecording"
+        v-if="isRecording"
       >
         Stop Recording
       </button>
