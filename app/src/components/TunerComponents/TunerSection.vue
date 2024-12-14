@@ -98,11 +98,17 @@ const normalizeToBaseOctave = (frequency) => {
 const startPitchDetection = async () => {
   try {
     // Request microphone input
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        autoGainControl: false,
+        noiseSuppression: false,
+        echoCancellation: false,
+      },
+    });
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
-    analyser.fftSize = 4096;
+    analyser.fftSize = 8192;
     source.connect(analyser);
 
     // YIN algorithm
@@ -110,32 +116,66 @@ const startPitchDetection = async () => {
       sampleRate: audioContext.sampleRate,
     });
 
+    const highPassFilter = audioContext.createBiquadFilter();
+    highPassFilter.type = "highpass";
+    highPassFilter.frequency.value = 50; // Filter out frequencies below 50 Hz
+    source.connect(highPassFilter).connect(analyser);
+
+    // detect amplitude
+    const calculatePeakAmplitude = (dataArray) => {
+      return Math.max(...dataArray.map(Math.abs));
+    };
+
     // Detect pitch
     const dataArray = new Float32Array(analyser.fftSize);
+
+    const pitchBuffer = [];
+    const isConstantPitch = () => {
+      if (pitchBuffer.length < 10) return false; // Require a sufficient number of samples
+      const meanPitch =
+        pitchBuffer.reduce((a, b) => a + b, 0) / pitchBuffer.length;
+      const deviation = pitchBuffer.every((p) => Math.abs(p - meanPitch) < 1); // Allow slight variation
+      return deviation;
+    };
+
     const detect = () => {
       analyser.getFloatTimeDomainData(dataArray);
+
+      // Calculate peak amplitude
+      const peakAmplitude = calculatePeakAmplitude(dataArray);
+
+      // Set a threshold for significant signals
+      const amplitudeThreshold = 0.02; // Adjust this based on testing
+      if (peakAmplitude < amplitudeThreshold) {
+        console.log("Weak signal detected. Ignoring noise.");
+        requestAnimationFrame(detect); // Continue loop without processing pitch
+        return;
+      }
+
       const detectedPitch = pitchFinder(dataArray);
 
       if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
+        pitchBuffer.push(detectedPitch);
+        if (pitchBuffer.length > 10) pitchBuffer.shift(); // Maintain buffer size
+
         const normalizedPitch = normalizeToBaseOctave(detectedPitch);
         const normalizedTarget = normalizeToBaseOctave(selectedNote.value);
 
-        const detune = 1200 * Math.log2(normalizedPitch / normalizedTarget); // Detune in cents
+        const detune = 1200 * Math.log2(normalizedPitch / normalizedTarget);
         pitch.value = detectedPitch;
 
-        // Determine the note name for display purposes
         note.value = Object.keys(noteFrequencies).find(
           (key) => noteFrequencies[key] === selectedNote.value,
         );
 
-        detuneValue.value = detune; // Update slider position
+        detuneValue.value = detune;
 
-        // Determine if the pitch is sharp or flat
-        isFlat.value = detune < -10; // Flat if detune is less than -10 cents
-        isSharp.value = detune > 10; // Sharp if detune is more than 10 cents
+        isFlat.value = detune < -10;
+        isSharp.value = detune > 10;
 
+        const constant = isConstantPitch();
         console.log(
-          `Pitch detected: ${detectedPitch.toFixed(2)} Hz (Normalized: ${normalizedPitch.toFixed(2)} Hz, Target: ${note.value}, Detune: ${detune.toFixed(2)} cents)`,
+          `Pitch detected: ${detectedPitch.toFixed(2)} Hz, Constant: ${constant}`,
         );
       }
 
