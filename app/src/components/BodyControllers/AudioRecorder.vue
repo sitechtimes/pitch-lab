@@ -7,9 +7,11 @@
         <select
           class="bg-gray-700 text-white p-2 rounded"
           v-model="currentAudio"
+          @click="viewingHistory = true"
         >
           History
           <option
+            @click="viewingHistory = true"
             v-for="file in store.pastAudio"
             :key="file.id"
             :value="{ audio: file.audio, id: file.id }"
@@ -29,14 +31,14 @@
       <button
         class="bg-[#36C4E4] rounded-full"
         @click="startRecording"
-        v-if="!isRecording"
+        v-if="!isRecording && !viewingHistory"
       >
         Start Recording
       </button>
       <button
         class="bg-[#A3D10A] rounded-full"
         @click="stopRecording"
-        v-if="isRecording"
+        v-if="isRecording && !viewingHistory"
       >
         Stop Recording
       </button>
@@ -56,8 +58,12 @@
         <button>Download Recording</button>
       </a>
       <input type="text" v-model="fileName" />
-      <button @click="saveAudio">save to history</button>
-      <button @click="deleteAudio">delete</button>
+      <button @click="saveAudio" v-if="viewingHistory">Rename File</button>
+      <button @click="viewingHistory = false" v-if="viewingHistory">
+        Exit History
+      </button>
+      <button @click="saveAudio" v-if="!viewingHistory">Save To History</button>
+      <button @click="deleteAudio">Delete</button>
     </div>
   </div>
   <!-- Timer section -->
@@ -72,6 +78,7 @@ const fileName = ref(null);
 const currentAudio = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
+const viewingHistory = ref(false);
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
