@@ -7,7 +7,7 @@
         <select
           class="bg-gray-700 text-white p-2 rounded"
           v-model="currentAudio"
-          @click="viewingHistory = true"
+          @click="checkAudio"
         >
           History
           <option
@@ -149,6 +149,12 @@ const formatTime = (seconds) => {
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
 
+const checkAudio = () => {
+  if (currentAudio.value) {
+    viewingHistory.value = true;
+  }
+};
+
 const saveAudio = () => {
   let index;
   if (
@@ -202,6 +208,7 @@ const deleteAudio = () => {
     });
   }
   currentAudio.value = null;
+  viewingHistory.value = false;
 };
 </script>
 
