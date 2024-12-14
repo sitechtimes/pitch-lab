@@ -43,7 +43,7 @@
     </div>
 
     <!-- Display recorded audio playback and download link -->
-    <div v-if="currentAudio">
+    <div v-if="currentAudio && !isRecording">
       <h3>Recorded Audio:</h3>
       <audio
         :src="'data:audio/wav;base64,' + currentAudio.audio"
@@ -94,7 +94,7 @@ const startRecording = async () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64Audio = reader.result.split(",")[1]; // Extract the base64 part
-        currentAudio.value = { audio: base64Audio, id: Date.now() }; // Store the base64 string with id
+        currentAudio.value = { audio: base64Audio, id: store.assignedID }; // Store the base64 string with id
       };
       reader.readAsDataURL(audioBlob); // Convert Blob to Base64 string
     };
@@ -150,14 +150,14 @@ const saveAudio = () => {
     console.log("creating smth new");
     let date = new Date();
 
-    if (fileName.value !== null && undefined) {
+    if (fileName.value !== null) {
     } else {
       fileName.value = `Untitled Recording ${store.assignedID}`;
     }
 
     store.pastAudio.push({
       id: store.assignedID,
-      name: fileName.value,
+      name: fileName.value.trim(),
       audio: currentAudio.value.audio,
       date: date.toLocaleDateString(),
     });
@@ -169,7 +169,10 @@ const saveAudio = () => {
 const deleteAudio = () => {
   let index;
   console.log(currentAudio.value.id);
-  if (currentAudio.value.id || currentAudio.value.id === 0) {
+  if (
+    currentAudio.value.id ||
+    (currentAudio.value.id === 0 && currentAudio.value.id < store.assignedID)
+  ) {
     console.log("found it");
     index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
     store.recentlyDeleted.push(store.pastAudio[index]);
