@@ -54,7 +54,9 @@
         :href="'data:audio/wav;base64,' + currentAudio.audio"
         download="recorded-audio.wav"
       >
-        <button><img :src="url" /></button>
+        <button class="btn btn-ghost">
+          <img :src="url" class="download-icon" />
+        </button>
       </a>
       <input type="text" v-model="fileName" />
       <button @click="saveAudio" v-if="viewingHistory">Rename File</button>
@@ -73,13 +75,12 @@
       <button @click="deleteAudio">Delete</button>
     </div>
   </div>
-  <!-- Timer section -->
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { settingsStore } from "@/stores/settings";
-import url from "../../../public/download-button.jpg";
+import url from "../../../public/download-button.png";
 const store = settingsStore();
 
 const fileName = ref(null);
@@ -236,5 +237,10 @@ a {
 
 .bg-white {
   background-color: white;
+}
+
+.download-icon {
+  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
+  object-fit: contain; /* Ensure the image maintains its aspect ratio */
 }
 </style>
