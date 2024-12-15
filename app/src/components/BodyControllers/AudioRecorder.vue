@@ -54,7 +54,7 @@
         :href="'data:audio/wav;base64,' + currentAudio.audio"
         download="recorded-audio.wav"
       >
-        <button>Download Recording</button>
+        <button><img :src="url" /></button>
       </a>
       <input type="text" v-model="fileName" />
       <button @click="saveAudio" v-if="viewingHistory">Rename File</button>
@@ -79,6 +79,7 @@
 <script setup>
 import { ref } from "vue";
 import { settingsStore } from "@/stores/settings";
+import url from "../../../public/download-button.jpg";
 const store = settingsStore();
 
 const fileName = ref(null);
@@ -159,12 +160,13 @@ const saveAudio = () => {
   let index;
   if (
     (index = store.pastAudio.findIndex(
-      (file) => file.audio === currentAudio.value,
+      (file) => file.audio === currentAudio.value.audio,
     )) !== -1
   ) {
     console.log("found dupe maybe");
-    if (fileName.value.trim() !== null && undefined) {
-      store.pastAudio[index].name = fileName.value;
+    if (fileName.value !== null && !undefined) {
+      store.pastAudio[index].name = fileName.value.trim();
+      console.log(store.pastAudio[index].name);
     }
   } else {
     console.log("creating smth new");
@@ -190,8 +192,8 @@ const deleteAudio = () => {
   let index;
   console.log(currentAudio.value.id);
   if (
-    currentAudio.value.id ||
-    (currentAudio.value.id === 0 && currentAudio.value.id < store.assignedID)
+    (currentAudio.value.id && currentAudio.value.id < store.assignedID) ||
+    currentAudio.value.id === 0
   ) {
     console.log("found it");
     index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
