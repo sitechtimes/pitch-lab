@@ -228,6 +228,7 @@ const deleteAudio = () => {
       "dateDeleted",
       date.toLocaleDateString(),
     );
+    console.log(obj);
     store.recentlyDeleted.push(obj);
     store.pastAudio.splice(index, 1);
   } else {
@@ -239,6 +240,7 @@ const deleteAudio = () => {
       date: date.toLocaleDateString(),
       deletedDate: date.toLocaleDateString(),
     });
+    store.assignedID -= store.assignedID + 1;
   }
   currentAudio.value = null;
   viewingHistory.value = false;
