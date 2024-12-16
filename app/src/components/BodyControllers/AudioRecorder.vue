@@ -52,7 +52,7 @@
       ></audio>
       <a
         :href="'data:audio/wav;base64,' + currentAudio.audio"
-        download="recorded-audio.wav"
+        download="recorded-audio.mp4"
       >
         <button class="btn btn-ghost">
           <img :src="url" class="download-icon" />
