@@ -4,7 +4,14 @@
       <h1 class="text-white text-3xl">Recorder</h1>
       <div class="mt-6">
         <label for="note-selection" class="text-gray-400 mr-4">History</label>
+        <button v-if="!viewingDeleted" @click="viewingDeleted = true">
+          Recently Deleted...
+        </button>
+        <button v-if="viewingDeleted" @click="viewingDeleted = false">
+          Back To History...
+        </button>
         <select
+          v-if="!viewingDeleted"
           class="bg-gray-700 text-white p-2 rounded"
           v-model="currentAudio"
           @click="checkAudio"
@@ -16,6 +23,22 @@
             :value="{ audio: file.audio, id: file.id }"
           >
             {{ file.name }} recorded on {{ file.date }}
+          </option>
+        </select>
+
+        <select
+          v-if="viewingDeleted"
+          class="bg-gray-700 text-white p-2 rounded"
+          v-model="currentAudio"
+          @click="checkAudio"
+        >
+          History
+          <option
+            v-for="file in store.recentlyDeleted"
+            :key="file.id"
+            :value="{ audio: file.audio, id: file.id }"
+          >
+            {{ file.name }} deleted on {{ file.deleteDate }}
           </option>
         </select>
       </div>
@@ -83,6 +106,7 @@ import { settingsStore } from "@/stores/settings";
 import url from "../../../public/download-button.png";
 const store = settingsStore();
 
+const viewingDeleted = ref(false);
 const fileName = ref(null);
 const currentAudio = ref(null);
 const isRecording = ref(false);
@@ -191,6 +215,7 @@ const saveAudio = () => {
 
 const deleteAudio = () => {
   let index;
+  let date = new Date();
   console.log(currentAudio.value.id);
   if (
     (currentAudio.value.id && currentAudio.value.id < store.assignedID) ||
@@ -198,16 +223,21 @@ const deleteAudio = () => {
   ) {
     console.log("found it");
     index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
-    store.recentlyDeleted.push(store.pastAudio[index]);
+    let obj = Object.defineProperty(
+      store.pastAudio[index],
+      "dateDeleted",
+      date.toLocaleDateString(),
+    );
+    store.recentlyDeleted.push(obj);
     store.pastAudio.splice(index, 1);
   } else {
     console.log("deleting smth new");
-    let date = new Date();
     store.recentlyDeleted.push({
       id: store.assignedID,
       name: fileName.value,
       audio: currentAudio.value,
       date: date.toLocaleDateString(),
+      deletedDate: date.toLocaleDateString(),
     });
   }
   currentAudio.value = null;
