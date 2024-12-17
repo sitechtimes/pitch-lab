@@ -16,7 +16,7 @@
           v-model="currentAudio"
           @click="checkAudio"
         >
-          History
+          History:
           <option
             v-for="file in store.pastAudio"
             :key="file.id"
@@ -32,7 +32,7 @@
           v-model="currentAudio"
           @click="checkAudio"
         >
-          History
+          Recently Deleted:
           <option
             v-for="file in store.recentlyDeleted"
             :key="file.id"
@@ -81,8 +81,10 @@
           <img :src="url" class="download-icon" />
         </button>
       </a>
-      <input type="text" v-model="fileName" />
-      <button @click="saveAudio" v-if="viewingHistory">Rename File</button>
+      <input type="text" v-model="fileName" v-if="!viewingDeleted" />
+      <button @click="saveAudio" v-if="viewingHistory && !viewingDeleted">
+        Rename File
+      </button>
       <button
         @click="
           () => {
@@ -95,7 +97,11 @@
         Exit History
       </button>
       <button @click="saveAudio" v-if="!viewingHistory">Save To History</button>
-      <button @click="deleteAudio">Delete</button>
+      <button @click="deleteAudio" v-if="!viewingDeleted">Delete</button>
+      <button @click="deleteRecent" v-if="viewingDeleted">Delete</button>
+      <button @click="store.recentlyDeleted = []" v-if="viewingDeleted">
+        Clear Recently Deleted
+      </button>
     </div>
   </div>
 </template>
@@ -214,6 +220,9 @@ const saveAudio = () => {
 };
 
 const deleteAudio = () => {
+  store.assignedID = 1;
+  store.pastAudio = [];
+  store.recentlyDeleted = [];
   let index;
   let date = new Date();
   console.log(currentAudio.value.id);
@@ -252,6 +261,15 @@ const deleteAudio = () => {
   currentAudio.value = null;
   fileName.value = null;
   viewingHistory.value = false;
+};
+
+const deleteRecent = () => {
+  let index = store.recentlyDeleted.findIndex(
+    (file) => file.id === currentAudio.id,
+  );
+  console.log("found it", index);
+  store.recentlyDeleted.splice(index, 1);
+  currentAudio.value = null;
 };
 </script>
 
