@@ -38,7 +38,7 @@
             :key="file.id"
             :value="{ audio: file.audio, id: file.id }"
           >
-            {{ file.name }} deleted on {{ file.deleteDate }}
+            {{ file.name }} deleted on {{ file.deletedDate }}
           </option>
         </select>
       </div>
@@ -223,26 +223,34 @@ const deleteAudio = () => {
   ) {
     console.log("found it");
     index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
-    let obj = Object.defineProperty(
-      store.pastAudio[index],
-      "dateDeleted",
-      date.toLocaleDateString(),
-    );
+    let obj = Object.defineProperty(store.pastAudio[index], "dateDeleted", {
+      value: date.toLocaleDateString(),
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
     console.log(obj);
     store.recentlyDeleted.push(obj);
     store.pastAudio.splice(index, 1);
   } else {
     console.log("deleting smth new");
+
+    if (fileName.value !== null) {
+    } else {
+      fileName.value = `Untitled Recording ${store.assignedID}`;
+    }
+
     store.recentlyDeleted.push({
       id: store.assignedID,
       name: fileName.value,
-      audio: currentAudio.value,
+      audio: currentAudio.value.audio,
       date: date.toLocaleDateString(),
       deletedDate: date.toLocaleDateString(),
     });
-    store.assignedID -= store.assignedID + 1;
+    store.assignedID = store.assignedID + 1;
   }
   currentAudio.value = null;
+  fileName.value = null;
   viewingHistory.value = false;
 };
 </script>
