@@ -4,8 +4,42 @@
       <h1 class="text-white text-3xl">Recorder</h1>
       <div class="mt-6">
         <label for="note-selection" class="text-gray-400 mr-4">History</label>
-        <select class="bg-gray-700 text-white p-2 rounded">
-          History
+        <button v-if="!viewingDeleted" @click="viewingDeleted = true">
+          Recently Deleted...
+        </button>
+        <button v-if="viewingDeleted" @click="viewingDeleted = false">
+          Back To History...
+        </button>
+        <select
+          v-if="!viewingDeleted"
+          class="bg-gray-700 text-white p-2 rounded"
+          v-model="currentAudio"
+          @click="checkAudio"
+        >
+          History:
+          <option
+            v-for="file in store.pastAudio"
+            :key="file.id"
+            :value="{ audio: file.audio, id: file.id }"
+          >
+            {{ file.name }} recorded on {{ file.date }}
+          </option>
+        </select>
+
+        <select
+          v-if="viewingDeleted"
+          class="bg-gray-700 text-white p-2 rounded"
+          v-model="currentAudio"
+          @click="checkAudio"
+        >
+          Recently Deleted:
+          <option
+            v-for="file in store.recentlyDeleted"
+            :key="file.id"
+            :value="{ audio: file.audio, id: file.id }"
+          >
+            {{ file.name }} deleted on {{ file.deletedDate }}
+          </option>
         </select>
       </div>
     </div>
@@ -14,51 +48,79 @@
       <div class="text-black bg-white my-4 p-2 rounded">
         Timer: {{ formatTime(timer) }}
       </div>
-      <div class="bg-[#120E1D] rounded-full text-white flex justify-between">
-        <p>HIIII</p>
-        <p>HIIII</p>
-      </div>
     </div>
     <div class="flex w-[30%] flex-col my-2">
       <button
         class="bg-[#36C4E4] rounded-full"
         @click="startRecording"
-        :disabled="isRecording"
+        v-if="!isRecording && !viewingHistory"
       >
         Start Recording
       </button>
       <button
         class="bg-[#A3D10A] rounded-full"
         @click="stopRecording"
-        :disabled="!isRecording"
+        v-if="isRecording && !viewingHistory"
       >
         Stop Recording
       </button>
     </div>
 
     <!-- Display recorded audio playback and download link -->
-    <div v-if="audioUrl">
+    <div v-if="currentAudio && !isRecording">
       <h3>Recorded Audio:</h3>
-      <audio :src="audioUrl" controls></audio>
-      <a :href="audioUrl" download="recorded-audio.wav">
-        <button>Download Recording</button>
+      <audio
+        :src="'data:audio/wav;base64,' + currentAudio.audio"
+        controls
+      ></audio>
+      <a
+        :href="'data:audio/wav;base64,' + currentAudio.audio"
+        download="recorded-audio.mp4"
+      >
+        <button class="btn btn-ghost">
+          <img :src="url" class="download-icon" />
+        </button>
       </a>
+      <input type="text" v-model="fileName" v-if="!viewingDeleted" />
+      <button @click="saveAudio" v-if="viewingHistory && !viewingDeleted">
+        Rename File
+      </button>
+      <button
+        @click="
+          () => {
+            viewingHistory = false;
+            currentAudio = null;
+          }
+        "
+        v-if="viewingHistory"
+      >
+        Exit History
+      </button>
+      <button @click="saveAudio" v-if="!viewingHistory">Save To History</button>
+      <button @click="deleteAudio" v-if="!viewingDeleted">Delete</button>
+      <button @click="deleteRecent" v-if="viewingDeleted">Delete</button>
+      <button @click="store.recentlyDeleted = []" v-if="viewingDeleted">
+        Clear Recently Deleted
+      </button>
     </div>
   </div>
-  <!-- Timer section -->
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { settingsStore } from "@/stores/settings";
+import url from "../../../public/download-button.png";
+const store = settingsStore();
 
+const viewingDeleted = ref(false);
+const fileName = ref(null);
+const currentAudio = ref(null);
 const isRecording = ref(false);
-const audioUrl = ref(null);
 const timer = ref(0);
+const viewingHistory = ref(false);
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
-
-const pastHistory = {};
 
 const startRecording = async () => {
   try {
@@ -75,7 +137,12 @@ const startRecording = async () => {
 
     mediaRecorder.onstop = () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-      audioUrl.value = URL.createObjectURL(audioBlob); // Create audio URL for playback
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Audio = reader.result.split(",")[1]; // Extract the base64 part
+        currentAudio.value = { audio: base64Audio, id: store.assignedID }; // Store the base64 string with id
+      };
+      reader.readAsDataURL(audioBlob); // Convert Blob to Base64 string
     };
 
     // Start recording
@@ -113,6 +180,97 @@ const formatTime = (seconds) => {
   const secs = seconds % 60;
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
+
+const checkAudio = () => {
+  if (currentAudio.value) {
+    viewingHistory.value = true;
+  }
+};
+
+const saveAudio = () => {
+  let index;
+  if (
+    (index = store.pastAudio.findIndex(
+      (file) => file.audio === currentAudio.value.audio,
+    )) !== -1
+  ) {
+    console.log("found dupe maybe");
+    if (fileName.value !== null && !undefined) {
+      store.pastAudio[index].name = fileName.value.trim();
+      console.log(store.pastAudio[index].name);
+    }
+  } else {
+    console.log("creating smth new");
+    let date = new Date();
+
+    if (fileName.value !== null) {
+    } else {
+      fileName.value = `Untitled Recording ${store.assignedID}`;
+    }
+
+    store.pastAudio.push({
+      id: store.assignedID,
+      name: fileName.value.trim(),
+      audio: currentAudio.value.audio,
+      date: date.toLocaleDateString(),
+    });
+    store.assignedID = store.assignedID + 1;
+  }
+  fileName.value = null;
+};
+
+const deleteAudio = () => {
+  store.assignedID = 1;
+  store.pastAudio = [];
+  store.recentlyDeleted = [];
+  let index;
+  let date = new Date();
+  console.log(currentAudio.value.id);
+  if (
+    (currentAudio.value.id && currentAudio.value.id < store.assignedID) ||
+    currentAudio.value.id === 0
+  ) {
+    console.log("found it");
+    index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
+    let obj = Object.defineProperty(store.pastAudio[index], "dateDeleted", {
+      value: date.toLocaleDateString(),
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
+    console.log(obj);
+    store.recentlyDeleted.push(obj);
+    store.pastAudio.splice(index, 1);
+  } else {
+    console.log("deleting smth new");
+
+    if (fileName.value !== null) {
+    } else {
+      fileName.value = `Untitled Recording ${store.assignedID}`;
+    }
+
+    store.recentlyDeleted.push({
+      id: store.assignedID,
+      name: fileName.value,
+      audio: currentAudio.value.audio,
+      date: date.toLocaleDateString(),
+      deletedDate: date.toLocaleDateString(),
+    });
+    store.assignedID = store.assignedID + 1;
+  }
+  currentAudio.value = null;
+  fileName.value = null;
+  viewingHistory.value = false;
+};
+
+const deleteRecent = () => {
+  let index = store.recentlyDeleted.findIndex(
+    (file) => file.id === currentAudio.id,
+  );
+  console.log("found it", index);
+  store.recentlyDeleted.splice(index, 1);
+  currentAudio.value = null;
+};
 </script>
 
 <style scoped>
@@ -137,5 +295,10 @@ a {
 
 .bg-white {
   background-color: white;
+}
+
+.download-icon {
+  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
+  object-fit: contain; /* Ensure the image maintains its aspect ratio */
 }
 </style>
