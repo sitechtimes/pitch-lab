@@ -1,24 +1,13 @@
-import { defineStore } from "pinia";
+// stores/selectedNote.js
+import { defineStore } from 'pinia';
 
-export const useTuningStore = defineStore("tuning", {
+export const useSelectedNoteStore = defineStore('selectedNote', {
     state: () => ({
-        currentNote: "A", // Default tuning note
-        noteFrequencies: {
-            A: 440,
-            "B♭": 466.16,
-            C: 261.63,
-            "E♭": 311.13,
-            F: 349.23,
-        },
+        selectedNote: { name: 'A', frequency: 440 }, // Default note
     }),
-    getters: {
-        currentFrequency(state) {
-            return state.noteFrequencies[state.currentNote];
-        },
-    },
     actions: {
-        setNote(note) {
-            this.currentNote = note;
+        setSelectedNote(note) {
+            this.selectedNote = note;
         },
     },
 });
