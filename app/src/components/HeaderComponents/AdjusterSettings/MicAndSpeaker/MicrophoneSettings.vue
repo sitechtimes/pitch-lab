@@ -4,14 +4,14 @@
     <div>
       <!-- Microphone Selection -->
       <div class="mb-6">
-        <label for="microphone" class="block text-white text-sm mb-2">
+        <h1 for="microphone" class="block text-white text-lg mb-2">
           Select Microphone:
-        </label>
+        </h1>
         <select
           id="microphone"
           v-model="store.selectedMicrophone"
           @change="updateMicrophone"
-          class="select select-bordered w-full"
+          class="select select-bordered w-[70%] text-black"
         >
           <option
             v-for="device in store.microphones"

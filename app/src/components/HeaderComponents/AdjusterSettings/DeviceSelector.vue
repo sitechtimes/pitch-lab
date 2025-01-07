@@ -1,22 +1,28 @@
 <template>
   <div
-    class="device-selector fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    class="device-selector fixed inset-0 flex items-center justify-center border-black bg-opacity-50 z-50"
   >
     <!-- Modal Header -->
     <h2 class="text-2xl text-white font-semibold mb-4">Select Devices</h2>
-    <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-96 relative">
+    <div
+      class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
+    >
       <MicrophoneSettings />
-      <SpeakerSettings />
-    </div>
-    <!-- Modal Footer -->
-    <div class="flex justify-end space-x-4">
-      <button class="btn btn-outline btn-success" @click="saveSettings">
+      <hr class="my-4 border-[.1rem] border-[#A3D10A] w-[90%] mx-auto" />
+      <SpeakerSettings /><button
+        class="btn btn-outline btn-success bg-[#7210E3] mr-4"
+        @click="saveSettings"
+      >
         Save
       </button>
-      <button class="btn btn-outline btn-error" @click="store.toggleModal">
+      <button
+        class="btn btn-outline btn-error bg-[#7210E3]"
+        @click="store.toggleModal"
+      >
         Cancel
       </button>
     </div>
+    <!-- Modal Footer -->
   </div>
 </template>
 
