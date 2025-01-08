@@ -7,6 +7,8 @@ export const settingsStore = defineStore(
     const assignedID = ref(1);
     const pastAudio = ref([]);
     const recentlyDeleted = ref([]);
+    const deleteFunc = ref(null);
+
     const microphones = ref([]);
     const speakers = ref([]);
     const selectedMicrophone = ref(null);
@@ -106,6 +108,7 @@ export const settingsStore = defineStore(
       assignedID,
       pastAudio,
       recentlyDeleted,
+      deleteFunc,
       microphones,
       speakers,
       selectedMicrophone,
