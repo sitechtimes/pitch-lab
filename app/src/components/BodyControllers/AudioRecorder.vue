@@ -98,11 +98,12 @@
       </button>
       <button @click="saveAudio" v-if="!viewingHistory">Save To History</button>
       <button @click="deleteAudio" v-if="!viewingDeleted">Delete</button>
-      <button @click="deleteRecent" v-if="viewingDeleted">Delete</button>
+      <button @click="warning = true" v-if="viewingDeleted">Delete</button>
       <button @click="store.recentlyDeleted = []" v-if="viewingDeleted">
         Clear Recently Deleted
       </button>
     </div>
+    <WarningModal v-if="warning" @kill="deleteRecent" @keep="warning = false" />
   </div>
 </template>
 
@@ -110,6 +111,7 @@
 import { ref } from "vue";
 import { settingsStore } from "@/stores/settings";
 import url from "../../../public/download-button.png";
+import WarningModal from "../RandomComponents/WarningModal.vue";
 const store = settingsStore();
 
 const viewingDeleted = ref(false);
@@ -118,6 +120,7 @@ const currentAudio = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
 const viewingHistory = ref(false);
+const warning = ref(false);
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
@@ -220,16 +223,10 @@ const saveAudio = () => {
 };
 
 const deleteAudio = () => {
-  store.assignedID = 1;
-  store.pastAudio = [];
-  store.recentlyDeleted = [];
   let index;
   let date = new Date();
   console.log(currentAudio.value.id);
-  if (
-    (currentAudio.value.id && currentAudio.value.id < store.assignedID) ||
-    currentAudio.value.id === 0
-  ) {
+  if (currentAudio.value.id && currentAudio.value.id < store.assignedID) {
     console.log("found it");
     index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
     let obj = Object.defineProperty(store.pastAudio[index], "dateDeleted", {
@@ -270,6 +267,7 @@ const deleteRecent = () => {
   console.log("found it", index);
   store.recentlyDeleted.splice(index, 1);
   currentAudio.value = null;
+  warning.value = false;
 };
 </script>
 
