@@ -113,7 +113,7 @@
     </div>
     <WarningModal
       v-if="warning"
-      @killone="deleteRecent"
+      @killone="deleteRecent, (warning = false)"
       @keep="warning = false"
     />
   </div>
