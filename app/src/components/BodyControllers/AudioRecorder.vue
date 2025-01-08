@@ -98,12 +98,24 @@
       </button>
       <button @click="saveAudio" v-if="!viewingHistory">Save To History</button>
       <button @click="deleteAudio" v-if="!viewingDeleted">Delete</button>
-      <button @click="warning = true" v-if="viewingDeleted">Delete</button>
-      <button @click="store.recentlyDeleted = []" v-if="viewingDeleted">
+      <button
+        @click="(warning = true), (settingsStore.deleteFunc = 'single')"
+        v-if="viewingDeleted"
+      >
+        Delete
+      </button>
+      <button
+        @click="(warning = true), (settingsStore.deleteFunc = all)"
+        v-if="viewingDeleted"
+      >
         Clear Recently Deleted
       </button>
     </div>
-    <WarningModal v-if="warning" @kill="deleteRecent" @keep="warning = false" />
+    <WarningModal
+      v-if="warning"
+      @killone="deleteRecent"
+      @keep="warning = false"
+    />
   </div>
 </template>
 
@@ -228,7 +240,9 @@ const deleteAudio = () => {
   console.log(currentAudio.value.id);
   if (currentAudio.value.id && currentAudio.value.id < store.assignedID) {
     console.log("found it");
-    index = store.pastAudio.findIndex((file) => file.id === currentAudio.id);
+    index = store.pastAudio.findIndex(
+      (file) => file.id === currentAudio.value.id,
+    );
     let obj = Object.defineProperty(store.pastAudio[index], "dateDeleted", {
       value: date.toLocaleDateString(),
       writable: true,
@@ -262,7 +276,7 @@ const deleteAudio = () => {
 
 const deleteRecent = () => {
   let index = store.recentlyDeleted.findIndex(
-    (file) => file.id === currentAudio.id,
+    (file) => file.id === currentAudio.value.id,
   );
   console.log("found it", index);
   store.recentlyDeleted.splice(index, 1);
