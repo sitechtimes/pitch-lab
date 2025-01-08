@@ -60,17 +60,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useSelectedNoteStore } from "@/stores/selectedNote";
 import { tuningOptions } from "@/constants/TuningOptions";
 
+// Initialize the store
 const store = useSelectedNoteStore();
-const selectedOption = ref(store.selectedNote); // Selected tuning note
+
+// Bind the selected option to the store's state
+const selectedOption = ref(store.selectedNote); // Default to the current value in the store
 const isPlaying = ref(false); // Toggle play state
 let audioCtx = null;
 let oscillator = null;
 let gainNode = null;
 const volume = ref(50); // Default volume at 50%
+
+// Watch for changes in `selectedOption` and update the store
+watch(selectedOption, (newValue) => {
+  store.updateSelectedNote(newValue);
+});
 
 // Start or stop the audio
 const togglePlay = () => {
