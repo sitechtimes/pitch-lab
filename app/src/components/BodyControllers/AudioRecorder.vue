@@ -62,9 +62,7 @@ import { ref } from "vue";
 import url from "../../../public/download-button.png";
 import HistoryModal from "../AudioComponents/HistoryModal.vue";
 
-import { settingsStore } from "@/stores/settings";
 import { audioFiles } from "@/stores/audioFiles";
-const store = settingsStore();
 const audioStore = audioFiles();
 
 const isRecording = ref(false);
