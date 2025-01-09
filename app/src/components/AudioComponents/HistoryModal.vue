@@ -39,10 +39,7 @@
     <div>
       <button
         @click="
-          () => {
-            audioStore.viewingHistory = false;
-            audioStore.currentAudio = null;
-          }
+          (audioStore.viewingHistory = false), (audioStore.currentAudio = null)
         "
       >
         Exit History
@@ -53,7 +50,15 @@
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
+import url from "../../../public/download-button.png";
 import PastAudio from "./PastAudio.vue";
 import RecentlyDeleted from "./RecentlyDeleted.vue";
 const audioStore = audioFiles();
 </script>
+
+<style lang="css" scoped>
+.download-icon {
+  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
+  object-fit: contain; /* Ensure the image maintains its aspect ratio */
+}
+</style>

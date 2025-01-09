@@ -33,7 +33,7 @@
     </div>
 
     <div>
-      <WarningModal v-if="warning" @keep="audioStore.warning = false" />
+      <WarningModal v-if="audioStore.warning" />
     </div>
   </div>
 </template>

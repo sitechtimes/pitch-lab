@@ -4,11 +4,6 @@ import { defineStore } from "pinia";
 export const settingsStore = defineStore(
   "settings",
   () => {
-    const assignedID = ref(1);
-    const pastAudio = ref([]);
-    const recentlyDeleted = ref([]);
-    const deleteFunc = ref(null);
-
     const microphones = ref([]);
     const speakers = ref([]);
     const selectedMicrophone = ref(null);
@@ -105,10 +100,6 @@ export const settingsStore = defineStore(
     };
 
     return {
-      assignedID,
-      pastAudio,
-      recentlyDeleted,
-      deleteFunc,
       microphones,
       speakers,
       selectedMicrophone,
@@ -134,8 +125,6 @@ export const settingsStore = defineStore(
         {
           storage: localStorage, // Use localStorage to persist the state
           paths: [
-            "recentlyDeleted",
-            "pastAudio",
             "microphones",
             "speakers",
             "selectedMicrophone",
