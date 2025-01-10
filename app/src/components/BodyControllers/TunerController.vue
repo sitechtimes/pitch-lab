@@ -11,8 +11,7 @@
       <!-- Dropdown -->
       <div class="relative">
         <select
-          v-model="selectedOption"
-          @change="stopOscillator"
+          v-model="store.selectedNote"
           class="bg-gray-800 text-gray-300 border border-gray-600 rounded px-4 py-1 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option
@@ -61,24 +60,15 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import { useSelectedNoteStore } from "@/stores/selectedNote";
+import { settingsStore } from "@/stores/settings";
 import { tuningOptions } from "@/constants/TuningOptions";
 
-// Initialize the store
-const store = useSelectedNoteStore();
-
-// Bind the selected option to the store's state
-const selectedOption = ref(store.selectedNote); // Default to the current value in the store
+const store = settingsStore();
 const isPlaying = ref(false); // Toggle play state
 let audioCtx = null;
 let oscillator = null;
 let gainNode = null;
 const volume = ref(50); // Default volume at 50%
-
-// Watch for changes in `selectedOption` and update the store
-watch(selectedOption, (newValue) => {
-  store.updateSelectedNote(newValue);
-});
 
 // Start or stop the audio
 const togglePlay = () => {

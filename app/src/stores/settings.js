@@ -4,6 +4,8 @@ import { defineStore } from "pinia";
 export const settingsStore = defineStore(
   "settings",
   () => {
+    const selectedNote = ref()
+
     const microphones = ref([]);
     const speakers = ref([]);
     const selectedMicrophone = ref(null);
@@ -100,6 +102,7 @@ export const settingsStore = defineStore(
     };
 
     return {
+      selectedNote,
       microphones,
       speakers,
       selectedMicrophone,
