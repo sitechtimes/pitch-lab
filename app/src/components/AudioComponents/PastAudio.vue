@@ -43,7 +43,7 @@ const saveAudio = () => {
   );
   console.log(index);
   console.log(audioStore.pastAudio);
-  if (index || index === 0) {
+  if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName === true) {
       audioStore.pastAudio[index].name = audioStore.fileName.trim();
@@ -72,7 +72,7 @@ const deleteAudio = () => {
   );
   let date = new Date();
   console.log(audioStore.currentAudio.id);
-  if (index || index === 0) {
+  if (index === Number || index === 0) {
     console.log("found it");
     let obj = Object.defineProperty(
       audioStore.pastAudio[index],

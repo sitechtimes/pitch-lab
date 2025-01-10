@@ -144,7 +144,7 @@ const saveAudio = () => {
   let index = audioStore.pastAudio.findIndex(
     (file) => file.audio === audioStore.currentAudio.audio,
   );
-  if (index || index === 0) {
+  if (index === Number || index === 0) {
     console.log("how the heck?? please report this. found dupe maybe");
   } else {
     console.log("creating smth new");
