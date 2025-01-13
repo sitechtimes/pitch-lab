@@ -1,6 +1,8 @@
 <template>
-  <div class="bg-black">
-    <div >
+  <div
+    class="device-selector inset-0 flex items-center justify-center bg-red bg-opacity-50 z-50 absolute bg-black/30 p-4"
+  >
+    <div>
       <Button
         v-if="!audioStore.viewingDeleted"
         @click="audioStore.viewingDeleted = true"
