@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div>
+  <div class="bg-black">
+    <div >
       <Button
         v-if="!audioStore.viewingDeleted"
         @click="audioStore.viewingDeleted = true"

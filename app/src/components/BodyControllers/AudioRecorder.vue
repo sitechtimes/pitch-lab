@@ -3,14 +3,19 @@
     <h1 class="text-white text-3xl">Recorder</h1>
   </div>
 
-  <div>
-    <button @click="audioStore.viewingHistory = true">
-      View History Here:
-    </button>
-  </div>
-  <div>
-    <HistoryModal v-if="audioStore.viewingHistory" />
-  </div>
+  <
+    <button
+          type="button"
+          class="text-black bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
+          @click="
+            // changeDate = true;
+            open = true;
+            audioStore.viewingHistory = true
+          "
+        >
+          View History Here: 
+        </button>
+ 
 
   <div class="flex flex-col">
     <!-- Timer display -->
@@ -64,6 +69,7 @@ import HistoryModal from "../AudioComponents/HistoryModal.vue";
 
 import { audioFiles } from "@/stores/audioFiles";
 const audioStore = audioFiles();
+
 
 const isRecording = ref(false);
 const timer = ref(0);
