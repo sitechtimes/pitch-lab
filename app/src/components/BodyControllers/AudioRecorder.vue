@@ -6,7 +6,7 @@
   <
     <button
           type="button"
-          class="text-black bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
+          class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
           @click="
             // changeDate = true;
             open = true;
@@ -23,7 +23,7 @@
       Timer: {{ formatTime(timer) }}
     </div>
   </div>
-  <div class="flex w-[30%] flex-col my-2">
+  <div class="flex w-1/6 flex-col my-2">
     <button
       class="bg-[#36C4E4] rounded-full"
       @click="startRecording"
@@ -55,7 +55,7 @@
         <img :src="url" class="download-icon" />
       </button>
     </a>
-    <input type="text" v-model="audioStore.fileName" />
+    <input type="text" class="text-black" v-model="audioStore.fileName" />
     <button @click="saveAudio">Rename File</button>
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>
