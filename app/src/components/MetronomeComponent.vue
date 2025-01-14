@@ -9,19 +9,25 @@ const isPlaying = ref(false);
 let loop;
 let currentBeat = 0; // Tracks the current beat in the measure
 
+// Preload duck quack sounds
+const firstBeatQuack = new Tone.Player(
+  "https://example.com/first-beat-quack.mp3",
+).toDestination();
+const normalBeatQuack = new Tone.Player(
+  "https://example.com/normal-beat-quack.mp3",
+).toDestination();
+
 // Function to start the metronome
 const startMetronome = () => {
   Tone.Transport.bpm.value = bpm.value; // Set tempo
   currentBeat = 0; // Reset beat count
   loop = new Tone.Loop((time) => {
-    // Choose a different sound for the first beat
-    const synth = new Tone.Synth({
-      oscillator: { type: "sine" },
-      envelope: { attack: 0, decay: 0.1, sustain: 0.1, release: 0.1 },
-    }).toDestination();
-
-    const note = currentBeat === 0 ? "C5" : "C4"; // Stronger sound on first beat
-    synth.triggerAttackRelease(note, "8n", time);
+    // Play quack sound for the current beat
+    if (currentBeat === 0) {
+      firstBeatQuack.start(time); // Distinct quack for the first beat
+    } else {
+      normalBeatQuack.start(time); // Normal quack for other beats
+    }
 
     // Advance the beat counter
     currentBeat = (currentBeat + 1) % beatsPerMeasure.value;
