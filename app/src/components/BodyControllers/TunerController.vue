@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { settingsStore } from "@/stores/settings";
 import { tuningOptions } from "@/constants/TuningOptions";
 
@@ -91,7 +91,7 @@ const startOscillator = () => {
   oscillator = audioCtx.createOscillator();
   oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(
-    selectedOption.value.frequency,
+    tuningOptions.value.frequency,
     audioCtx.currentTime,
   );
 

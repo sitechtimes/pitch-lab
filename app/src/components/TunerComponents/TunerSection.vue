@@ -11,24 +11,6 @@
       Start Pitch Detection
     </button>
 
-    <!-- Note Selection -->
-    <div class="mt-6">
-      <label for="note-selection" class="text-gray-400 mr-4">Tune to:</label>
-      <select
-        id="note-selection"
-        v-model="selectedNote"
-        class="bg-gray-700 text-white p-2 rounded"
-      >
-        <option
-          v-for="(frequency, noteName) in noteFrequencies"
-          :key="noteName"
-          :value="frequency"
-        >
-          {{ noteName }}
-        </option>
-      </select>
-    </div>
-
     <!-- Tuning Scale -->
     <div class="mt-8">
       <div
@@ -63,20 +45,21 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Pitchfinder from "pitchfinder";
+import { settingsStore } from "../../stores/settings";
 
+const store = settingsStore();
 const pitch = ref(null);
 const note = ref("");
 const detuneValue = ref(0); // The slider position
 const isFlat = ref(false);
 const isSharp = ref(false);
-const selectedNote = ref(440); // Default to "A" (440 Hz)
+const selectedNote = ref(440);
 
 let audioContext = null;
 let analyser = null;
 
-// Note frequencies for selection
 const noteFrequencies = {
   A: 440,
   "B♭": 466.16,
@@ -164,7 +147,7 @@ const startPitchDetection = async () => {
         const detune = 1200 * Math.log2(normalizedPitch / normalizedTarget);
         pitch.value = detectedPitch;
 
-        note.value = Object.keys(noteFrequencies).find(
+        note.value = Object.keys(store.selectedNote).find(
           (key) => noteFrequencies[key] === selectedNote.value,
         );
 
@@ -188,6 +171,10 @@ const startPitchDetection = async () => {
     alert("Could not access your microphone. Please allow microphone access.");
   }
 };
+
+onMounted(() => {
+  startPitchDetection();
+});
 </script>
 
 <style scoped>
