@@ -1,6 +1,7 @@
 <script setup>
 import * as Tone from "tone";
 import { ref } from "vue";
+import Quack from "../assets/rams-duck-quack-edited.mp3";
 
 const bpm = ref(120); // Default tempo
 const beatsPerMeasure = ref(4); // Default beats per measure
@@ -10,24 +11,33 @@ let loop;
 let currentBeat = 0; // Tracks the current beat in the measure
 
 // Preload duck quack sounds
-const firstBeatQuack = new Tone.Player(
-  "https://example.com/first-beat-quack.mp3",
-).toDestination();
-const normalBeatQuack = new Tone.Player(
+
+/*const normalBeatQuack = new Tone.Player(
   "https://example.com/normal-beat-quack.mp3",
-).toDestination();
+).toDestination(); */
 
 // Function to start the metronome
 const startMetronome = () => {
   Tone.Transport.bpm.value = bpm.value; // Set tempo
   currentBeat = 0; // Reset beat count
   loop = new Tone.Loop((time) => {
-    // Play quack sound for the current beat
+    /* // Play quack sound for the current beat
     if (currentBeat === 0) {
       firstBeatQuack.start(time); // Distinct quack for the first beat
     } else {
       normalBeatQuack.start(time); // Normal quack for other beats
-    }
+    } */
+
+    /* const synth = new Tone.Player({
+      url: "../assets/rams-duck-quack-edited.mp3",
+      autostart: false,
+    }).toDestination(); */
+
+    const ramsQuack = new Tone.Player({
+      url: Quack,
+      autostart: false,
+    }).toDestination();
+    Quack.start(time);
 
     // Advance the beat counter
     currentBeat = (currentBeat + 1) % beatsPerMeasure.value;
