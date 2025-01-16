@@ -4,14 +4,15 @@
     <div>
       <!-- Microphone Selection -->
       <div class="mb-6">
-        <h1 for="microphone" class="block text-white text-lg mb-2">
-          Select Microphone:
+        <h1 for="microphone" class="block text-white text-3xl mb-2">
+          Microphone:
         </h1>
+        <button class="bg-[#A3D10A] text-black w-[20%] rounded-lg mr-4">Test Microphone</button>
         <select
           id="microphone"
           v-model="store.selectedMicrophone"
           @change="updateMicrophone"
-          class="select select-bordered w-[70%] text-black"
+          class="select select-bordered w-[60%] text-black"
         >
           <option
             v-for="device in store.microphones"
@@ -20,7 +21,8 @@
           >
             {{ device.label || `Microphone ${device.deviceId}` }}
           </option>
-        </select>
+        </select>        
+        <h2 class="my-3">Output Level:</h2>
       </div>
     </div>
 

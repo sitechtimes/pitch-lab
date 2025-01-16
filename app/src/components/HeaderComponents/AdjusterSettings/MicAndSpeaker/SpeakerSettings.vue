@@ -2,14 +2,16 @@
   <div>
     <!-- Speaker Selection -->
     <div class="mb-6">
-      <h1 for="speaker" class="block text-white text-lg mb-2">
-        Select Speaker:
+      <h1 for="speaker" class="block text-white text-3xl mb-2">
+        Speaker:
       </h1>
+      <button class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4">Test Speaker</button>
+
       <select
         id="speaker"
         v-model="store.selectedSpeaker"
         @change="updateSpeaker"
-        class="select select-bordered w-[70%] text-black"
+        class="select select-bordered w-[60%] text-black"
       >
         <option
           v-for="device in store.speakers"
