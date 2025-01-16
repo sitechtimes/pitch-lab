@@ -1,9 +1,9 @@
 <template>
   <div>
     <div>
-      <label for="note-selection" class="text-gray-400 mr-4">History</label>
+      <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
       <select
-        class="bg-gray-700 text-white p-2 rounded"
+        class="bg-gray-700 text-white p-2 rounded w-[90%]"
         v-model="audioStore.currentAudio"
       >
         History:
@@ -17,7 +17,7 @@
       </select>
     </div>
     <div>
-      <input type="text" v-model="audioStore.fileName" />
+      <input type="text" class="text-black w-1/2 mt-3" v-model="audioStore.fileName" />
 
       <button @click="saveAudio">Rename File</button>
       <button @click="deleteAudio">Delete</button>
