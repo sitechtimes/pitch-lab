@@ -4,18 +4,17 @@
   </div>
 
   <
-    <button
-          type="button"
-          class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
-          @click="
-            // changeDate = true;
-            open = true;
-            audioStore.viewingHistory = true
-          "
-        >
-          View History Here: 
-        </button>
- 
+  <button
+    type="button"
+    class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
+    @click="
+      // changeDate = true;
+      open = true;
+      audioStore.viewingHistory = true;
+    "
+  >
+    View History Here:
+  </button>
 
   <div class="flex flex-col">
     <!-- Timer display -->
@@ -65,11 +64,8 @@
 <script setup>
 import { ref } from "vue";
 import url from "../../../public/download-button.png";
-import HistoryModal from "../AudioComponents/HistoryModal.vue";
-
 import { audioFiles } from "@/stores/audioFiles";
 const audioStore = audioFiles();
-
 
 const isRecording = ref(false);
 const timer = ref(0);
@@ -169,7 +165,7 @@ const saveAudio = () => {
 
 const deleteAudio = () => {
   let date = new Date();
-  console.log(audioStore.audio.id);
+  //console.log(audioStore.audio.id);
   if (
     audioStore.currentAudio.id &&
     audioStore.currentAudio.id < audioStore.assignedID

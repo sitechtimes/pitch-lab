@@ -1,0 +1,34 @@
+import { ref } from "vue";
+import { defineStore } from "pinia";
+
+export const persistedStore = defineStore(
+  "persistedStore",
+  () => {
+    //how we remember what ids we assign to new stuff and where we store audio
+    const assignedID = ref(1);
+    const pastAudio = ref([]);
+    const recentlyDeleted = ref([]);
+
+    //settings ig
+    const selectedMicrophone = ref(null);
+    const selectedSpeaker = ref(null);
+
+    return {
+      assignedID,
+      pastAudio,
+      recentlyDeleted,
+      selectedMicrophone,
+      selectedSpeaker,
+    };
+  },
+  {
+    persist: {
+      enabled: true,
+      strategies: [
+        {
+          storage: localStorage, // Use localStorage to persist the state
+        },
+      ],
+    },
+  },
+);

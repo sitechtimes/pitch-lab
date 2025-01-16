@@ -1,13 +1,13 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { persistedStore } from "./persistedStore";
+const persistedStore = persistedStore();
 
 export const settingsStore = defineStore(
   "settings",
   () => {
     const microphones = ref([]);
     const speakers = ref([]);
-    const selectedMicrophone = ref(null);
-    const selectedSpeaker = ref(null);
     const showModal = ref(false);
 
     const inputVolume = ref(0.5); // Microphone volume
@@ -37,7 +37,7 @@ export const settingsStore = defineStore(
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         // Set up input (microphone)
-        if (selectedMicrophone.value) {
+        if (persistedStore.selectedMicrophone) {
           micStream = await navigator.mediaDevices.getUserMedia({
             audio: { deviceId: selectedMicrophone.value },
           });
@@ -86,12 +86,12 @@ export const settingsStore = defineStore(
     };
 
     const updateMicrophone = (deviceId) => {
-      selectedMicrophone.value = deviceId;
+      persistedStore.selectedMicrophone = deviceId;
       initializeAudio();
     };
 
     const updateSpeaker = (deviceId) => {
-      selectedSpeaker.value = deviceId;
+      persistedStore.selectedSpeaker = deviceId;
       initializeAudio();
     };
 
@@ -102,8 +102,6 @@ export const settingsStore = defineStore(
     return {
       microphones,
       speakers,
-      selectedMicrophone,
-      selectedSpeaker,
       showModal,
       inputVolume,
       outputVolume,
@@ -120,18 +118,7 @@ export const settingsStore = defineStore(
   },
   {
     persist: {
-      enabled: true, // Enable persistence for this store
-      strategies: [
-        {
-          storage: localStorage, // Use localStorage to persist the state
-          paths: [
-            "microphones",
-            "speakers",
-            "selectedMicrophone",
-            "selectedSpeaker",
-          ], // Specify which state to persist
-        },
-      ],
+      enabled: false, // dont persist this store
     },
   },
 );
