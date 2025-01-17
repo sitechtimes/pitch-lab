@@ -79,8 +79,12 @@ const togglePlay = () => {
   }
 };
 
-// Start the oscillator
 const startOscillator = () => {
+  if (!store.selectedNote || !store.selectedNote.frequency) {
+    alert("Please select a valid note.");
+    return;
+  }
+
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
   // Create a gain node for volume control
@@ -91,7 +95,7 @@ const startOscillator = () => {
   oscillator = audioCtx.createOscillator();
   oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(
-    tuningOptions.value.frequency,
+    store.selectedNote.frequency, // Use the selected note's frequency
     audioCtx.currentTime,
   );
 
