@@ -41,7 +41,7 @@
 <script setup>
 import WarningModal from "./WarningModal.vue";
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedStore, persistedStore } from "@/stores/persistedStore";
-const persistedStore = persistedStore();
+import { persistedSettings } from "@/stores/persistedStore";
+const persistedStore = persistedSettings();
 const audioStore = audioFiles();
 </script>

@@ -26,16 +26,11 @@ import SpeakerSettings from "./MicAndSpeaker/SpeakerSettings.vue";
 import MicrophoneSettings from "./MicAndSpeaker/MicrophoneSettings.vue";
 
 import { settingsStore } from "../../../stores/settings.js";
-import { persistedStore } from "@/stores/persistedStore";
 const store = settingsStore();
-const persistedStore = persistedStore();
-
-// Fetch devices when the modal is shown
 
 const saveSettings = () => {
-  store.updateMicrophone(persistedStore.selectedMicrophone);
-  store.updateSpeaker(persistedStore.selectedSpeaker);
-  store.toggleModal;
+  store.initializeAudio();
+  store.showModal = false;
 };
 </script>
 
