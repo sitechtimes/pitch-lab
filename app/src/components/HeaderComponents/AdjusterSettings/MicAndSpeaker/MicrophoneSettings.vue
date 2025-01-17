@@ -22,14 +22,7 @@
             {{ device.label || `Microphone ${device.deviceId}` }}
           </option>
         </select>        
-        <h2 class="my-3">Output Level:</h2>
-      </div>
-    </div>
-
-    <!-- slider -->
-    <div class="audio-controls">
-      <div>
-        <label for="input-volume"
+        <h2 class="my-3">Output Level:</h2><label for="input-volume"
           >Input Volume (Microphone): {{ inputVolume.toFixed(2) }}</label
         >
         <input

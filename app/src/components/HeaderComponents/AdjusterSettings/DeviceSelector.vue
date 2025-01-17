@@ -7,9 +7,9 @@
     <div
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[38%] relative"
     >
-      <MicrophoneSettings />
-      <hr class="my-4 border-[.12rem] border-[#A3D10A] w-[80%] mx-auto" />
       <SpeakerSettings />
+      <hr class="my-4 border-[.12rem] border-[#A3D10A] w-[80%] mx-auto" />
+      <MicrophoneSettings />   
       <button
         class="btn btn-outline btn-success bg-[#7210E3] mr-4"
         @click="saveSettings"
