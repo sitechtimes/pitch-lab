@@ -175,6 +175,8 @@ const startPitchDetection = async () => {
 onMounted(() => {
   startPitchDetection();
 });
+// if no mic, display no microphone selected until mic is selected
+// tuning to: store.selectedNote() or just nothing is nothing is selected
 </script>
 
 <style scoped>
