@@ -9,7 +9,7 @@
         id="speaker"
         v-model="store.selectedSpeaker"
         @change="updateSpeaker"
-        class="select select-bordered w-full"
+        class="select select-bordered w-full text-black"
       >
         <option
           v-for="device in store.speakers"
