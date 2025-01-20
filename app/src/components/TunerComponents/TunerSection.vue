@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col items-center justify-center p-4">
+  <div class="flex flex-col items-center justify-center p-4 w-full h-[70vh]">
     <div class="w-full max-w-screen-lg">
       <!-- Adjust the py value for padding and add custom max-width if needed -->
-      <div class="relative h-[25vh] w-[vw] bg-tuner-bg py-10 mt-17 rounded-lg">
+      <div class="relative h-[25vh] w-[?vw] bg-tuner-bg rounded-lg">
         <div
           v-for="i in 21"
           :key="i"
