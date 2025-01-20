@@ -1,8 +1,8 @@
 <template>
-  <div class="w-screen bg-[#2A283B] text-white">
+  <div class="w-screen h-[100vh] bg-entire-bg text-white">
     <!-- Header -->
     <header
-      class="flex items-center justify-between px-6 py-4 bg-[#1A1725] shadow-lg"
+      class="flex items-center justify-between px-6 py-4 bg-entire-bg shadow-lg"
     >
       <HeaderTitle />
       <SettingsIcon />
@@ -58,10 +58,3 @@ import { settingsStore } from "./stores/settings.js";
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
 const settings = settingsStore();
 </script>
-
-<style scoped>
-header {
-  background-color: #1a1725;
-  border-bottom: 2px solid #3a3a3a;
-}
-</style>

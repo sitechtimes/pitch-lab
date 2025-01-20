@@ -27,6 +27,7 @@ export default {
     },
     fontFamily: {},
     extend: {
+
     },
   },
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
