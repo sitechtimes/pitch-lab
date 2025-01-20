@@ -1,22 +1,21 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { persistedStore } from "./persistedStore";
-const persistedStore = persistedStore();
+import { persistedSettings } from "./persistedStore";
 
 export const settingsStore = defineStore(
   "settings",
   () => {
+    const persistedStore = persistedSettings();
+
     const microphones = ref([]);
     const speakers = ref([]);
     const showModal = ref(false);
 
     const inputVolume = ref(0.5); // Microphone volume
-    const outputVolume = ref(0.5); // Speaker volume
 
     let audioContext = null;
     let micStream = null;
     let inputGainNode = null;
-    let outputGainNode = null;
     let audioElement = null;
     let sourceNode = null;
 
@@ -50,9 +49,6 @@ export const settingsStore = defineStore(
         // Set up output (speaker)
         audioElement = new Audio("your-audio-file.mp3");
         sourceNode = audioContext.createMediaElementSource(audioElement);
-        outputGainNode = audioContext.createGain();
-        sourceNode.connect(outputGainNode).connect(audioContext.destination);
-        outputGainNode.gain.value = outputVolume.value;
       }
     };
 
@@ -61,14 +57,6 @@ export const settingsStore = defineStore(
       inputVolume.value = Number(volume);
       if (inputGainNode) {
         inputGainNode.gain.value = Number(volume);
-      }
-    };
-
-    // Update output (speaker) volume
-    const setOutputVolume = (volume) => {
-      outputVolume.value = Number(volume);
-      if (outputGainNode) {
-        outputGainNode.gain.value = Number(volume);
       }
     };
 
@@ -85,35 +73,16 @@ export const settingsStore = defineStore(
       }
     };
 
-    const updateMicrophone = (deviceId) => {
-      persistedStore.selectedMicrophone = deviceId;
-      initializeAudio();
-    };
-
-    const updateSpeaker = (deviceId) => {
-      persistedStore.selectedSpeaker = deviceId;
-      initializeAudio();
-    };
-
-    const toggleModal = () => {
-      showModal.value = !showModal.value;
-    };
-
     return {
       microphones,
       speakers,
       showModal,
       inputVolume,
-      outputVolume,
       getDevices,
       setInputVolume,
-      setOutputVolume,
       initializeAudio,
       playAudio,
       pauseAudio,
-      toggleModal,
-      updateMicrophone,
-      updateSpeaker,
     };
   },
   {

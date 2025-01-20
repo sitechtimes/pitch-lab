@@ -17,7 +17,11 @@
       </select>
     </div>
     <div>
-      <input type="text" class="text-black w-1/2 mt-3" v-model="audioStore.fileName" />
+      <input
+        type="text"
+        class="text-black w-1/2 mt-3"
+        v-model="audioStore.fileName"
+      />
 
       <button @click="saveAudio">Rename File</button>
       <button @click="deleteAudio">Delete</button>
@@ -27,9 +31,9 @@
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedStore, persistedStore } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
-const persistedStore = persistedStore();
+const persistedStore = persistedSettings();
 
 const checkName = () => {
   if (audioStore.fileName !== null) {

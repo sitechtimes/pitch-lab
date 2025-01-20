@@ -1,8 +1,8 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const persistedStore = defineStore(
-  "persistedStore",
+export const persistedSettings = defineStore(
+  "persistedSettings",
   () => {
     //how we remember what ids we assign to new stuff and where we store audio
     const assignedID = ref(1);
