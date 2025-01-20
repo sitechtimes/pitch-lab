@@ -10,10 +10,10 @@
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedStore } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedStore";
 
 const audioStore = audioFiles();
-const persistedStore = persistedStore();
+const persistedStore = persistedSettings();
 
 const killIt = () => {
   if (audioStore.deleteFunc === "single") {

@@ -1,8 +1,8 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const persistedStore = defineStore(
-  "persistedStore",
+export const persistedSettings = defineStore(
+  "persistedSettings",
   () => {
     //how we remember what ids we assign to new stuff and where we store audio
     const assignedID = ref(1);
@@ -12,6 +12,7 @@ export const persistedStore = defineStore(
     //settings ig
     const selectedMicrophone = ref(null);
     const selectedSpeaker = ref(null);
+    const defaultNote = ref("A");
 
     return {
       assignedID,
@@ -19,6 +20,7 @@ export const persistedStore = defineStore(
       recentlyDeleted,
       selectedMicrophone,
       selectedSpeaker,
+      defaultNote,
     };
   },
   {
