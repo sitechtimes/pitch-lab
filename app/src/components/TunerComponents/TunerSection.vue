@@ -1,198 +1,49 @@
 <template>
-  <div class="flex flex-col items-center justify-center bg-gray-800 text-white">
-    <h1 class="text-3xl font-bold text-gray-200 mb-6">Pitch Finder</h1>
-    <p class="text-gray-400 mb-4">
-      Click the button below to start detecting pitch.
-    </p>
-    <button
-      @click="startPitchDetection"
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
-    >
-      Start Pitch Detection
-    </button>
-
-    <!-- Tuning Scale -->
-    <div class="mt-8">
-      <div
-        class="scale-container relative w-96 h-6 bg-gray-900 rounded overflow-hidden"
-      >
-        <!-- Center line always visible -->
-        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-green-500"></div>
-        <!-- Notch Lines -->
-        <div v-for="i in 11" :key="i" class="absolute inset-y-0">
-          <div
-            :style="{ left: `${50 + i * 5}px` }"
-            class="h-full w-0.5 bg-gray-500"
-          ></div>
-          <div
-            :style="{ left: `${50 - i * 5}px` }"
-            class="h-full w-0.5 bg-gray-500"
-          ></div>
-        </div>
-        <!-- Slider for Detune Value -->
+  <div class="flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-screen-lg">
+      <div class="relative w-full bg-tuner-bg py-8 rounded-lg">
+        <!-- Long bars and short bars -->
         <div
-          :style="{ transform: `translateX(${detuneValue}px)` }"
-          class="slider w-2 h-6 bg-blue-500 absolute top-0 left-1/2 -translate-x-1/2"
+          v-for="i in 21"
+          :key="i"
+          class="absolute bottom-4"
+          :class="[i % 2 === 1 ? 'h-20' : 'h-10', 'bg-white', 'w-0.5']"
+          :style="{ left: `${(i - 1) * 4.76}%` }"
         ></div>
+        <!-- Slider indicator -->
+        <div
+          class="bg-blue-500 w-2 h-10 absolute bottom-4"
+          :style="{ left: `calc(50% + ${detuneValue}px)` }"
+        ></div>
+        <!-- Numerical labels for long bars -->
+        <div
+          v-for="j in 11"
+          :key="`label-${j}`"
+          class="absolute text-xs text-white"
+          :style="{ left: `${(2 * j - 2) * 4.76}%`, bottom: '-20px' }"
+        >
+          {{ (j - 6) * 10 }}
+        </div>
       </div>
-
-      <div class="flex justify-center items-center mt-6">
-        <p class="mr-2 text-2xl font-semibold">{{ note }}</p>
-        <p v-if="isFlat" class="text-2xl text-gray-400">b</p>
-        <p v-if="isSharp" class="text-2xl text-gray-400">#</p>
+      <div class="text-white flex justify-center mt-2">
+        <div v-if="isFlat" class="text-2xl text-gray-400 mr-1">b</div>
+        <div class="text-2xl">{{ currentNote }}</div>
+        <div v-if="isSharp" class="text-2xl text-gray-400 ml-1">#</div>
       </div>
     </div>
   </div>
 </template>
+
 <script setup>
-import { onMounted, ref } from "vue";
-import Pitchfinder from "pitchfinder";
-import { settingsStore } from "../../stores/settings";
+import { ref } from "vue";
 
-const store = settingsStore();
-const pitch = ref(null);
-const note = ref("");
-const detuneValue = ref(0); // The slider position
+// Mock data for demonstration
+const detuneValue = ref(20); // Detune value should be dynamically updated based on pitch detection
+const currentNote = ref("F");
 const isFlat = ref(false);
-const isSharp = ref(false);
-const selectedNote = ref(440);
-
-let audioContext = null;
-let analyser = null;
-
-const noteFrequencies = {
-  A: 440,
-  "B♭": 466.16,
-  C: 261.63,
-  "E♭": 311.13,
-  F: 349.23,
-};
-
-const normalizeToBaseOctave = (frequency) => {
-  while (frequency > 523.25) {
-    frequency /= 2;
-  }
-  while (frequency < 261.63) {
-    frequency *= 2;
-  }
-  return frequency;
-};
-
-const startPitchDetection = async () => {
-  try {
-    // Request microphone input
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        autoGainControl: false,
-        noiseSuppression: false,
-        echoCancellation: false,
-      },
-    });
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(stream);
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 8192;
-    source.connect(analyser);
-
-    // YIN algorithm
-    const pitchFinder = Pitchfinder.YIN({
-      sampleRate: audioContext.sampleRate,
-    });
-
-    const highPassFilter = audioContext.createBiquadFilter();
-    highPassFilter.type = "highpass";
-    highPassFilter.frequency.value = 50; // Filter out frequencies below 50 Hz
-    source.connect(highPassFilter).connect(analyser);
-
-    // detect amplitude
-    const calculatePeakAmplitude = (dataArray) => {
-      return Math.max(...dataArray.map(Math.abs));
-    };
-
-    // Detect pitch
-    const dataArray = new Float32Array(analyser.fftSize);
-
-    const pitchBuffer = [];
-    const isConstantPitch = () => {
-      if (pitchBuffer.length < 10) return false; // Require a sufficient number of samples
-      const meanPitch =
-        pitchBuffer.reduce((a, b) => a + b, 0) / pitchBuffer.length;
-      const deviation = pitchBuffer.every((p) => Math.abs(p - meanPitch) < 1); // Allow slight variation
-      return deviation;
-    };
-
-    const detect = () => {
-      analyser.getFloatTimeDomainData(dataArray);
-
-      // Calculate peak amplitude
-      const peakAmplitude = calculatePeakAmplitude(dataArray);
-
-      // Set a threshold for significant signals
-      const amplitudeThreshold = 0.02; // Adjust this based on testing
-      if (peakAmplitude < amplitudeThreshold) {
-        console.log("Weak signal detected. Ignoring noise.");
-        requestAnimationFrame(detect); // Continue loop without processing pitch
-        return;
-      }
-
-      const detectedPitch = pitchFinder(dataArray);
-
-      if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-        pitchBuffer.push(detectedPitch);
-        if (pitchBuffer.length > 10) pitchBuffer.shift(); // Maintain buffer size
-
-        const normalizedPitch = normalizeToBaseOctave(detectedPitch);
-        const normalizedTarget = normalizeToBaseOctave(selectedNote.value);
-
-        const detune = 1200 * Math.log2(normalizedPitch / normalizedTarget);
-        pitch.value = detectedPitch;
-
-        note.value = Object.keys(store.selectedNote).find(
-          (key) => noteFrequencies[key] === selectedNote.value,
-        );
-
-        detuneValue.value = detune;
-
-        isFlat.value = detune < -10;
-        isSharp.value = detune > 10;
-
-        const constant = isConstantPitch();
-        console.log(
-          `Pitch detected: ${detectedPitch.toFixed(2)} Hz, Constant: ${constant}`,
-        );
-      }
-
-      requestAnimationFrame(detect);
-    };
-
-    detect();
-  } catch (err) {
-    console.error("Error accessing microphone: ", err);
-    alert("Could not access your microphone. Please allow microphone access.");
-  }
-};
-
-onMounted(() => {
-  startPitchDetection();
-});
-// if no mic, display no microphone selected until mic is selected
-// tuning to: store.selectedNote() or just nothing is nothing is selected
+const isSharp = ref(detuneValue.value > 0);
 </script>
 
 <style scoped>
-.scale-container {
-  position: relative;
-  background-color: #1a1a1a;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.slider {
-  height: 24px;
-  width: 8px;
-  background-color: #00b4d8;
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-}
+/* Additional styling as needed */
 </style>

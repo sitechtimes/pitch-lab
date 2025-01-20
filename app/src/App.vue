@@ -38,7 +38,7 @@
     </div>
 
     <!-- Tuning Section -->
-    <div class="mt-8">
+    <div class="mt-20 bg-entire-bg">
       <TunerSection />
     </div>
 
@@ -55,9 +55,8 @@ import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import { settingsStore } from "./stores/settings.js";
 
-const settings = settingsStore();
-
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
+const settings = settingsStore();
 </script>
 
 <style scoped>
