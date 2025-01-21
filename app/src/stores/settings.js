@@ -38,7 +38,7 @@ export const settingsStore = defineStore(
         // Set up input (microphone)
         if (persistedStore.selectedMicrophone) {
           micStream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: selectedMicrophone.value },
+            audio: { deviceId: persistedStore.selectedMicrophone },
           });
           const micSource = audioContext.createMediaStreamSource(micStream);
           inputGainNode = audioContext.createGain();
