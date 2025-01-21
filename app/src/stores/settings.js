@@ -11,7 +11,7 @@ export const settingsStore = defineStore(
     const microphones = ref([]);
     const speakers = ref([]);
     const showModal = ref(false);
-
+    const selectedNote = ref(persistedStore.defaultNote);
     const inputVolume = ref(0.5); // Microphone volume
 
     let audioContext = null;
@@ -39,7 +39,7 @@ export const settingsStore = defineStore(
         // Set up input (microphone)
         if (persistedStore.selectedMicrophone) {
           micStream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: selectedMicrophone.value },
+            audio: { deviceId: persistedStore.selectedMicrophone },
           });
           const micSource = audioContext.createMediaStreamSource(micStream);
           inputGainNode = audioContext.createGain();
@@ -79,6 +79,7 @@ export const settingsStore = defineStore(
       microphones,
       speakers,
       showModal,
+      selectedNote,
       inputVolume,
       getDevices,
       setInputVolume,
