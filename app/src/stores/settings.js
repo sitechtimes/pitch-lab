@@ -1,25 +1,22 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { persistedSettings } from "./persistedStore";
 
 export const settingsStore = defineStore(
   "settings",
   () => {
-    const assignedID = ref(1);
-    const pastAudio = ref([]);
-    const recentlyDeleted = ref([]);
+
+    const persistedStore = persistedSettings();
+
     const microphones = ref([]);
     const speakers = ref([]);
-    const selectedMicrophone = ref(null);
-    const selectedSpeaker = ref(null);
     const showModal = ref(false);
-
+    const selectedNote = ref(persistedStore.defaultNote);
     const inputVolume = ref(0.5); // Microphone volume
-    const outputVolume = ref(0.5); // Speaker volume
 
     let audioContext = null;
     let micStream = null;
     let inputGainNode = null;
-    let outputGainNode = null;
     let audioElement = null;
     let sourceNode = null;
 
@@ -40,9 +37,9 @@ export const settingsStore = defineStore(
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         // Set up input (microphone)
-        if (selectedMicrophone.value) {
+        if (persistedStore.selectedMicrophone) {
           micStream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: selectedMicrophone.value },
+            audio: { deviceId: persistedStore.selectedMicrophone },
           });
           const micSource = audioContext.createMediaStreamSource(micStream);
           inputGainNode = audioContext.createGain();
@@ -53,9 +50,6 @@ export const settingsStore = defineStore(
         // Set up output (speaker)
         audioElement = new Audio("your-audio-file.mp3");
         sourceNode = audioContext.createMediaElementSource(audioElement);
-        outputGainNode = audioContext.createGain();
-        sourceNode.connect(outputGainNode).connect(audioContext.destination);
-        outputGainNode.gain.value = outputVolume.value;
       }
     };
 
@@ -64,14 +58,6 @@ export const settingsStore = defineStore(
       inputVolume.value = Number(volume);
       if (inputGainNode) {
         inputGainNode.gain.value = Number(volume);
-      }
-    };
-
-    // Update output (speaker) volume
-    const setOutputVolume = (volume) => {
-      outputVolume.value = Number(volume);
-      if (outputGainNode) {
-        outputGainNode.gain.value = Number(volume);
       }
     };
 
@@ -88,58 +74,23 @@ export const settingsStore = defineStore(
       }
     };
 
-    const updateMicrophone = (deviceId) => {
-      selectedMicrophone.value = deviceId;
-      initializeAudio();
-    };
-
-    const updateSpeaker = (deviceId) => {
-      selectedSpeaker.value = deviceId;
-      initializeAudio();
-    };
-
-    const toggleModal = () => {
-      showModal.value = !showModal.value;
-    };
-
     return {
-      assignedID,
-      pastAudio,
-      recentlyDeleted,
+      selectedNote,
       microphones,
       speakers,
-      selectedMicrophone,
-      selectedSpeaker,
       showModal,
+      selectedNote,
       inputVolume,
-      outputVolume,
       getDevices,
       setInputVolume,
-      setOutputVolume,
       initializeAudio,
       playAudio,
       pauseAudio,
-      toggleModal,
-      updateMicrophone,
-      updateSpeaker,
     };
   },
   {
     persist: {
-      enabled: true, // Enable persistence for this store
-      strategies: [
-        {
-          storage: localStorage, // Use localStorage to persist the state
-          paths: [
-            "recentlyDeleted",
-            "pastAudio",
-            "microphones",
-            "speakers",
-            "selectedMicrophone",
-            "selectedSpeaker",
-          ], // Specify which state to persist
-        },
-      ],
+      enabled: false, // dont persist this store
     },
   },
 );

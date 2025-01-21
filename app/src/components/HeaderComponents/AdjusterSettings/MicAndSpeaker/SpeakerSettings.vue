@@ -32,14 +32,10 @@
 import { settingsStore } from "../../../../stores/settings.js";
 import { onMounted, computed, ref } from "vue";
 
+
 const store = settingsStore();
 const isPlaying = ref(false);
 const currentVolume = ref(0);
-
-const outputVolume = computed({
-  get: () => store.outputVolume,
-  set: (value) => store.setOutputVolume(value),
-});
 
 // Fetch devices when the modal is shown
 onMounted(() => {

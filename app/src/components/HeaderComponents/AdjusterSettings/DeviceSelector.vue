@@ -15,30 +15,28 @@
         @click="saveSettings"
       >
         Save
-      </button>
+      </button>  
       <button
-        class="btn btn-outline btn-error bg-[#7210E3]"
-        @click="store.toggleModal"
-      >
-        Cancel
-      </button>
-    </div>
+          class="btn btn-outline btn-error"
+          @click="store.showModal = false"
+        >
+          Exit
+        </button>
+
     <!-- Modal Footer -->
   </div>
 </template>
 
 <script setup>
-import { settingsStore } from "../../../stores/settings.js";
 import SpeakerSettings from "./MicAndSpeaker/SpeakerSettings.vue";
 import MicrophoneSettings from "./MicAndSpeaker/MicrophoneSettings.vue";
+
+import { settingsStore } from "../../../stores/settings.js";
 const store = settingsStore();
 
-// Fetch devices when the modal is shown
-
 const saveSettings = () => {
-  store.updateMicrophone(store.selectedMicrophone);
-  store.updateSpeaker(store.selectedSpeaker);
-  store.toggleModal;
+  store.initializeAudio();
+  store.showModal = false;
 };
 </script>
 
