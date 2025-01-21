@@ -13,7 +13,10 @@
         <button class="btn btn-outline btn-success" @click="saveSettings">
           Save
         </button>
-        <button class="btn btn-outline btn-error" @click="store.toggleModal">
+        <button
+          class="btn btn-outline btn-error"
+          @click="store.showModal = false"
+        >
           Exit
         </button>
       </div>
