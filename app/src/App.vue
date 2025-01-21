@@ -23,7 +23,7 @@
     <!-- Main Control Panel -->
     <div class="flex justify-center mt-8">
       <div
-        class="w-[95%] bg-controller-bg rounded-3xl p-6 flex justify-between items-center"
+        class="w-[95%] bg-[#1A1725] rounded-3xl p-6 flex justify-between items-center"
       >
         <!-- Recorder -->
         <AudioRecorder class="w-[30%]" />
@@ -43,7 +43,7 @@
     </div>
 
     <!-- Tuning Section -->
-    <div class="bg-entire-bg">
+    <div class="mt-20 bg-entire-bg">
       <TunerSection />
     </div>
 

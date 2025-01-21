@@ -12,7 +12,7 @@ export default {
       white: "#FFFFFF",
       "tuner-bg": "#120E1D",
       "entire-bg": "#2A283B",
-      "controller-bg": "#1A1725",
+      "controllers-bg": "#1A1725",
       "tuner-controller-button": "#2A4296",
       "tuner-controller-text": "#A3D10A",
       purple: "#7210E3",
