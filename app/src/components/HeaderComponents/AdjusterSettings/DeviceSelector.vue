@@ -22,9 +22,11 @@
         >
           Exit
         </button>
+      </div>
 
     <!-- Modal Footer -->
   </div>
+
 </template>
 
 <script setup>
