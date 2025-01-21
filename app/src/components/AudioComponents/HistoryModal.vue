@@ -1,19 +1,21 @@
 <template>
-  <div>
-    <div>
+  <div
+    class="device-selector inset-0 flex items-center justify-center bg-red bg-opacity-30 z-50 absolute bg-black/30 p-4"
+  >
+    <div class="bg-[#0E021C] rounded-lg shadow-lg p-6 w-[50%] relative">
+      <h2 class="text-3xl">History</h2>
       <Button
         v-if="!audioStore.viewingDeleted"
         @click="audioStore.viewingDeleted = true"
         >Go to recently deleted</Button
       >
+      <div class="flex w-[80%] flex-row items-center justify-between  mx-auto">  
+    <div>      
       <Button
         v-if="audioStore.viewingDeleted"
         @click="audioStore.viewingDeleted = false"
         >Go back to history</Button
       >
-    </div>
-
-    <div>
       <PastAudio v-if="!audioStore.viewingDeleted" />
       <RecentlyDeleted v-if="audioStore.viewingDeleted" />
     </div>
@@ -35,8 +37,8 @@
         </a>
       </div>
     </div>
+    </div>
 
-    <div>
       <button
         @click="
           (audioStore.viewingHistory = false), (audioStore.currentAudio = null)
@@ -44,8 +46,9 @@
       >
         Exit History
       </button>
-    </div>
-  </div>
+  </div>    
+</div>
+
 </template>
 
 <script setup>
