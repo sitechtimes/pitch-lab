@@ -10,7 +10,7 @@
       >
         History:
         <option
-          v-for="file in audioStore.recentlyDeleted"
+          v-for="file in persistedStore.recentlyDeleted"
           :key="file.id"
           :value="{ audio: file.audio, id: file.id }"
         >
@@ -39,7 +39,9 @@
 </template>
 
 <script setup>
-import { audioFiles } from "@/stores/audioFiles";
 import WarningModal from "./WarningModal.vue";
+import { audioFiles } from "@/stores/audioFiles";
+import { persistedSettings } from "@/stores/persistedStore";
+const persistedStore = persistedSettings();
 const audioStore = audioFiles();
 </script>
