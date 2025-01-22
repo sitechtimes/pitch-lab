@@ -2,10 +2,13 @@
   <div>
     <!-- Speaker Selection -->
     <div class="mb-6">
-      <h1 for="speaker" class="block text-white text-3xl mb-2">
-        Speaker:
-      </h1>
-      <button @click="testSpeaker" class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4">Test Speaker</button>
+      <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
+      <button
+        @click="testSpeaker"
+        class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4"
+      >
+        Test Speaker
+      </button>
 
       <select
         id="speaker"
@@ -32,10 +35,14 @@
 import { settingsStore } from "../../../../stores/settings.js";
 import { onMounted, computed, ref } from "vue";
 
-
 const store = settingsStore();
 const isPlaying = ref(false);
 const currentVolume = ref(0);
+
+const outputVolume = computed({
+  get: () => store.outputVolume,
+  set: (value) => store.setOutputVolume(value),
+});
 
 // Fetch devices when the modal is shown
 onMounted(() => {
@@ -50,7 +57,7 @@ const testSpeaker = () => {
   const gainNode = audioContext.createGain();
   const analyser = audioContext.createAnalyser();
 
-  oscillator.type = 'sine';
+  oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
   oscillator.connect(gainNode);
   gainNode.connect(analyser);

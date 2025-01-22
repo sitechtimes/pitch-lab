@@ -25,7 +25,9 @@ export default {
       gray: "#8492a6",
       "gray-light": "#D9D9D9",
     },
-    fontFamily: {},
+    fontFamily: {
+      heading: ['Open Sans', 'sans-serif']
+    },
     extend: {
 
     },

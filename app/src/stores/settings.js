@@ -5,12 +5,11 @@ import { persistedSettings } from "./persistedStore";
 export const settingsStore = defineStore(
   "settings",
   () => {
-
     const persistedStore = persistedSettings();
 
     const microphones = ref([]);
     const speakers = ref([]);
-    const showModal = ref(false);
+    const showSettingsModal = ref(false);
     const selectedNote = ref(persistedStore.defaultNote);
     const inputVolume = ref(0.5); // Microphone volume
 
@@ -20,7 +19,7 @@ export const settingsStore = defineStore(
     let audioElement = null;
     let sourceNode = null;
 
-    // Fetch devices
+    // Initialize audio context and gain nodes
     const getDevices = async () => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       microphones.value = devices.filter(
@@ -74,11 +73,11 @@ export const settingsStore = defineStore(
       }
     };
 
+
     return {
-      selectedNote,
       microphones,
       speakers,
-      showModal,
+      showSettingsModal,
       selectedNote,
       inputVolume,
       getDevices,

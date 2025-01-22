@@ -1,14 +1,14 @@
 <template>
   <div>
     <div>
-      <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
+      <label for="note-selection" class="text-gray-400 mr-4">History</label>
       <select
-        class="bg-gray-700 text-white p-2 rounded w-[90%]"
+        class="bg-gray-700 text-white p-2 rounded"
         v-model="audioStore.currentAudio"
       >
         History:
         <option
-          v-for="file in persistedStore.pastAudio"
+          v-for="file in audioStore.pastAudio"
           :key="file.id"
           :value="{ audio: file.audio, id: file.id }"
         >
@@ -17,11 +17,7 @@
       </select>
     </div>
     <div>
-      <input
-        type="text"
-        class="text-black w-1/2 mt-3"
-        v-model="audioStore.fileName"
-      />
+      <input type="text" v-model="audioStore.fileName" />
 
       <button @click="saveAudio">Rename File</button>
       <button @click="deleteAudio">Delete</button>
@@ -31,29 +27,27 @@
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
-const persistedStore = persistedSettings();
 
 const checkName = () => {
   if (audioStore.fileName !== null) {
     return true;
   } else {
-    audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
+    audioStore.fileName = `Untitled Recording ${audioStore.assignedID}`;
   }
 };
 
 const saveAudio = () => {
-  let index = persistedStore.pastAudio.findIndex(
+  let index = audioStore.pastAudio.findIndex(
     (file) => file.id === audioStore.currentAudio.id,
   );
   console.log(index);
-  console.log(persistedStore.pastAudio);
+  console.log(audioStore.pastAudio);
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName === true) {
-      persistedStore.pastAudio[index].name = audioStore.fileName.trim();
-      console.log(persistedStore.pastAudio[index].name);
+      audioStore.pastAudio[index].name = audioStore.fileName.trim();
+      console.log(audioStore.pastAudio[index].name);
     }
   } else {
     console.log(
@@ -61,19 +55,19 @@ const saveAudio = () => {
     );
     let date = new Date();
     checkName();
-    persistedStore.pastAudio.push({
-      id: persistedStore.assignedID,
+    audioStore.pastAudio.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName.trim(),
       audio: audioStore.currentAudio.audio,
       date: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
   audioStore.fileName = null;
 };
 
 const deleteAudio = () => {
-  let index = persistedStore.pastAudio.findIndex(
+  let index = audioStore.pastAudio.findIndex(
     (file) => file.id === audioStore.currentAudio.id,
   );
   let date = new Date();
@@ -81,7 +75,7 @@ const deleteAudio = () => {
   if (index === Number || index === 0) {
     console.log("found it");
     let obj = Object.defineProperty(
-      persistedStore.pastAudio[index],
+      audioStore.pastAudio[index],
       "dateDeleted",
       {
         value: date.toLocaleDateString(),
@@ -91,21 +85,21 @@ const deleteAudio = () => {
       },
     );
     console.log(obj);
-    persistedStore.recentlyDeleted.push(obj);
-    persistedStore.pastAudio.splice(index, 1);
+    audioStore.recentlyDeleted.push(obj);
+    audioStore.pastAudio.splice(index, 1);
   } else {
     console.log(
       "what the hell? how did you manage that? please report this issue. whatever. deleting smth new",
     );
     checkName();
-    persistedStore.recentlyDeleted.push({
-      id: persistedStore.assignedID,
+    audioStore.recentlyDeleted.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName,
       audio: audioStore.currentAudio.audio,
       date: date.toLocaleDateString(),
       deletedDate: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
   audioStore.currentAudio = null;
   audioStore.fileName = null;

@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 export const audioFiles = defineStore(
   "audioFiles",
   () => {
+
     //how we select stuff to delete or view and renaming maybeeee
     const fileName = ref(null);
     const currentAudio = ref(null);
@@ -25,9 +26,17 @@ export const audioFiles = defineStore(
       warning,
     };
   },
+
+
   {
     persist: {
-      enabled: false, // dont persist this store
+      enabled: true, // Enable persistence for this store
+      strategies: [
+        {
+          storage: localStorage, // Use localStorage to persist the state
+          paths: ["assignedID", "recentlyDeleted", "pastAudio"], // Specify which state to persist
+        },
+      ],
     },
   },
 );
