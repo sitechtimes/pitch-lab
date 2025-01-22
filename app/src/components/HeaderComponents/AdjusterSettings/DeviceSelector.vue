@@ -9,37 +9,36 @@
     >
       <SpeakerSettings />
       <hr class="my-4 border-[.12rem] border-[#A3D10A] w-[80%] mx-auto" />
-      <MicrophoneSettings />
+      <MicrophoneSettings />   
       <button
         class="btn btn-outline btn-success bg-[#7210E3] mr-4"
         @click="saveSettings"
       >
         Save
-      </button>
+      </button>  
       <button
-        class="btn btn-outline btn-error"
-        @click="store.showSettingsModal = false"
-      >
-        Exit
-      </button>
-    </div>
+          class="btn btn-outline btn-error"
+          @click="store.showSettingsModal"
+        >
+          Exit
+        </button>
+      </div>
 
     <!-- Modal Footer -->
   </div>
+
 </template>
 
 <script setup>
-import { settingsStore } from "../../../stores/settings.js";
 import SpeakerSettings from "./MicAndSpeaker/SpeakerSettings.vue";
 import MicrophoneSettings from "./MicAndSpeaker/MicrophoneSettings.vue";
+
+import { settingsStore } from "../../../stores/settings.js";
 const store = settingsStore();
 
-// Fetch devices when the modal is shown
-
 const saveSettings = () => {
-  store.updateMicrophone(store.selectedMicrophone);
-  store.updateSpeaker(store.selectedSpeaker);
-  store.toggleModal;
+  store.initializeAudio();
+  store.showSettingsModal = false;
 };
 </script>
 

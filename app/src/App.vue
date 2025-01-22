@@ -15,23 +15,23 @@
 
     <!-- Main Control Panel -->
     <div class="flex justify-center mt-8">
+  
       <div
-        class="w-[95%] bg-controllers-bg rounded-3xl p-6 flex justify-between items-center"
-      >
+        class="w-[95%] bg-controllers-bg rounded-3xl p-6 "
+      >    
+      <div class="flex justify-between w-[80%] text-3xl font-semibold mb-2">      
+        <h1>Recorder</h1>    
+        <h1>Metronome</h1>       
+        <h1>Tuner</h1>
+      </div>
+      <div class="flex justify-between items-center">
         <!-- Recorder -->
         <AudioRecorder class="w-[30%]" />
-
         <!-- Metronome -->
-        <div class="w-[30%] flex flex-col items-center">
-          <h2 class="text-lg font-semibold mb-2">Metronome</h2>
           <MetronomeController />
-        </div>
-
         <!-- Tuner -->
-        <div class="w-[30%] flex flex-col items-center">
-          <h2 class="text-lg font-semibold mb-2">Tuner</h2>
           <TunerController />
-        </div>
+      </div>
       </div>
     </div>
 
