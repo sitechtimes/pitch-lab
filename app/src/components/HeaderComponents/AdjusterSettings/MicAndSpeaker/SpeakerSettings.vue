@@ -25,18 +25,13 @@
 
 <script setup>
 import { settingsStore } from "../../../../stores/settings.js";
-import { onMounted, computed } from "vue";
+import { onMounted } from "vue";
 
 const store = settingsStore();
 
-const outputVolume = computed({
-  get: () => store.outputVolume,
-  set: (value) => store.setOutputVolume(value),
-});
-
 // Fetch devices when the modal is shown
 onMounted(() => {
-  if (store.showModal) {
+  if (store.showSettingsModal) {
     store.getDevices();
   }
 });
