@@ -1,8 +1,8 @@
 <template>
-  <div class="w-screen bg-[#2A283B] text-white">
+  <div class="w-screen h-[100vh] bg-entire-bg text-white">
     <!-- Header -->
     <header
-      class="flex items-center justify-between px-6 py-4 bg-[#1A1725] shadow-lg"
+      class="flex items-center justify-between px-6 py-4 bg-entire-bg shadow-lg"
     >
       <HeaderTitle />
       <SettingsIcon />
@@ -11,15 +11,10 @@
     <!-- Settings Modal -->
     <DeviceSelector
       v-if="settings.showModal"
-      name="Setting"
+      name="History"
       class="absolute inset-0 bg-black/30 p-4"
     />
-    <div>
-      <HistoryModal
-        v-if="audioStore.viewingHistory"
-        class="absolute inset-0 bg-black/30 p-4"
-      />
-    </div>
+
     <!-- Main Control Panel -->
     <div class="flex justify-center mt-8">
       <div
@@ -43,7 +38,7 @@
     </div>
 
     <!-- Tuning Section -->
-    <div class="mt-8">
+    <div class="mt-20 bg-entire-bg">
       <TunerSection />
     </div>
 
@@ -59,18 +54,7 @@ import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/Devic
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import { settingsStore } from "./stores/settings.js";
-import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
-import { audioFiles } from "./stores/audioFiles";
-
-const settings = settingsStore();
-const audioStore = audioFiles();
 
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
+const settings = settingsStore();
 </script>
-
-<style scoped>
-header {
-  background-color: #1a1725;
-  border-bottom: 2px solid #3a3a3a;
-}
-</style>

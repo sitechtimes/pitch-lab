@@ -3,18 +3,14 @@
     <h1 class="text-white text-3xl">Recorder</h1>
   </div>
 
-  <
-  <button
-    type="button"
-    class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
-    @click="
-      // changeDate = true;
-      open = true;
-      audioStore.viewingHistory = true;
-    "
-  >
-    View History Here:
-  </button>
+  <div>
+    <button @click="audioStore.viewingHistory = true">
+      View History Here:
+    </button>
+  </div>
+  <div>
+    <HistoryModal v-if="audioStore.viewingHistory" />
+  </div>
 
   <div class="flex flex-col">
     <!-- Timer display -->
@@ -22,7 +18,7 @@
       Timer: {{ formatTime(timer) }}
     </div>
   </div>
-  <div class="flex w-1/6 flex-col my-2">
+  <div class="flex w-[30%] flex-col my-2">
     <button
       class="bg-[#36C4E4] rounded-full"
       @click="startRecording"
@@ -54,7 +50,7 @@
         <img :src="url" class="download-icon" />
       </button>
     </a>
-    <input type="text" class="text-black" v-model="audioStore.fileName" />
+    <input type="text" v-model="audioStore.fileName" />
     <button @click="saveAudio">Rename File</button>
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>
@@ -64,10 +60,10 @@
 <script setup>
 import { ref } from "vue";
 import url from "../../../public/download-button.png";
+import HistoryModal from "../AudioComponents/HistoryModal.vue";
+
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
-const persistedStore = persistedSettings();
 
 const isRecording = ref(false);
 const timer = ref(0);
@@ -95,7 +91,7 @@ const startRecording = async () => {
         const base64Audio = reader.result.split(",")[1]; // Extract the base64 part
         audioStore.currentAudio = {
           audio: base64Audio,
-          id: persistedStore.assignedID,
+          id: audioStore.assignedID,
         }; // Store the base64 string with id
       };
       reader.readAsDataURL(audioBlob); // Convert Blob to Base64 string
@@ -140,12 +136,12 @@ const formatTime = (seconds) => {
 const checkName = () => {
   if (audioStore.fileName !== null) {
   } else {
-    audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
+    audioStore.fileName = `Untitled Recording ${audioStore.assignedID}`;
   }
 };
 
 const saveAudio = () => {
-  let index = persistedStore.pastAudio.findIndex(
+  let index = audioStore.pastAudio.findIndex(
     (file) => file.audio === audioStore.currentAudio.audio,
   );
   if (index === Number || index === 0) {
@@ -154,36 +150,36 @@ const saveAudio = () => {
     console.log("creating smth new");
     let date = new Date();
     checkName();
-    persistedStore.pastAudio.push({
-      id: persistedStore.assignedID,
+    audioStore.pastAudio.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName.trim(),
       audio: audioStore.currentAudio.audio,
       date: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
   audioStore.fileName = null;
 };
 
 const deleteAudio = () => {
   let date = new Date();
-  //console.log(audioStore.audio.id);
+  console.log(audioStore.audio.id);
   if (
     audioStore.currentAudio.id &&
-    audioStore.currentAudio.id < persistedStore.assignedID
+    audioStore.currentAudio.id < audioStore.assignedID
   ) {
     console.log("how the heck?? please report this. found dupe");
   } else {
     console.log("deleting smth new");
     checkName();
-    persistedStore.recentlyDeleted.push({
-      id: persistedStore.assignedID,
+    audioStore.recentlyDeleted.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName.value,
       audio: audioStore.currentAudio.audio,
       date: date.toLocaleDateString(),
       deletedDate: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
   audioStore.currentAudio = null;
   audioStore.fileName = null;

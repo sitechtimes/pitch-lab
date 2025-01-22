@@ -19,7 +19,7 @@ export const settingsStore = defineStore(
     let audioElement = null;
     let sourceNode = null;
 
-    // Fetch devices
+    // Initialize audio context and gain nodes
     const getDevices = async () => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       microphones.value = devices.filter(
@@ -72,6 +72,7 @@ export const settingsStore = defineStore(
         audioElement.pause();
       }
     };
+
 
     return {
       microphones,
