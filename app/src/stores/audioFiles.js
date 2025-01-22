@@ -37,13 +37,6 @@ export const audioFiles = defineStore(
           paths: ["assignedID", "recentlyDeleted", "pastAudio"], // Specify which state to persist
         },
       ],
-      enabled: true, // Enable persistence for this store
-      strategies: [
-        {
-          storage: localStorage, // Use localStorage to persist the state
-          paths: ["assignedID", "recentlyDeleted", "pastAudio"], // Specify which state to persist
-        },
-      ],
     },
   },
 );
