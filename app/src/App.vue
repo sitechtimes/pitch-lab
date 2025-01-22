@@ -8,7 +8,7 @@
 
     <!-- Settings Modal -->
     <DeviceSelector
-      v-if="settings.showModal"
+      v-if="settings.showSettingsModal"
       name="History"
       class="absolute inset-0 bg-black/30 p-4"
     />
@@ -16,7 +16,7 @@
     <!-- Main Control Panel -->
     <div class="flex justify-center mt-8">
       <div
-        class="w-[95%] bg-[#1A1725] rounded-3xl p-6 flex justify-between items-center"
+        class="w-[95%] bg-controllers-bg rounded-3xl p-6 flex justify-between items-center"
       >
         <!-- Recorder -->
         <AudioRecorder class="w-[30%]" />
@@ -52,7 +52,7 @@ import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/Devic
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import { settingsStore } from "./stores/settings.js";
-
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
+
 const settings = settingsStore();
 </script>
