@@ -134,8 +134,7 @@ const formatTime = (seconds) => {
 };
 
 const checkName = () => {
-  if (audioStore.fileName !== null) {
-  } else {
+  if (audioStore.fileName === null) {
     audioStore.fileName = `Untitled Recording ${audioStore.assignedID}`;
   }
 };
