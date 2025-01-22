@@ -21,6 +21,13 @@
         <!-- Recorder -->
         <AudioRecorder class="w-[30%]" />
 
+        <div
+          v-if="audioStore.viewingHistory"
+          class="absolute inset-0 bg-black/30 p-4"
+        >
+          <HistoryModal />
+        </div>
+
         <!-- Metronome -->
         <div class="w-[30%] flex flex-col items-center">
           <h2 class="text-lg font-semibold mb-2">Metronome</h2>
@@ -51,8 +58,12 @@ import TunerController from "./components/BodyControllers/TunerController.vue";
 import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
-import { settingsStore } from "./stores/settings.js";
+import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
 
+import { audioFiles } from "./stores/audioFiles";
+import { settingsStore } from "./stores/settings.js";
+
+const audioStore = audioFiles();
 const settings = settingsStore();
 </script>
