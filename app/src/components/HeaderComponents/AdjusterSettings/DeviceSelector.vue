@@ -18,7 +18,7 @@
       </button>
       <button
         class="btn btn-outline btn-error"
-        @click="store.showModal = false"
+        @click="store.showSettingsModal = false"
       >
         Exit
       </button>
