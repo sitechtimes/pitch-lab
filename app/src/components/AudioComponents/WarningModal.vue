@@ -3,30 +3,34 @@
     <h2>Warning!</h2>
     <p>Selecting delete will cause these files to be lost forever.</p>
     <p>Do you want to proceed?</p>
-    <button @click="store.warning = false">Cancel</button>
+    <button @click="audioStore.warning = false">Cancel</button>
     <button @click="killIt">Yes</button>
   </div>
 </template>
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
+import { persistedSettings } from "@/stores/persistedStore";
 
-const store = audioFiles();
+const audioStore = audioFiles();
+const persistedStore = persistedSettings();
+
 const killIt = () => {
-  if (store.deleteFunc === "single") {
+  if (audioStore.deleteFunc === "single") {
     deleteRecent();
   } else {
-    store.recentlyDeleted = [];
+    persistedStore.recentlyDeleted = [];
   }
 };
 
 const deleteRecent = () => {
-  let index = store.recentlyDeleted.findIndex(
-    (file) => file.id === store.currentAudio.id,
+  let index = persistedStore.recentlyDeleted.findIndex(
+    (file) => file.id === audioStore.currentAudio.id,
   );
   console.log("found it", index);
-  store.recentlyDeleted.splice(index, 1);
-  store.currentAudio = null;
-  store.warning = false;
+  persistedStore.recentlyDeleted.splice(index, 1);
+  audioStore.currentAudio = null;
+  audioStore.warning = false;
 };
 </script>
+``
