@@ -9,7 +9,7 @@
         id="speaker"
         v-model="store.selectedSpeaker"
         @change="updateSpeaker"
-        class="select select-bordered w-full text-black"
+        class="select select-bordered w-full"
       >
         <option
           v-for="device in store.speakers"
@@ -25,9 +25,14 @@
 
 <script setup>
 import { settingsStore } from "../../../../stores/settings.js";
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 
 const store = settingsStore();
+
+const outputVolume = computed({
+  get: () => store.outputVolume,
+  set: (value) => store.setOutputVolume(value),
+});
 
 // Fetch devices when the modal is shown
 onMounted(() => {

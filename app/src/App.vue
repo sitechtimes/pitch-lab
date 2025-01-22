@@ -11,15 +11,10 @@
     <!-- Settings Modal -->
     <DeviceSelector
       v-if="settings.showModal"
-      name="Setting"
+      name="History"
       class="absolute inset-0 bg-black/30 p-4"
     />
-    <div>
-      <HistoryModal
-        v-if="audioStore.viewingHistory"
-        class="absolute inset-0 bg-black/30 p-4"
-      />
-    </div>
+
     <!-- Main Control Panel -->
     <div class="flex justify-center mt-8">
       <div
@@ -59,8 +54,7 @@ import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/Devic
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import { settingsStore } from "./stores/settings.js";
-import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
-import { audioFiles } from "./stores/audioFiles";
+
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
 const settings = settingsStore();
 </script>

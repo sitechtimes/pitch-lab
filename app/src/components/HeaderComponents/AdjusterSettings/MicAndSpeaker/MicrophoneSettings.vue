@@ -11,7 +11,7 @@
           id="microphone"
           v-model="store.selectedMicrophone"
           @change="updateMicrophone"
-          class="select select-bordered w-full text-black"
+          class="select select-bordered w-full"
         >
           <option
             v-for="device in store.microphones"
