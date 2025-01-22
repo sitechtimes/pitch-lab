@@ -1,9 +1,7 @@
 <template>
   <div class="w-screen h-[100vh] bg-entire-bg text-white">
     <!-- Header -->
-    <header
-      class="flex items-center justify-between px-6 py-4 bg-entire-bg shadow-lg"
-    >
+    <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
       <HeaderTitle />
       <SettingsIcon />
     </header>

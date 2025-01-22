@@ -9,7 +9,7 @@ export const settingsStore = defineStore(
 
     const microphones = ref([]);
     const speakers = ref([]);
-    const showModal = ref(false);
+    const showSettingsModal = ref(false);
     const selectedNote = ref(persistedStore.defaultNote);
     const inputVolume = ref(0.5); // Microphone volume
 
@@ -77,7 +77,7 @@ export const settingsStore = defineStore(
     return {
       microphones,
       speakers,
-      showModal,
+      showSettingsModal,
       selectedNote,
       inputVolume,
       getDevices,
