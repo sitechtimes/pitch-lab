@@ -47,13 +47,10 @@ const saveAudio = () => {
   let index = persistedStore.pastAudio.findIndex(
     (file) => file.id === audioStore.currentAudio.id,
   );
-  console.log(index);
-  console.log(persistedStore.pastAudio);
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName === true) {
       persistedStore.pastAudio[index].name = audioStore.fileName.trim();
-      console.log(persistedStore.pastAudio[index].name);
     }
   } else {
     console.log(
@@ -77,7 +74,6 @@ const deleteAudio = () => {
     (file) => file.id === audioStore.currentAudio.id,
   );
   let date = new Date();
-  console.log(audioStore.currentAudio.id);
   if (index === Number || index === 0) {
     console.log("found it");
     let obj = Object.defineProperty(
@@ -90,7 +86,6 @@ const deleteAudio = () => {
         configurable: true,
       },
     );
-    console.log(obj);
     persistedStore.recentlyDeleted.push(obj);
     persistedStore.pastAudio.splice(index, 1);
   } else {

@@ -165,7 +165,6 @@ const saveAudio = () => {
 
 const deleteAudio = () => {
   let date = new Date();
-  //console.log(audioStore.audio.id);
   if (
     audioStore.currentAudio.id &&
     audioStore.currentAudio.id < persistedStore.assignedID
