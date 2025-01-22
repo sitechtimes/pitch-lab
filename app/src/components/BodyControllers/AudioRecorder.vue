@@ -6,10 +6,16 @@
   <button
     type="button"
     class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
-    @click="audioStore.viewingHistory = true"
+    @click="
+      (audioStore.viewingHistory = true), console.log(audioStore.viewingHistory)
+    "
   >
     View History Here:
   </button>
+
+  <div v-if="audioStore.viewingHistory">
+    <HistoryModal />
+  </div>
 
   <div class="flex flex-col">
     <!-- Timer display -->
@@ -59,6 +65,7 @@
 <script setup>
 import { ref } from "vue";
 import url from "../../../public/download-button.png";
+import HistoryModal from "../AudioComponents/HistoryModal.vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
@@ -133,7 +140,7 @@ const formatTime = (seconds) => {
 };
 
 const checkName = () => {
-  if (audioStore.fileName !== null) {
+  if (audioStore.fileName === null) {
     audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
   }
 };
