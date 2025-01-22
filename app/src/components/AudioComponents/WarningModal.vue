@@ -21,13 +21,12 @@ const killIt = () => {
 };
 
 const deleteRecent = () => {
-  let index = audioStore.recentlyDeleted.findIndex(
-    (file) => file.id === audioStore.currentAudio.id,
+  let index = store.recentlyDeleted.findIndex(
+    (file) => file.id === store.currentAudio.id,
   );
   console.log("found it", index);
-  audioStore.recentlyDeleted.splice(index, 1);
-  audioStore.currentAudio = null;
-  audioStore.warning = false;
+  store.recentlyDeleted.splice(index, 1);
+  store.currentAudio = null;
+  store.warning = false;
 };
 </script>
-``
