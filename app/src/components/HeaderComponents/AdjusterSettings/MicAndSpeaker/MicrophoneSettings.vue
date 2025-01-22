@@ -10,7 +10,6 @@
         <select
           id="microphone"
           v-model="store.selectedMicrophone"
-          @change="updateMicrophone"
           class="select select-bordered w-full"
         >
           <option

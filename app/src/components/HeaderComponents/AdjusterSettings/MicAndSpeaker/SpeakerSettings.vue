@@ -8,7 +8,6 @@
       <select
         id="speaker"
         v-model="store.selectedSpeaker"
-        @change="updateSpeaker"
         class="select select-bordered w-full"
       >
         <option
