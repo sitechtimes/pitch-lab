@@ -6,11 +6,7 @@
   <button
     type="button"
     class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
-    @click="
-      // changeDate = true;
-      open = true;
-      audioStore.viewingHistory = true;
-    "
+    @click="audioStore.viewingHistory = true"
   >
     View History Here:
   </button>
