@@ -43,7 +43,7 @@
     </div>
 
     <!-- Tuning Section -->
-    <div class="mt-20 bg-entire-bg">
+    <div class="mt-5 bg-entire-bg">
       <TunerSection />
     </div>
 
