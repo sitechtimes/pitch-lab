@@ -74,9 +74,6 @@ const isFlat = ref(false);
 const isSharp = ref(false);
 const selectedNote = ref(440);
 
-let audioContext = null;
-let analyser = null;
-
 const noteFrequencies = {
   A: 440,
   "B♭": 466.16,
@@ -84,6 +81,9 @@ const noteFrequencies = {
   "E♭": 311.13,
   F: 349.23,
 };
+
+let audioContext = null;
+let analyser = null;
 
 const normalizeToBaseOctave = (frequency) => {
   while (frequency > 523.25) {
@@ -193,7 +193,3 @@ onMounted(() => {
   startPitchDetection();
 });
 </script>
-
-<style scoped>
-/* Additional styling as needed */
-</style>
