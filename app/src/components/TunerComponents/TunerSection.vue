@@ -47,13 +47,43 @@
         </div>
       </div>
       <div class="flex items-center justify-between w-1/3 mx-auto">
-        <div class="bg-tuner-bg px-5 py-3 text-3xl rounded-full text-white">
+        <div
+          :class="{
+            'bg-tuner-bg': !isFlat,
+            'bg-orange': isFlat,
+            'px-5': true,
+            'py-3': true,
+            'text-3xl': true,
+            'rounded-full': true,
+            'text-white': true,
+          }"
+        >
           b
         </div>
-        <div class="text-4xl bg-tuner-bg px-5 py-3 rounded-lg text-white">
+        <div
+          :class="{
+            'bg-tuner-bg': !isInTune,
+            'bg-green': isInTune,
+            'text-4xl': true,
+            'px-5': true,
+            'py-3': true,
+            'rounded-lg': true,
+            'text-white': true,
+          }"
+        >
           {{ store.selectedNote.name }}
         </div>
-        <div class="bg-tuner-bg px-5 py-3 text-3xl rounded-full text-white">
+        <div
+          :class="{
+            'bg-tuner-bg': !isSharp,
+            'bg-orange': isSharp,
+            'px-5': true,
+            'py-3': true,
+            'text-3xl': true,
+            'rounded-full': true,
+            'text-white': true,
+          }"
+        >
           #
         </div>
       </div>
@@ -72,6 +102,7 @@ const note = ref("");
 const detuneValue = ref(0); // The slider position
 const isFlat = ref(false);
 const isSharp = ref(false);
+const isInTune = ref(false);
 const selectedNote = ref(440);
 
 const noteFrequencies = {
