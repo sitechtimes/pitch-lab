@@ -179,10 +179,6 @@ const detectPitch = () => {
   const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
-  const isConstantPitch = () =>
-    pitchBuffer.length >= 10 &&
-    pitchBuffer.every((p) => Math.abs(p - pitchBuffer[0]) < 1);
-
   const updateTuning = (detectedPitch) => {
     const normalizedPitch = normalizeFrequency(detectedPitch);
     const targetPitch = normalizeFrequency(selectedNoteFrequency.value);
@@ -195,11 +191,11 @@ const detectPitch = () => {
     detuneValue.value = detune;
     isFlat.value = detune < -10;
     isSharp.value = detune > 10;
-    isInTune.value = isConstantPitch();
-
+    isInTune.value = detune === 0; //Math.abs(detune) <= 5; (if allowing tolerance)
     console.log(
-      `Pitch: ${detectedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
+      `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
     );
+    console.log("Detune" + detune.toFixed(2));
   };
 
   const processDetectedPitch = (detectedPitch) => {
@@ -239,12 +235,11 @@ const detectPitch = () => {
 };
 
 const normalizeFrequency = (frequency) => {
-  const octaveBase = 523.25;
-  while (frequency > octaveBase) {
-    frequency /= 2;
-  }
   while (frequency < 261.63) {
     frequency *= 2;
+  }
+  while (frequency >= 523.25) {
+    frequency /= 2;
   }
   return frequency;
 };
