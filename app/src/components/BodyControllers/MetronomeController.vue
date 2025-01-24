@@ -54,11 +54,11 @@ const toggleMetronome = () => {
     <h1>Metronome</h1>
     <div>
       <label for="bpm">Tempo (BPM): </label>
-      <input type="number" id="bpm" v-model="bpm" min="30" max="300" />
+      <input type="number" id="bpm" class="text-black" v-model="bpm" min="30" max="300" />
     </div>
     <div>
       <label for="beats">Beats per Measure: </label>
-      <select id="beats" v-model="beatsPerMeasure">
+      <select id="beats" class="text-black" v-model="beatsPerMeasure">
         <option v-for="beat in beatOptions" :key="beat" :value="beat">
           {{ beat }}
         </option>

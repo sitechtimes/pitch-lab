@@ -4,12 +4,10 @@
   >
     <!-- Label -->
     <div class="flex flex-col">
-      <label for="tuning" class="text-lg font-semibold mb-2 text-gray-300">
-        Tuner
-      </label>
+
 
       <!-- Dropdown -->
-      <div class="relative">
+      <div class="relative text-black">
         <select
           v-model="store.selectedNote"
           class="bg-gray-800 text-gray-300 border border-gray-600 rounded px-4 py-1 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -17,7 +15,7 @@
           <option
             v-for="option in tuningOptions"
             :key="option.name"
-            :value="option"
+            :value="option" 
           >
             Tune to {{ option.name }}
           </option>
