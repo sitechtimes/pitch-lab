@@ -68,7 +68,7 @@
             'text-white': true,
           }"
         >
-          {{ store.selectedNote.name }}
+          {{ selectedNoteName }}
         </div>
         <div
           :class="{
@@ -84,18 +84,20 @@
           #
         </div>
       </div>
-      <button
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow"
-        @click="startTuning"
-      >
-        Start Tuning
-      </button>
+      <div class="flex flex-col items-center py-9">
+        <button
+          class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
+          @click="toggleTuning"
+        >
+          {{ isTuning ? "Stop Tuning" : "Start Tuning" }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed } from "vue";
 import Pitchfinder from "pitchfinder";
 import { settingsStore } from "../../stores/settings";
 
@@ -106,7 +108,9 @@ const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
 const isInTune = ref(false);
-const selectedNote = ref(440);
+const selectedNoteName = computed(() => store.selectedNote.name);
+const selectedNoteFrequency = computed(() => store.selectedNote.frequency);
+const isTuning = ref(false);
 
 const noteFrequencies = {
   A: 440,
@@ -119,15 +123,26 @@ const noteFrequencies = {
 let audioContext = null;
 let analyser = null;
 
-const normalizeFrequency = (frequency) => {
-  const octaveBase = 523.25;
-  while (frequency > octaveBase) {
-    frequency /= 2;
+const toggleTuning = async () => {
+  isTuning.value = !isTuning.value;
+
+  if (isTuning.value) {
+    try {
+      if (!audioContext) {
+        await setupAudioComponents();
+      }
+      detectPitch();
+    } catch (error) {
+      console.error("Error setting up audio components:", error);
+      isTuning.value = false;
+    }
+  } else {
+    if (audioContext) {
+      await audioContext.close();
+      audioContext = null;
+      analyser = null;
+    }
   }
-  while (frequency < 261.63) {
-    frequency *= 2;
-  }
-  return frequency;
 };
 
 const setupAudioComponents = async () => {
@@ -154,46 +169,28 @@ const setupHighPassFilter = (source) => {
 };
 
 const detectPitch = () => {
+  if (!audioContext) {
+    console.error("Audio context is not initialized.");
+    return;
+  }
+
   const pitchFinder = Pitchfinder.YIN({ sampleRate: audioContext.sampleRate });
   const dataArray = new Float32Array(analyser.fftSize);
-  const amplitudeThreshold = 0.02;
+  const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
   const isConstantPitch = () =>
     pitchBuffer.length >= 10 &&
     pitchBuffer.every((p) => Math.abs(p - pitchBuffer[0]) < 1);
 
-  const analyze = () => {
-    analyser.getFloatTimeDomainData(dataArray);
-    const peakAmplitude = Math.max(...dataArray.map(Math.abs));
-
-    if (peakAmplitude < amplitudeThreshold) {
-      console.log("Weak signal detected.");
-      requestAnimationFrame(analyze);
-      return;
-    }
-
-    const detectedPitch = pitchFinder(dataArray);
-    processDetectedPitch(detectedPitch);
-    requestAnimationFrame(analyze);
-  };
-
-  const processDetectedPitch = (detectedPitch) => {
-    if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-      pitchBuffer.push(detectedPitch);
-      if (pitchBuffer.length > 10) pitchBuffer.shift();
-      updateTuning(detectedPitch);
-    }
-  };
-
   const updateTuning = (detectedPitch) => {
     const normalizedPitch = normalizeFrequency(detectedPitch);
-    const targetPitch = normalizeFrequency(selectedNote.value);
+    const targetPitch = normalizeFrequency(selectedNoteFrequency.value);
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
 
     pitch.value = detectedPitch;
     note.value = Object.keys(noteFrequencies).find(
-      (key) => noteFrequencies[key] === selectedNote.value,
+      (key) => noteFrequencies[key] === selectedNoteFrequency.value,
     );
     detuneValue.value = detune;
     isFlat.value = detune < -10;
@@ -205,14 +202,50 @@ const detectPitch = () => {
     );
   };
 
-  analyze();
+  const processDetectedPitch = (detectedPitch) => {
+    if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
+      pitchBuffer.push(detectedPitch);
+      if (pitchBuffer.length > 10) pitchBuffer.shift();
+      updateTuning(detectedPitch);
+    }
+  };
+
+  const analyze = () => {
+    if (!isTuning.value) {
+      console.log("Stopping pitch detection.");
+      return; // Stop the loop
+    }
+
+    try {
+      analyser.getFloatTimeDomainData(dataArray);
+      const peakAmplitude = Math.max(...dataArray.map(Math.abs));
+
+      if (peakAmplitude < amplitudeThreshold) {
+        console.log("Weak signal detected.");
+        requestAnimationFrame(analyze);
+        return;
+      }
+
+      const detectedPitch = pitchFinder(dataArray);
+      processDetectedPitch(detectedPitch);
+    } catch (error) {
+      console.error("Error during pitch detection:", error);
+    }
+
+    requestAnimationFrame(analyze); // Continue the loop
+  };
+
+  analyze(); // Start the loop
 };
 
-const startTuning = () => {
-  // Initiates the tuning process when button is clicked
-  setupAudioComponents();
-  detectPitch();
+const normalizeFrequency = (frequency) => {
+  const octaveBase = 523.25;
+  while (frequency > octaveBase) {
+    frequency /= 2;
+  }
+  while (frequency < 261.63) {
+    frequency *= 2;
+  }
+  return frequency;
 };
-
-onMounted(startTuning); // Changed to start the tuning when the component mounts.
 </script>
