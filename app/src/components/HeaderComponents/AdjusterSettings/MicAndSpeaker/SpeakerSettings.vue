@@ -12,7 +12,7 @@
 
       <select
         id="speaker"
-        v-model="store.selectedSpeaker",
+        v-model="store.selectedSpeaker"
         class="select select-bordered w-[60%] text-black"
       >
         <option

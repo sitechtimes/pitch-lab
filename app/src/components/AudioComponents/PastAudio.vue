@@ -3,7 +3,7 @@
     <div>
       <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
       <select
-        class="bg-gray-700 text-white p-2 rounded w-[90%]"
+        class="bg-gray-700 text-black rounded w-[90%]"
         v-model="audioStore.currentAudio"
       >
         History:

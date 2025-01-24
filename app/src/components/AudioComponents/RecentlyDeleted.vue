@@ -5,7 +5,7 @@
         >Recently Deleted</label
       >
       <select
-        class="bg-gray-700 text-white p-2 rounded"
+        class="bg-gray-700 text-black rounded"
         v-model="audioStore.currentAudio"
       >
         History:

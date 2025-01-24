@@ -16,11 +16,11 @@
 
   <div class="flex flex-col w-1/10 my-2">
     <!-- Timer display -->
-    <div class="text-black bg-white my-4 p-2 rounded">
+    <div class="text-black bg-white my-4 text-center p-2 rounded">
       Timer: {{ formatTime(timer) }}
     </div>
     <button
-      class="bg-[#36C4E4] rounded-full"
+      class="bg-[#36C4E4] rounded-full px-2"
       @click="startRecording"
       v-if="!isRecording"
     >

@@ -34,7 +34,7 @@
         >
           <HistoryModal />
         </div>
-
+        
         <!-- Metronome -->
           <MetronomeController />
         <!-- Tuner -->
