@@ -23,7 +23,7 @@
           <div
             class="w-2 h-16 bg-yellow-500 absolute"
             :style="{
-              left: `calc(50% + ${detuneValue}px)`,
+              left: indicatorPosition,
               transform: 'translateX(-50%) translateY(-50%)',
               top: '50%',
               border: '4px solid yellow',
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import Pitchfinder from "pitchfinder";
 import { settingsStore } from "../../stores/settings";
 
@@ -111,6 +111,11 @@ const isInTune = ref(false);
 const selectedNoteName = computed(() => store.selectedNote.name);
 const selectedNoteFrequency = computed(() => store.selectedNote.frequency);
 const isTuning = ref(false);
+const windowWidth = ref(window.innerWidth);
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+};
 
 const noteFrequencies = {
   A: 440,
@@ -122,6 +127,13 @@ const noteFrequencies = {
 
 let audioContext = null;
 let analyser = null;
+
+const indicatorPosition = computed(() => {
+  const maxRange = 50;
+  let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
+  let percentageOffset = (detune / maxRange) * 50;
+  return `calc(50% + ${percentageOffset}%)`;
+});
 
 const toggleTuning = async () => {
   isTuning.value = !isTuning.value;
@@ -191,7 +203,7 @@ const detectPitch = () => {
     detuneValue.value = detune;
     isFlat.value = detune < -10;
     isSharp.value = detune > 10;
-    isInTune.value = detune === 0; //Math.abs(detune) <= 5; (if allowing tolerance)
+    isInTune.value = Math.abs(detune) <= 10;
     console.log(
       `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
     );
@@ -228,10 +240,10 @@ const detectPitch = () => {
       console.error("Error during pitch detection:", error);
     }
 
-    requestAnimationFrame(analyze); // Continue the loop
+    requestAnimationFrame(analyze);
   };
 
-  analyze(); // Start the loop
+  analyze();
 };
 
 const normalizeFrequency = (frequency) => {
@@ -243,4 +255,12 @@ const normalizeFrequency = (frequency) => {
   }
   return frequency;
 };
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
