@@ -68,7 +68,7 @@
             'text-white': true,
           }"
         >
-          {{ selectedNoteName }}
+          {{ store.selectedNote.name }}
         </div>
         <div
           :class="{
@@ -108,8 +108,6 @@ const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
 const isInTune = ref(false);
-const selectedNoteName = ref(store.selectedNote.name);
-const selectedNoteFrequency = ref(store.selectedNote.frequency);
 const isTuning = ref(false);
 const windowWidth = ref(window.innerWidth);
 
@@ -193,12 +191,12 @@ const detectPitch = () => {
 
   const updateTuning = (detectedPitch) => {
     const normalizedPitch = normalizeFrequency(detectedPitch);
-    const targetPitch = normalizeFrequency(selectedNoteFrequency.value);
+    const targetPitch = normalizeFrequency(store.selectedNote.fequency.value);
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
 
     pitch.value = detectedPitch;
     note.value = Object.keys(noteFrequencies).find(
-      (key) => noteFrequencies[key] === selectedNoteFrequency.value,
+      (key) => noteFrequencies[key] === store.selectedNote.fequency.value,
     );
     detuneValue.value = detune;
     isFlat.value = detune < -10;
