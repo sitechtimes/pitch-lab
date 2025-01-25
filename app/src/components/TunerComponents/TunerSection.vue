@@ -1,82 +1,122 @@
 <template>
-  <div class="flex flex-col items-center justify-center bg-gray-800 text-white">
-    <h1 class="text-3xl font-bold text-gray-200 mb-6">Pitch Finder</h1>
-    <p class="text-gray-400 mb-4">
-      Click the button below to start detecting pitch.
-    </p>
-    <button
-      @click="startPitchDetection"
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
-    >
-      Start Pitch Detection
-    </button>
-
-    <!-- Note Selection -->
-    <div class="mt-6">
-      <label for="note-selection" class="text-gray-400 mr-4">Tune to:</label>
-      <select
-        id="note-selection"
-        v-model="selectedNote"
-        class="bg-gray-700 text-white p-2 rounded"
-      >
-        <option
-          v-for="(frequency, noteName) in noteFrequencies"
-          :key="noteName"
-          :value="frequency"
-        >
-          {{ noteName }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Tuning Scale -->
-    <div class="mt-8">
+  <div class="flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-screen-xl">
       <div
-        class="scale-container relative w-96 h-6 bg-gray-900 rounded overflow-hidden"
+        class="relative flex justify-center items-center h-[30vh] bg-tuner-bg py-12 my-12 px-6 rounded-lg shadow-lg"
+        style="width: 100%"
       >
-        <!-- Center line always visible -->
-        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-green-500"></div>
-        <!-- Notch Lines -->
-        <div v-for="i in 11" :key="i" class="absolute inset-y-0">
+        <div class="relative w-full" style="height: 100%">
           <div
-            :style="{ left: `${50 + i * 5}px` }"
-            class="h-full w-0.5 bg-gray-500"
+            v-for="i in 21"
+            :key="i"
+            class="absolute bg-white w-[1px]"
+            :class="{
+              'h-[16vh]': i % 2 === 1,
+              'h-[10vh]': i % 2 !== 1,
+            }"
+            :style="{
+              left: `${(i - 1) * 5}%`,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }"
           ></div>
           <div
-            :style="{ left: `${50 - i * 5}px` }"
-            class="h-full w-0.5 bg-gray-500"
+            class="w-2 h-16 bg-yellow-500 absolute"
+            :style="{
+              left: indicatorPosition,
+              transform: 'translateX(-50%) translateY(-50%)',
+              top: '50%',
+              border: '4px solid yellow',
+            }"
           ></div>
+          <div
+            v-for="j in 11"
+            :key="`label-${j}`"
+            class="absolute text-2xl text-white"
+            :style="{
+              left: `${(2 * j - 2) * 5}%`,
+              bottom: '-30px',
+              transform: 'translateX(-50%)',
+            }"
+          >
+            {{ (j - 6) * 10 }}
+          </div>
         </div>
-        <!-- Slider for Detune Value -->
-        <div
-          :style="{ transform: `translateX(${detuneValue}px)` }"
-          class="slider w-2 h-6 bg-blue-500 absolute top-0 left-1/2 -translate-x-1/2"
-        ></div>
       </div>
-
-      <div class="flex justify-center items-center mt-6">
-        <p class="mr-2 text-2xl font-semibold">{{ note }}</p>
-        <p v-if="isFlat" class="text-2xl text-gray-400">b</p>
-        <p v-if="isSharp" class="text-2xl text-gray-400">#</p>
+      <div class="flex items-center justify-between w-1/3 mx-auto">
+        <div
+          :class="{
+            'bg-tuner-bg': !isFlat,
+            'bg-orange': isFlat,
+            'px-5': true,
+            'py-3': true,
+            'text-3xl': true,
+            'rounded-full': true,
+            'text-white': true,
+          }"
+        >
+          b
+        </div>
+        <div
+          :class="{
+            'bg-tuner-bg': !isInTune,
+            'bg-green': isInTune,
+            'text-4xl': true,
+            'px-5': true,
+            'py-3': true,
+            'rounded-lg': true,
+            'text-white': true,
+          }"
+        >
+          {{ selectedNoteName }}
+        </div>
+        <div
+          :class="{
+            'bg-tuner-bg': !isSharp,
+            'bg-orange': isSharp,
+            'px-5': true,
+            'py-3': true,
+            'text-3xl': true,
+            'rounded-full': true,
+            'text-white': true,
+          }"
+        >
+          #
+        </div>
+      </div>
+      <div class="flex flex-col items-center py-9">
+        <button
+          class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
+          @click="toggleTuning"
+        >
+          {{ isTuning ? "Stop Tuning" : "Start Tuning" }}
+        </button>
       </div>
     </div>
   </div>
 </template>
-<script setup>
-import { ref } from "vue";
-import Pitchfinder from "pitchfinder";
 
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import Pitchfinder from "pitchfinder";
+import { settingsStore } from "../../stores/settings";
+
+const store = settingsStore();
 const pitch = ref(null);
 const note = ref("");
-const detuneValue = ref(0); // The slider position
+const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
-const selectedNote = ref(440); // Default to "A" (440 Hz)
+const isInTune = ref(false);
+const selectedNoteName = computed(() => store.selectedNote.name);
+const selectedNoteFrequency = computed(() => store.selectedNote.frequency);
+const isTuning = ref(false);
+const windowWidth = ref(window.innerWidth);
 
-let audioContext = null;
-let analyser = null;
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+};
 
-// Note frequencies for selection
 const noteFrequencies = {
   A: 440,
   "B♭": 466.16,
@@ -85,85 +125,142 @@ const noteFrequencies = {
   F: 349.23,
 };
 
-const normalizeToBaseOctave = (frequency) => {
-  while (frequency > 523.25) {
-    frequency /= 2;
+let audioContext = null;
+let analyser = null;
+
+const indicatorPosition = computed(() => {
+  const maxRange = 50;
+  let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
+  let percentageOffset = (detune / maxRange) * 50;
+  return `calc(50% + ${percentageOffset}%)`;
+});
+
+const toggleTuning = async () => {
+  isTuning.value = !isTuning.value;
+
+  if (isTuning.value) {
+    try {
+      if (!audioContext) {
+        await setupAudioComponents();
+      }
+      detectPitch();
+    } catch (error) {
+      console.error("Error setting up audio components:", error);
+      isTuning.value = false;
+    }
+  } else {
+    if (audioContext) {
+      await audioContext.close();
+      audioContext = null;
+      analyser = null;
+    }
   }
+};
+
+const setupAudioComponents = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      autoGainControl: false,
+      noiseSuppression: false,
+      echoCancellation: false,
+    },
+  });
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioContext.createMediaStreamSource(stream);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 8192;
+  source.connect(analyser);
+  setupHighPassFilter(source);
+};
+
+const setupHighPassFilter = (source) => {
+  const highPassFilter = audioContext.createBiquadFilter();
+  highPassFilter.type = "highpass";
+  highPassFilter.frequency.value = 50;
+  source.connect(highPassFilter).connect(analyser);
+};
+
+const detectPitch = () => {
+  if (!audioContext) {
+    console.error("Audio context is not initialized.");
+    return;
+  }
+
+  const pitchFinder = Pitchfinder.YIN({ sampleRate: audioContext.sampleRate });
+  const dataArray = new Float32Array(analyser.fftSize);
+  const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
+  const pitchBuffer = [];
+
+  const updateTuning = (detectedPitch) => {
+    const normalizedPitch = normalizeFrequency(detectedPitch);
+    const targetPitch = normalizeFrequency(selectedNoteFrequency.value);
+    const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
+
+    pitch.value = detectedPitch;
+    note.value = Object.keys(noteFrequencies).find(
+      (key) => noteFrequencies[key] === selectedNoteFrequency.value,
+    );
+    detuneValue.value = detune;
+    isFlat.value = detune < -10;
+    isSharp.value = detune > 10;
+    isInTune.value = Math.abs(detune) <= 10;
+    console.log(
+      `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
+    );
+    console.log("Detune" + detune.toFixed(2));
+  };
+
+  const processDetectedPitch = (detectedPitch) => {
+    if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
+      pitchBuffer.push(detectedPitch);
+      if (pitchBuffer.length > 10) pitchBuffer.shift();
+      updateTuning(detectedPitch);
+    }
+  };
+
+  const analyze = () => {
+    if (!isTuning.value) {
+      console.log("Stopping pitch detection.");
+      return; // Stop the loop
+    }
+
+    try {
+      analyser.getFloatTimeDomainData(dataArray);
+      const peakAmplitude = Math.max(...dataArray.map(Math.abs));
+
+      if (peakAmplitude < amplitudeThreshold) {
+        console.log("Weak signal detected.");
+        requestAnimationFrame(analyze);
+        return;
+      }
+
+      const detectedPitch = pitchFinder(dataArray);
+      processDetectedPitch(detectedPitch);
+    } catch (error) {
+      console.error("Error during pitch detection:", error);
+    }
+
+    requestAnimationFrame(analyze);
+  };
+
+  analyze();
+};
+
+const normalizeFrequency = (frequency) => {
   while (frequency < 261.63) {
     frequency *= 2;
+  }
+  while (frequency >= 523.25) {
+    frequency /= 2;
   }
   return frequency;
 };
 
-const startPitchDetection = async () => {
-  try {
-    // Request microphone input
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(stream);
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 4096;
-    source.connect(analyser);
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+});
 
-    // YIN algorithm
-    const pitchFinder = Pitchfinder.YIN({
-      sampleRate: audioContext.sampleRate,
-    });
-
-    // Detect pitch
-    const dataArray = new Float32Array(analyser.fftSize);
-    const detect = () => {
-      analyser.getFloatTimeDomainData(dataArray);
-      const detectedPitch = pitchFinder(dataArray);
-
-      if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-        const normalizedPitch = normalizeToBaseOctave(detectedPitch);
-        const normalizedTarget = normalizeToBaseOctave(selectedNote.value);
-
-        const detune = 1200 * Math.log2(normalizedPitch / normalizedTarget); // Detune in cents
-        pitch.value = detectedPitch;
-
-        // Determine the note name for display purposes
-        note.value = Object.keys(noteFrequencies).find(
-          (key) => noteFrequencies[key] === selectedNote.value,
-        );
-
-        detuneValue.value = detune; // Update slider position
-
-        // Determine if the pitch is sharp or flat
-        isFlat.value = detune < -10; // Flat if detune is less than -10 cents
-        isSharp.value = detune > 10; // Sharp if detune is more than 10 cents
-
-        console.log(
-          `Pitch detected: ${detectedPitch.toFixed(2)} Hz (Normalized: ${normalizedPitch.toFixed(2)} Hz, Target: ${note.value}, Detune: ${detune.toFixed(2)} cents)`,
-        );
-      }
-
-      requestAnimationFrame(detect);
-    };
-
-    detect();
-  } catch (err) {
-    console.error("Error accessing microphone: ", err);
-    alert("Could not access your microphone. Please allow microphone access.");
-  }
-};
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
-
-<style scoped>
-.scale-container {
-  position: relative;
-  background-color: #1a1a1a;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.slider {
-  height: 24px;
-  width: 8px;
-  background-color: #00b4d8;
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-}
-</style>

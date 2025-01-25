@@ -8,21 +8,30 @@ export default {
       xl: "1440px",
     },
     colors: {
+      black: "#000000",
+      white: "#FFFFFF",
+      "tuner-bg": "#120E1D",
+      "entire-bg": "#2A283B",
+      "controllers-bg": "#1A1725",
+      "tuner-controller-button": "#2A4296",
+      "tuner-controller-text": "#A3D10A",
+      purple: "#7210E3",
       blue: "#1fb6ff",
       pink: "#ff49db",
       orange: "#ff7849",
       green: "#13ce66",
+      skyblue: "#36C4E4",
       "gray-dark": "#273444",
       gray: "#8492a6",
-      "gray-light": "#d3dce6",
-      purple: "#7210E3",
-      skyblue: "#36C4E4",
+      "gray-light": "#D9D9D9",
     },
-    fontFamily: {},
+    fontFamily: {
+    },
+    extend: {
+
+    },
   },
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  theme: {
-    extend: {},
-  },
+
   plugins: ["daisyui"],
 };

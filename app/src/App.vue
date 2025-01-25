@@ -1,39 +1,69 @@
 <template>
-  <div class="w-screen bg-[#2A283B]">
-    <header class="flex justify-between">
+  <div class="w-screen h-[100vh] bg-entire-bg text-white">
+    <!-- Header -->
+    <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
       <HeaderTitle />
       <SettingsIcon />
     </header>
 
+    <!-- Settings Modal -->
     <DeviceSelector
-      v-if="settings.showModal"
+      v-if="settings.showSettingsModal"
       name="History"
       class="absolute inset-0 bg-black/30 p-4"
     />
 
-    <div class="flex justify-center">
-      <div class="w-[95%] bg-[#1A1725] rounded-3xl my-10">
-        <AudioRecorder class="ml-9 w-[30%]" />
+    <!-- Main Control Panel -->
+    <div class="flex justify-center mt-8">
+      <div
+        class="w-[95%] bg-controllers-bg rounded-3xl p-6 flex justify-between items-center"
+      >
+        <!-- Recorder -->
+        <AudioRecorder class="w-[30%]" />
+
+        <div
+          v-if="audioStore.viewingHistory"
+          class="absolute inset-0 bg-black/30 p-4"
+        >
+          <HistoryModal />
+        </div>
+
+        <!-- Metronome -->
+        <div class="w-[30%] flex flex-col items-center">
+          <h2 class="text-lg font-semibold mb-2">Metronome</h2>
+          <MetronomeController />
+        </div>
+
+        <!-- Tuner -->
+        <div class="w-[30%] flex flex-col items-center">
+          <h2 class="text-lg font-semibold mb-2">Tuner</h2>
+          <TunerController />
+        </div>
       </div>
-      <!-- add metronome and tuner thingy here -->
     </div>
 
-    <TunerSection />
-    <MetronomeComponent />
+    <!-- Tuning Section -->
+    <div class="mt-5 bg-entire-bg">
+      <TunerSection />
+    </div>
+
     <RouterView />
   </div>
 </template>
 
 <script setup>
 import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
-import AudioRecorder from "./components/BodyComponents/AudioRecorder.vue";
-import DeviceSelector from "./components/HeaderComponents/Settings/DeviceSelector.vue";
-import SettingsIcon from "./components/HeaderComponents/Settings/SettingsIcon.vue";
+import AudioRecorder from "./components/BodyControllers/AudioRecorder.vue";
+import TunerController from "./components/BodyControllers/TunerController.vue";
+import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
+import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
+import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
+import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
-import MetronomeComponent from "./components/MetronomeComponent.vue";
+
+import { audioFiles } from "./stores/audioFiles";
 import { settingsStore } from "./stores/settings.js";
 
+const audioStore = audioFiles();
 const settings = settingsStore();
 </script>
-
-<style scoped></style>
