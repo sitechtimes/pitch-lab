@@ -73,7 +73,6 @@ export const settingsStore = defineStore(
       }
     };
 
-
     return {
       microphones,
       speakers,
@@ -88,8 +87,6 @@ export const settingsStore = defineStore(
     };
   },
   {
-    persist: {
-      enabled: false, // dont persist this store
-    },
+    persist: false, //don't persist
   },
 );

@@ -27,8 +27,6 @@ export const audioFiles = defineStore(
   },
 
   {
-    persist: {
-      enabled: false, // Don't persist this store
-    },
+    persist: false, // Don't persist this store
   },
 );
