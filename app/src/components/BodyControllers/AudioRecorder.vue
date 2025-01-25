@@ -74,7 +74,7 @@ const startRecording = async () => {
   try {
     // Get access to the microphone
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: { deviceID: persistedStore.selectedMicrophone },
     });
 
     mediaRecorder = new MediaRecorder(stream);
