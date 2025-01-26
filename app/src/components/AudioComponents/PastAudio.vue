@@ -25,6 +25,12 @@
 
       <button @click="saveAudio">Rename File</button>
       <button @click="deleteAudio">Delete</button>
+
+      <div v-if="saving">
+        <button @click="saving = null">x</button>
+        <p v-if="saving === 'delete'">Successfully Deleted!</p>
+        <p v-if="saving === 'save'">Successfully Saved!</p>
+      </div>
     </div>
   </div>
 </template>
@@ -32,8 +38,14 @@
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
+import { ref, onUnmounted } from "vue";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
+const saving = ref(null);
+
+onUnmounted(() => {
+  saving.value = null;
+});
 
 const checkName = () => {
   if (audioStore.fileName !== null) {
@@ -67,6 +79,7 @@ const saveAudio = () => {
     persistedStore.assignedID++;
   }
   audioStore.fileName = null;
+  saving.value = "save";
 };
 
 const deleteAudio = () => {
@@ -104,5 +117,6 @@ const deleteAudio = () => {
   }
   audioStore.currentAudio = null;
   audioStore.fileName = null;
+  saving.value = "delete";
 };
 </script>
