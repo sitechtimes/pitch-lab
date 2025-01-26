@@ -18,9 +18,9 @@
       <div
         class="w-[95%] bg-controllers-bg rounded-3xl p-6 flex justify-between items-center"
       >
-        <!-- Recorder -->
-        <AudioRecorder class="w-[30%]" />
-
+        <div class="w-[30%]">
+          <AudioRecorder />
+        </div>
         <div
           v-if="audioStore.viewingHistory"
           class="absolute inset-0 bg-black/30 p-4"

@@ -88,8 +88,6 @@ export const settingsStore = defineStore(
     };
   },
   {
-    persist: {
-      enabled: false, // dont persist this store
-    },
+    persist: false,
   },
 );
