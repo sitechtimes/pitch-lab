@@ -8,19 +8,25 @@ export const persistedSettings = defineStore(
     const assignedID = ref(1);
     const pastAudio = ref([]);
     const recentlyDeleted = ref([]);
-
-    //settings ig
-    const selectedMicrophone = ref(null);
-    const selectedSpeaker = ref(null);
     const defaultNote = ref({ name: "C", frequency: 261.63 });
 
+    const selectedMicrophone = ref(null);
+    const selectedSpeaker = ref(null);
+    const inputVolume = ref(0.5);
+    const outputVolume = ref(1.0);
+
     return {
+      // Audio settings
+      selectedMicrophone,
+      selectedSpeaker,
+      inputVolume,
+      outputVolume,
+
+      // App state
       assignedID,
       pastAudio,
       recentlyDeleted,
-      selectedMicrophone,
-      selectedSpeaker,
-      defaultNote,
+      defaultNote
     };
   },
   {
@@ -28,7 +34,17 @@ export const persistedSettings = defineStore(
       enabled: true,
       strategies: [
         {
-          storage: localStorage, // Use localStorage to persist the state
+          storage: localStorage,
+          paths: [
+            'selectedMicrophone',
+            'selectedSpeaker',
+            'inputVolume',
+            'outputVolume',
+            'assignedID',
+            'pastAudio',
+            'recentlyDeleted',
+            'defaultNote'
+          ]
         },
       ],
     },
