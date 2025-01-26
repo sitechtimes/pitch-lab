@@ -60,19 +60,6 @@ export const settingsStore = defineStore(
       }
     };
 
-    const playAudio = () => {
-      if (audioElement) {
-        audioContext.resume();
-        audioElement.play();
-      }
-    };
-
-    const pauseAudio = () => {
-      if (audioElement) {
-        audioElement.pause();
-      }
-    };
-
     return {
       microphones,
       speakers,
@@ -82,8 +69,7 @@ export const settingsStore = defineStore(
       getDevices,
       setInputVolume,
       initializeAudio,
-      playAudio,
-      pauseAudio,
+
     };
   },
   {
