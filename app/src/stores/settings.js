@@ -87,6 +87,6 @@ export const settingsStore = defineStore(
     };
   },
   {
-    persist: false, //don't persist
+    persist: false,
   },
 );
