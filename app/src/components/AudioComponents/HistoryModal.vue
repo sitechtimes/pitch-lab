@@ -1,16 +1,18 @@
 <template>
   <div>
     <div>
-      <Button
+      <button
         v-if="!audioStore.viewingDeleted"
         @click="audioStore.viewingDeleted = true"
-        >Go to recently deleted</Button
       >
-      <Button
+        Go to recently deleted
+      </button>
+      <button
         v-if="audioStore.viewingDeleted"
         @click="audioStore.viewingDeleted = false"
-        >Go back to history</Button
       >
+        Go back to history
+      </button>
     </div>
 
     <div>
