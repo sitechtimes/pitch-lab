@@ -49,8 +49,13 @@
         <img :src="url" class="download-icon" />
       </button>
     </a>
-    <input type="text" class="text-black" v-model="audioStore.fileName" />
-    <button @click="saveAudio">Name File</button>
+    <label for="name">Name File</label>
+    <input
+      id="name"
+      type="text"
+      class="text-black"
+      v-model="audioStore.fileName"
+    />
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>
   </div>
@@ -167,6 +172,7 @@ const saveAudio = () => {
   audioStore.currentAudio = null;
   audioStore.fileName = null;
   saving.value = "save";
+  timer.value = 0;
 };
 
 const deleteAudio = () => {
@@ -191,6 +197,7 @@ const deleteAudio = () => {
   audioStore.currentAudio = null;
   audioStore.fileName = null;
   saving.value = "delete";
+  timer.value = 0;
 };
 </script>
 
