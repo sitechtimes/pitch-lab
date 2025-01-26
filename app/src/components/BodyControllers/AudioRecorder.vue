@@ -6,7 +6,7 @@
   <button
     type="button"
     class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
-    @click="audioStore.viewingHistory = true"
+    @click="(audioStore.viewingHistory = true), (saving = null)"
   >
     View History Here:
   </button>
@@ -50,9 +50,15 @@
       </button>
     </a>
     <input type="text" class="text-black" v-model="audioStore.fileName" />
-    <button @click="saveAudio">Rename File</button>
+    <button @click="saveAudio">Name File</button>
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>
+  </div>
+
+  <div v-if="saving">
+    <button @click="saving = null">x</button>
+    <p v-if="saving === 'delete'">Successfully Deleted!</p>
+    <p v-if="saving === 'save'">Successfully Saved!</p>
   </div>
 </template>
 
@@ -64,6 +70,7 @@ import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 
+const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
 let mediaRecorder = null;
@@ -71,6 +78,7 @@ let audioChunks = [];
 let timerInterval = null;
 
 const startRecording = async () => {
+  saving.value = null;
   try {
     // Get access to the microphone
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -156,7 +164,9 @@ const saveAudio = () => {
     });
     persistedStore.assignedID++;
   }
+  audioStore.currentAudio = null;
   audioStore.fileName = null;
+  saving.value = "save";
 };
 
 const deleteAudio = () => {
@@ -180,6 +190,7 @@ const deleteAudio = () => {
   }
   audioStore.currentAudio = null;
   audioStore.fileName = null;
+  saving.value = "delete";
 };
 </script>
 
