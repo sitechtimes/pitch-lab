@@ -12,7 +12,7 @@ export const persistedSettings = defineStore(
     //settings ig
     const selectedMicrophone = ref(null);
     const selectedSpeaker = ref(null);
-    const defaultNote = ref();
+    const defaultNote = ref({ name: "C", frequency: 261.63 });
 
     return {
       assignedID,

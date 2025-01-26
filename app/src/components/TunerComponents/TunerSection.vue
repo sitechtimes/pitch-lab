@@ -193,7 +193,7 @@ const detectPitch = () => {
 
   const updateTuning = (detectedPitch) => {
     const normalizedPitch = normalizeFrequency(detectedPitch);
-    const targetPitch = normalizeFrequency(selectedNoteFrequency.value);
+    const targetPitch = selectedNoteFrequency.value;
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
 
     pitch.value = detectedPitch;
@@ -247,13 +247,8 @@ const detectPitch = () => {
 };
 
 const normalizeFrequency = (frequency) => {
-  while (frequency < 261.63) {
-    frequency *= 2;
-  }
-  while (frequency >= 523.25) {
-    frequency /= 2;
-  }
-  return frequency;
+  const A4 = 440;
+  return A4 * Math.pow(2, Math.log2(frequency / A4) % 1);
 };
 
 onMounted(() => {
