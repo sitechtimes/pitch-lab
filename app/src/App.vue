@@ -19,16 +19,14 @@
       <div
         class="w-[95%] bg-controllers-bg rounded-3xl p-6 "
       >    
-      <div class="flex justify-between w-[80%] text-3xl font-semibold mb-2">      
-        <h1>Recorder</h1>    
-        <h1>Metronome</h1>       
-        <h1>Tuner</h1>
+      <div class="flex justify-between text-center text-3xl font-semibold mb-2">      
+        <h1 class="w-[40%]" >Recorder</h1>    
+        <h1 class="w-[30%]" >Metronome</h1>       
+        <h1 class="w-[30%]" >Tuner</h1>
       </div>
       <div class="flex justify-between items-center">
         <!-- Recorder -->
-        <div class="w-[30%]">
-          <AudioRecorder />
-        </div>
+        <AudioRecorder class="w-[30%]" />
 
         <div
           v-if="audioStore.viewingHistory"

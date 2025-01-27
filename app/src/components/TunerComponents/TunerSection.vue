@@ -23,7 +23,7 @@
           <div
             class="w-2 h-16 bg-yellow-500 absolute"
             :style="{
-              left: indicatorPosition,
+              left: `calc(50% + ${detuneValue}px)`,
               transform: 'translateX(-50%) translateY(-50%)',
               top: '50%',
               border: '4px solid yellow',
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed } from "vue";
 import Pitchfinder from "pitchfinder";
 import { settingsStore } from "../../stores/settings";
 
@@ -111,11 +111,6 @@ const isInTune = ref(false);
 const selectedNoteName = computed(() => store.selectedNote.name);
 const selectedNoteFrequency = computed(() => store.selectedNote.frequency);
 const isTuning = ref(false);
-const windowWidth = ref(window.innerWidth);
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth;
-};
 
 const noteFrequencies = {
   A: 440,
@@ -127,13 +122,6 @@ const noteFrequencies = {
 
 let audioContext = null;
 let analyser = null;
-
-const indicatorPosition = computed(() => {
-  const maxRange = 50;
-  let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
-  let percentageOffset = (detune / maxRange) * 50;
-  return `calc(50% + ${percentageOffset}%)`;
-});
 
 const toggleTuning = async () => {
   isTuning.value = !isTuning.value;
@@ -191,9 +179,13 @@ const detectPitch = () => {
   const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
+  const isConstantPitch = () =>
+    pitchBuffer.length >= 10 &&
+    pitchBuffer.every((p) => Math.abs(p - pitchBuffer[0]) < 1);
+
   const updateTuning = (detectedPitch) => {
     const normalizedPitch = normalizeFrequency(detectedPitch);
-    const targetPitch = selectedNoteFrequency.value;
+    const targetPitch = normalizeFrequency(selectedNoteFrequency.value);
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
 
     pitch.value = detectedPitch;
@@ -203,11 +195,11 @@ const detectPitch = () => {
     detuneValue.value = detune;
     isFlat.value = detune < -10;
     isSharp.value = detune > 10;
-    isInTune.value = Math.abs(detune) <= 10;
+    isInTune.value = isConstantPitch();
+
     console.log(
-      `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
+      `Pitch: ${detectedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
     );
-    console.log("Detune" + detune.toFixed(2));
   };
 
   const processDetectedPitch = (detectedPitch) => {
@@ -240,22 +232,20 @@ const detectPitch = () => {
       console.error("Error during pitch detection:", error);
     }
 
-    requestAnimationFrame(analyze);
+    requestAnimationFrame(analyze); // Continue the loop
   };
 
-  analyze();
+  analyze(); // Start the loop
 };
 
 const normalizeFrequency = (frequency) => {
-  const A4 = 440;
-  return A4 * Math.pow(2, Math.log2(frequency / A4) % 1);
+  const octaveBase = 523.25;
+  while (frequency > octaveBase) {
+    frequency /= 2;
+  }
+  while (frequency < 261.63) {
+    frequency *= 2;
+  }
+  return frequency;
 };
-
-onMounted(() => {
-  window.addEventListener("resize", handleResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", handleResize);
-});
 </script>

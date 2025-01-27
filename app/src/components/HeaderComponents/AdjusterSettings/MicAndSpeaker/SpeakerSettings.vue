@@ -78,5 +78,4 @@ const testSpeaker = () => {
     isPlaying.value = false;
   }, 2000); // Play sound for 2 seconds
 };
-
 </script>

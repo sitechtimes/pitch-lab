@@ -32,28 +32,16 @@
       </button>
     </div>
 
-    <div v-if="saving">
-      <button @click="saving = null">x</button>
-      <p>Successfully Deleted!</p>
-    </div>
-
     <div>
-      <WarningModal @died="saving = 'hi'" v-if="audioStore.warning" />
+      <WarningModal v-if="audioStore.warning" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onUnmounted } from "vue";
 import WarningModal from "./WarningModal.vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
-
 const persistedStore = persistedSettings();
 const audioStore = audioFiles();
-const saving = ref(null);
-
-onUnmounted(() => {
-  saving.value = null;
-});
 </script>
