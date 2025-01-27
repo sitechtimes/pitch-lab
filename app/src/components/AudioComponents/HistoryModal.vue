@@ -39,6 +39,44 @@
             </a>
           </div>
         </div>
+
+  <!-- <div>
+    <div>
+      <button
+        v-if="!audioStore.viewingDeleted"
+        @click="audioStore.viewingDeleted = true"
+      >
+        Go to recently deleted
+      </button>
+      <button
+        v-if="audioStore.viewingDeleted"
+        @click="audioStore.viewingDeleted = false"
+      >
+        Go back to history
+      </button>
+    </div>
+
+    <div>
+      <PastAudio v-if="!audioStore.viewingDeleted" />
+      <RecentlyDeleted v-if="audioStore.viewingDeleted" />
+    </div>
+
+    <div v-if="audioStore.currentAudio">
+      <div :key="audioStore.currentAudio.id">
+        <h3>Recorded Audio:</h3>
+        <audio
+          :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
+          controls
+        ></audio>
+        <a
+          :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
+          download="recorded-audio.mp4"
+        >
+          <button class="btn btn-ghost">
+            <img :src="url" class="download-icon" />
+          </button>
+        </a> -->
+
       </div>
       <button
         @click="

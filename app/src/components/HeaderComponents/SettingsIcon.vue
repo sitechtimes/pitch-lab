@@ -1,5 +1,8 @@
 <template>
-  <button class="mr-24 text-white" @click="settings.showSettingsModal = true">
+  <button
+    class="mr-24 text-white"
+    @click="(settings.showSettingsModal = true), settings.getDevices()"
+  >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"

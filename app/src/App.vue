@@ -26,7 +26,9 @@
       </div>
       <div class="flex justify-between items-center">
         <!-- Recorder -->
-        <AudioRecorder class="w-[30%]" />
+        <div class="w-[30%]">
+          <AudioRecorder />
+        </div>
 
         <div
           v-if="audioStore.viewingHistory"
