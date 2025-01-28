@@ -44,11 +44,19 @@
 
 <script setup>
 import { settingsStore } from "../../../../stores/settings.js";
-import { computed } from "vue";
+import { onMounted, computed } from "vue";
+
 const store = settingsStore();
 
 const inputVolume = computed({
   get: () => store.inputVolume,
   set: (value) => store.setInputVolume(value),
+});
+
+// Fetch devices when the modal is shown
+onMounted(() => {
+  if (store.showModal) {
+    store.getDevices();
+  }
 });
 </script>
