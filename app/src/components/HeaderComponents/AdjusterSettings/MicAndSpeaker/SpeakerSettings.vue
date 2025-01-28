@@ -32,11 +32,9 @@
 
 <script setup>
 import { settingsStore } from "../../../../stores/settings.js";
-import { onMounted, computed, ref } from "vue";
+import { onMounted } from "vue";
 
 const store = settingsStore();
-const isPlaying = ref(false);
-const currentVolume = ref(0);
 
 // Fetch devices when the modal is shown
 onMounted(() => {
@@ -44,38 +42,4 @@ onMounted(() => {
     store.getDevices();
   }
 });
-
-const testSpeaker = () => {
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  const analyser = audioContext.createAnalyser();
-
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
-  oscillator.connect(gainNode);
-  gainNode.connect(analyser);
-  analyser.connect(audioContext.destination);
-
-  oscillator.start();
-  isPlaying.value = true;
-
-  const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-  const updateVolume = () => {
-    analyser.getByteFrequencyData(dataArray);
-    const volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
-    currentVolume.value = Math.round(volume);
-    if (isPlaying.value) {
-      requestAnimationFrame(updateVolume);
-    }
-  };
-
-  updateVolume();
-
-  setTimeout(() => {
-    oscillator.stop();
-    isPlaying.value = false;
-  }, 2000); // Play sound for 2 seconds
-};
 </script>
