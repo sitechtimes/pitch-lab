@@ -75,6 +75,7 @@ import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 
+const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
 let mediaRecorder = null;
@@ -82,10 +83,11 @@ let audioChunks = [];
 let timerInterval = null;
 
 const startRecording = async () => {
+  saving.value = null;
   try {
     // Get access to the microphone
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: { deviceID: persistedStore.selectedMicrophone },
     });
 
     mediaRecorder = new MediaRecorder(stream);
@@ -144,8 +146,7 @@ const formatTime = (seconds) => {
 };
 
 const checkName = () => {
-  if (audioStore.fileName !== null) {
-  } else {
+  if (audioStore.fileName === null) {
     audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
   }
 };
@@ -168,12 +169,14 @@ const saveAudio = () => {
     });
     persistedStore.assignedID++;
   }
+  audioStore.currentAudio = null;
   audioStore.fileName = null;
+  saving.value = "save";
+  timer.value = 0;
 };
 
 const deleteAudio = () => {
   let date = new Date();
-  //console.log(audioStore.audio.id);
   if (
     audioStore.currentAudio.id &&
     audioStore.currentAudio.id < persistedStore.assignedID
@@ -193,6 +196,8 @@ const deleteAudio = () => {
   }
   audioStore.currentAudio = null;
   audioStore.fileName = null;
+  saving.value = "delete";
+  timer.value = 0;
 };
 </script>
 

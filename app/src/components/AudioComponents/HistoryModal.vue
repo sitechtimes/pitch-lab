@@ -21,10 +21,8 @@
           <PastAudio v-if="!audioStore.viewingDeleted" />
           <RecentlyDeleted v-if="audioStore.viewingDeleted" />
         </div>
-        <hr class="vertical-line mx-6"></hr>
-        <div v-if="audioStore.currentAudio">
+        <div v-if="audioStore.currentAudio">       
           <div :key="audioStore.currentAudio.id">
-            <h2 class="text-xl">Recorded Audio:</h2>
             <audio
               :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
               controls
@@ -66,9 +64,4 @@ const audioStore = audioFiles();
   object-fit: contain; /* Ensure the image maintains its aspect ratio */
 }
 
-.vertical-line {
-  width: 2px;
-  background-color: #A3D10A;
-  height: 100%;
-}
 </style>
