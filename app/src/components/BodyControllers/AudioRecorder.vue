@@ -61,7 +61,7 @@
   </div>
 
   <div v-if="saving">
-    <button @click="saving = null">x</button>
+    <button @click="autoDisappear">x</button>
     <p v-if="saving === 'delete'">Successfully Deleted!</p>
     <p v-if="saving === 'save'">Successfully Saved!</p>
   </div>
@@ -198,6 +198,12 @@ const deleteAudio = () => {
   audioStore.fileName = null;
   saving.value = "delete";
   timer.value = 0;
+};
+
+const autoDisappear = () => {
+  setTimeout(() => {
+    saving.value = null;
+  }, 3000);
 };
 </script>
 
