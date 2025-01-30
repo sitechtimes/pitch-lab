@@ -101,7 +101,6 @@ const timeSignatureTop = ref(4);
 const timeSignatureBottom = ref(4);
 const selectedSound = ref("beep");
 const currentBeat = ref(1);
-const audioContext = computed(() => settings.audioContext.value);
 const pulseScale = ref(1);
 const pulseSize = 50;
 
@@ -114,7 +113,7 @@ const initAudio = async () => {
   try {
     // Initialize store audio first
     const success = await settings.initializeAudio();
-    if (!success || !settings.audioContext.value) {
+    if (!success || !settings.audioContext) {
       throw new Error("Audio system failed to initialize");
     }
 
@@ -127,8 +126,8 @@ const initAudio = async () => {
     }
 
     // Connect metronome to output
-    const source = settings.audioContext.value.createBufferSource();
-    source.connect(settings.outputGainNode.value);
+    const source = settings.audioContext.createBufferSource();
+    source.connect(settings.outputGainNode);
 
     return true;
   } catch (error) {
@@ -143,7 +142,7 @@ const loadAudio = async (url) => {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const arrayBuffer = await response.arrayBuffer();
-    return await audioContext.value.decodeAudioData(arrayBuffer);
+    return await settings.audioContext.decodeAudioData(arrayBuffer);
   } catch (error) {
     console.error("Failed to load audio:", url, error);
     throw error; // Rethrow for handling in initAudio
@@ -152,29 +151,30 @@ const loadAudio = async (url) => {
 
 const playSound = () => {
   try {
-    if (!audioContext.value) throw new Error("Audio context not initialized");
+    if (!settings.audioContext)
+      throw new Error("Audio context not initialized");
 
     const buffer = selectedSound.value === "duck" ? duckBuffer : beepBuffer;
-    const source = audioContext.value.createBufferSource();
+    const source = settings.audioContext.createBufferSource();
     source.buffer = buffer;
 
-    const gainNode = audioContext.value.createGain();
+    const gainNode = settings.audioContext.createGain();
     gainNode.gain.value = currentBeat.value === 1 ? 1 : 0.7;
 
     source.connect(gainNode);
-    gainNode.connect(settings.mediaStreamDestination.value);
+    gainNode.connect(settings.mediaStreamDestination);
     source.start(0);
 
-    settings.audioElement.value?.play().catch(console.error);
+    settings.audioElement?.play().catch(console.error);
   } catch (error) {
     console.error("Playback error:", error);
     // Handle playback failure
   }
   console.log("Audio Context State:", {
-    storeInitialized: !!settings.audioContext.value,
-    componentAudioContext: !!audioContext.value,
-    mediaStreamDest: !!settings.mediaStreamDestination.value,
-    audioElement: !!settings.audioElement.value,
+    storeInitialized: !!settings.audioContext,
+    componentAudioContext: !!settings.audioContext,
+    mediaStreamDest: !!settings.mediaStreamDestination,
+    audioElement: !!settings.audioElement,
   });
 };
 // Visual pulse animation
