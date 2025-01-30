@@ -40,9 +40,7 @@
 
     <div>
       <button
-        @click="
-          (audioStore.viewingHistory = false), (audioStore.currentAudio = null)
-        "
+        @click="(audioStore.warning = false), (audioStore.currentAudio = null)"
       >
         Exit History
       </button>
