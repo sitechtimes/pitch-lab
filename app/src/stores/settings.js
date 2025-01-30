@@ -30,7 +30,7 @@ export const settingsStore = defineStore(
         try {
           // Create context after user interaction
           audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
-
+          console.log(audioContext)
           // Resume if suspended (iOS/Safari fix)
           if (audioContext.value.state === 'suspended') {
             await audioContext.value.resume();
