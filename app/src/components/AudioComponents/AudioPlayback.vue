@@ -19,21 +19,20 @@
 
 <script setup>
 import url from "../../../public/download-button.png";
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import { settingsStore } from "@/stores/settings.js"; // Adjust to your store path
 import { audioFiles } from "@/stores/audioFiles";
 const settings = settingsStore();
 const audioStore = audioFiles();
-
-// Refs
-const audioElement = ref(null);
 
 // Methods
 const setupAudioRouting = () => {
   const audioContext = settings.audioContext; // Get Tone.js context from the store
 
   // Create a source node from the audio element
-  const audioSource = audioContext.createMediaElementSource(audioElement.value);
+  const audioSource = audioContext.createMediaElementSource(
+    audioStore.currentAudio.audio,
+  );
 
   // Example: Apply a gain node (volume control)
   const gainNode = audioContext.createGain();
