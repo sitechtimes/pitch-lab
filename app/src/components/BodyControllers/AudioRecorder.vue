@@ -1,32 +1,27 @@
 <template>
-  <div class="flex justify-between">
-    <h1 class="text-white text-3xl">Recorder</h1>
-  </div>
-
   <button
     type="button"
-    class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
+    class="text-white bg-gold font-medium rounded-lg text-sm"
     @click="(audioStore.viewingHistory = true), (saving = null)"
   >
     View History Here:
   </button>
 
-  <div class="flex flex-col">
+  <div class="flex flex-col my-2 text-center">
     <!-- Timer display -->
     <div class="text-black bg-white my-4 p-2 rounded">
       Timer: {{ formatTime(timer) }}
     </div>
-  </div>
-  <div class="flex w-1/6 flex-col my-2">
+
     <button
-      class="bg-[#36C4E4] rounded-full"
+      class="bg-[#36C4E4] rounded-full p-2"
       @click="startRecording"
-      v-if="!isRecording"
+      v-if="!isRecording" 
     >
       Start Recording
     </button>
     <button
-      class="bg-[#A3D10A] rounded-full"
+      class="bg-[#A3D10A] rounded-full p-2"
       @click="stopRecording"
       v-if="isRecording"
     >
@@ -45,10 +40,9 @@
       :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       download="recorded-audio.mp4"
     >
-      <button class="btn btn-ghost">
-        <img :src="url" class="download-icon" />
-      </button>
+
     </a>
+    <div class="flex flex-col">
     <label for="name">Name File</label>
     <input
       id="name"
@@ -56,8 +50,12 @@
       class="text-black"
       v-model="audioStore.fileName"
     />
+  </div>
     <button @click="saveAudio">Save To History</button>
-    <button @click="deleteAudio">Delete</button>
+    <button @click="deleteAudio">Delete</button>      
+    <button class="btn btn-ghost">
+        <img :src="url" class="download-icon" />
+      </button>
   </div>
 
   <div v-if="saving">

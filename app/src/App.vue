@@ -19,26 +19,32 @@
       <div
         class="w-[95%] bg-controllers-bg rounded-3xl p-6 "
       >    
-      <div class="flex justify-between w-[80%] text-3xl font-semibold mb-2">      
-        <h1>Recorder</h1>    
-        <h1>Metronome</h1>       
-        <h1>Tuner</h1>
+      <div class="flex justify-between text-center w-full text-3xl font-semibold mb-2">      
+        <h1 class="w-[40%]">Recorder</h1>    
+        <h1 class="w-[30%]">Metronome</h1>       
+        <h1 class="w-[30%]">Tuner</h1>
       </div>
       <div class="flex justify-between items-center">
         <!-- Recorder -->
+      <div class="w-[40%] flex flex-row justify-between">
         <AudioRecorder />
-
+    
         <div
           v-if="audioStore.viewingHistory"
           class="absolute inset-0 bg-black/30 p-4"
         >
           <HistoryModal />
-        </div>
+        </div>  
+      </div>
         
         <!-- Metronome -->
+        <div class="w-[30%]items-center">
           <MetronomeController />
+        </div>
         <!-- Tuner -->
+        <div class="w-[30%] ">
           <TunerController />
+        </div>
       </div>
       </div>
     </div>
