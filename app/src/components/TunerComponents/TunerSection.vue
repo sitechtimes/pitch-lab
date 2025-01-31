@@ -125,9 +125,6 @@ const noteFrequencies = {
   F: 349.23,
 };
 
-let audioContext = null;
-let analyser = null;
-
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -136,58 +133,48 @@ const indicatorPosition = computed(() => {
 });
 
 const toggleTuning = async () => {
-  isTuning.value = !isTuning.value;
+  try {
+    isTuning.value = !isTuning.value;
 
-  if (isTuning.value) {
-    try {
-      if (!audioContext) {
-        await setupAudioComponents();
+    if (isTuning.value) {
+      // Reset previous state
+      store.cleanupAudio();
+
+      // Initialize fresh audio pipeline
+      const success = await store.initializeAudio();
+
+      if (!success || !store.analyser?.value) {
+        throw new Error(
+          "Audio initialization failed - check microphone permissions",
+        );
       }
+
+      // Add brief stabilization delay
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
       detectPitch();
-    } catch (error) {
-      console.error("Error setting up audio components:", error);
-      isTuning.value = false;
+    } else {
+      store.cleanupAudio();
     }
-  } else {
-    if (audioContext) {
-      await audioContext.close();
-      audioContext = null;
-      analyser = null;
-    }
+  } catch (error) {
+    console.error("Tuning error:", error);
+    store.cleanupAudio();
+    isTuning.value = false;
+    // Add user-facing error message here
   }
-};
-
-const setupAudioComponents = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      autoGainControl: false,
-      noiseSuppression: false,
-      echoCancellation: false,
-    },
-  });
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const source = audioContext.createMediaStreamSource(stream);
-  analyser = audioContext.createAnalyser();
-  analyser.fftSize = 8192;
-  source.connect(analyser);
-  setupHighPassFilter(source);
-};
-
-const setupHighPassFilter = (source) => {
-  const highPassFilter = audioContext.createBiquadFilter();
-  highPassFilter.type = "highpass";
-  highPassFilter.frequency.value = 50;
-  source.connect(highPassFilter).connect(analyser);
 };
 
 const detectPitch = () => {
-  if (!audioContext) {
-    console.error("Audio context is not initialized.");
-    return;
-  }
+  if (!store.analyser?.value) return;
 
-  const pitchFinder = Pitchfinder.YIN({ sampleRate: audioContext.sampleRate });
-  const dataArray = new Float32Array(analyser.fftSize);
+  const analyserNode = store.analyser.value;
+  const bufferLength = analyserNode.fftSize;
+  const dataArray = new Float32Array(bufferLength);
+
+  const pitchFinder = Pitchfinder.YIN({
+    sampleRate: store.audioContext.value.sampleRate,
+  });
+  // const dataArray = new Float32Array(store.analyser.fftSize.value);
   const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
@@ -225,7 +212,7 @@ const detectPitch = () => {
     }
 
     try {
-      analyser.getFloatTimeDomainData(dataArray);
+      store.analyser.value.getFloatTimeDomainData(dataArray);
       const peakAmplitude = Math.max(...dataArray.map(Math.abs));
 
       if (peakAmplitude < amplitudeThreshold) {

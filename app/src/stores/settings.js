@@ -17,48 +17,92 @@ export const settingsStore = defineStore(
     const selectedNote = ref(persistedStore.defaultNote);
 
     const audioContext = ref(null);
-    const inputGainNode = ref(null)
-    const outputGainNode = ref(null)
-    const mediaStreamDestination = ref(null)
-    const audioElement = ref(null)
-
-
-    // stores/settings.js
-    // settings.js - Update initializeAudio
+    const inputGainNode = ref(null);
+    const outputGainNode = ref(null);
+    const mediaStreamDestination = ref(null);
+    const audioElement = ref(null);
+    const analyser = ref(null);
     const initializeAudio = async () => {
-      if (!audioContext.value) {
-        try {
-          // Create context after user interaction
-          audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
-          console.log(audioContext)
-          // Resume if suspended (iOS/Safari fix)
-          if (audioContext.value.state === 'suspended') {
-            await audioContext.value.resume();
-          }
+      try {
+        // Full cleanup before initialization
+        cleanupAudio();
 
-          // Initialize nodes
-          mediaStreamDestination.value = audioContext.value.createMediaStreamDestination();
-          audioElement.value = new Audio();
+        // Create fresh audio context
+        audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
+        console.log("AudioContext created");
 
-          // Create proper audio routing
-          const mediaElementSource = audioContext.value.createMediaElementSource(audioElement.value);
-          inputGainNode.value = audioContext.value.createGain();
-          outputGainNode.value = audioContext.value.createGain();
-
-          // Connect nodes: Source → Input Gain → Output Gain → Destination
-          mediaElementSource.connect(inputGainNode.value);
-          inputGainNode.value.connect(outputGainNode.value);
-          outputGainNode.value.connect(mediaStreamDestination.value);
-
-          return true;
-        } catch (error) {
-          console.error("AudioContext creation failed:", error);
-          audioContext.value = null;
-          return false;
+        // Resume context if needed (crucial for iOS)
+        if (audioContext.value.state === "suspended") {
+          await audioContext.value.resume();
         }
+
+        // Get fresh microphone stream
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            noiseSuppression: false,
+            echoCancellation: false,
+            autoGainControl: false,
+            deviceId: persistedStore.selectedMicrophone ?
+              { exact: persistedStore.selectedMicrophone } : undefined
+          }
+        });
+
+        // Create nodes
+        analyser.value = audioContext.value.createAnalyser();
+        analyser.value.fftSize = 2048; // Reduced for better compatibility
+        inputGainNode.value = audioContext.value.createGain();
+        outputGainNode.value = audioContext.value.createGain();
+
+        // Create processing chain
+        const source = audioContext.value.createMediaStreamSource(stream);
+        const highPassFilter = audioContext.value.createBiquadFilter();
+        highPassFilter.type = "highpass";
+        highPassFilter.frequency.value = 50;
+
+        // Connect nodes
+        source
+          .connect(highPassFilter)
+          .connect(inputGainNode.value)
+          .connect(analyser.value)
+          .connect(outputGainNode.value)
+          .connect(audioContext.value.destination);
+
+        console.log("Audio nodes initialized:", {
+          analyser: !!analyser.value,
+          context: audioContext.value.state
+        });
+
+        return true;
+      } catch (error) {
+        console.error("Audio initialization failed:", error);
+        cleanupAudio();
+        return false;
       }
-      return true;
     };
+
+    const cleanupAudio = () => {
+      if (audioContext.value) {
+        try {
+          // Disconnect all nodes first
+          inputGainNode.value?.disconnect();
+          outputGainNode.value?.disconnect();
+          analyser.value?.disconnect();
+
+          // Close context properly
+          if (typeof audioContext.value.close === "function") {
+            audioContext.value.close();
+          }
+        } catch (e) {
+          console.warn("Cleanup error:", e);
+        }
+        audioContext.value = null;
+      }
+      analyser.value = null;
+      inputGainNode.value = null;
+      outputGainNode.value = null;
+      console.log("Audio resources cleaned");
+    };
+
     const updateOutputDevice = async (deviceId) => {
       try {
         if (!audioElement.value) {
@@ -113,21 +157,17 @@ export const settingsStore = defineStore(
       }
     };
 
-    // Cleanup
-    const cleanupAudio = () => {
-      if (audioContext.value) {
-        audioContext.value.close();
-        audioContext.value = null;
-      }
-      mediaStreamDestination.value = null;
-      audioElement.value = null;
-    };
-
     const getDevices = async () => {
       try {
         // Only request mic permission if needed
         if (!persistedStore.selectedMicrophone) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              autoGainControl: false,
+              noiseSuppression: false,
+              echoCancellation: false,
+            },
+          });
           stream.getTracks().forEach(track => track.stop());
         }
 
@@ -165,7 +205,8 @@ export const settingsStore = defineStore(
       setInputVolume,
       setOutputVolume,
       cleanupAudio,
-      getDevices
+      getDevices,
+      analyser // Add analyser to the returned state
     };
   },
   {
