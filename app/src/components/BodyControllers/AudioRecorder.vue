@@ -1,14 +1,14 @@
 <template>
-  <button
+
+
+  <div class="flex flex-col my-2 text-center">
+    <!-- Timer display -->  <button
     type="button"
     class="text-white bg-gold font-medium rounded-lg text-sm"
     @click="(audioStore.viewingHistory = true), (saving = null)"
   >
     View History Here:
   </button>
-
-  <div class="flex flex-col my-2 text-center">
-    <!-- Timer display -->
     <div class="text-black bg-white my-4 p-2 rounded">
       Timer: {{ formatTime(timer) }}
     </div>
@@ -42,15 +42,13 @@
     >
 
     </a>
-    <div class="flex flex-col">
-    <label for="name">Name File</label>
-    <input
+      <input
       id="name"
       type="text"
       class="text-black"
       v-model="audioStore.fileName"
+      placeholder="Name File"
     />
-  </div>
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>      
     <button class="btn btn-ghost">

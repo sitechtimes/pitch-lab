@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-[100vh] bg-entire-bg text-white">
+  <div class="w-screen bg-entire-bg text-white">
     <!-- Header -->
     <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
       <HeaderTitle />
@@ -54,7 +54,6 @@
       <TunerSection />
     </div>
 
-    <RouterView />
   </div>
 </template>
 

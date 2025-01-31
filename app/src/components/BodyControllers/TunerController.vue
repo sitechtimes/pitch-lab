@@ -127,6 +127,6 @@ const updateVolume = () => {
 };
 </script>
 
-<style scoped>
+<!-- <style scoped>
 /* Tailwind classes are already applied inline */
-</style>
+</style> -->
