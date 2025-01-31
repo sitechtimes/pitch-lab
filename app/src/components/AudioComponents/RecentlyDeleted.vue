@@ -20,6 +20,7 @@
     </div>
     <!-- buttons to clear recently deleted -->
     <div>
+      <button @click="restoreAudio">Restore to History</button>
       <button
         @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
       >
@@ -33,12 +34,18 @@
     </div>
 
     <div v-if="saving">
-      <button @click="autoDisappear">x</button>
-      <p>Successfully Deleted!</p>
+      <div v-if="saving === 'delete'">
+        <button @click="autoDisappear">x</button>
+        <p>Successfully Deleted!</p>
+      </div>
+      <div v-if="saving === 'save'">
+        <button @click="autoDisappear">x</button>
+        <p>Successfully Saved!</p>
+      </div>
     </div>
 
     <div>
-      <WarningModal @died="saving = 'hi'" v-if="audioStore.warning" />
+      <WarningModal @died="saving = 'delete'" v-if="audioStore.warning" />
     </div>
   </div>
 </template>
@@ -57,5 +64,43 @@ const autoDisappear = () => {
   setTimeout(() => {
     saving.value = null;
   }, 3000);
+};
+
+const restoreAudio = () => {
+  let index = persistedStore.recentlyDeleted.findIndex(
+    (file) => file.id === audioStore.currentAudio.id,
+  );
+  let date = new Date();
+  if (index === Number || index === 0) {
+    console.log("found it");
+    let obj = persistedStore.recentlyDeleted[index];
+    delete obj.deletedDate;
+    persistedStore.pastAudio.push(obj);
+    persistedStore.recentlyDeleted.splice(index, 1);
+  } else {
+    console.log(
+      "what the hell? how did you manage that? please report this issue. whatever. deleting smth new",
+    );
+    checkName();
+    persistedStore.pastAudio.push({
+      id: persistedStore.assignedID,
+      name: audioStore.fileName,
+      audio: audioStore.currentAudio.audio,
+      date: date.toLocaleDateString(),
+      deletedDate: date.toLocaleDateString(),
+    });
+    persistedStore.assignedID++;
+  }
+  audioStore.currentAudio = null;
+  audioStore.fileName = null;
+  saving.value = "save";
+};
+
+const checkName = () => {
+  if (audioStore.fileName !== null) {
+    return true;
+  } else {
+    audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
+  }
 };
 </script>
