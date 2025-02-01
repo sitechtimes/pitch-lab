@@ -17,7 +17,7 @@ export const settingsStore = defineStore(
     let micStream = null;
     let inputGainNode = null;
     let audioElement = null;
-    let sourceNode = null;
+    const sourceNode = ref(null);
 
     // Initialize audio context and gain nodes
     const getDevices = async () => {
@@ -48,7 +48,7 @@ export const settingsStore = defineStore(
 
         // Set up output (speaker)
         audioElement = new Audio("your-audio-file.mp3");
-        sourceNode = audioContext.createMediaElementSource(audioElement);
+        sourceNode.value = audioContext.createMediaElementSource(audioElement);
       }
     };
 
