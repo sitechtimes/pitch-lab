@@ -144,10 +144,10 @@ const toggleTuning = async () => {
         console.error("Failed to initialize audio context.");
         return;
       } else {
-        console.log("Audio context initialized.");
+        console.log("Audio initialized.");
       }
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      console.log("store analyser value" + store.analyser.value);
+      console.log("store analyser value" + store.analyser);
       detectPitch();
     } else {
       store.cleanupAudio();
@@ -160,20 +160,19 @@ const toggleTuning = async () => {
 };
 
 const detectPitch = () => {
-  if (!store.analyser.value || !store.audioContext.value) {
+  if (!store.analyser || !store.audioContext) {
     console.error("Analyser node or AudioContext is not initialized.");
     return;
-  } // somethings up here
+  }
 
-  const analyserNode = store.analyser.value;
+  const analyserNode = store.analyser;
   console.log(analyserNode);
   const bufferLength = analyserNode.fftSize;
   const dataArray = new Float32Array(bufferLength);
 
   const pitchFinder = Pitchfinder.YIN({
-    sampleRate: store.audioContext.value.sampleRate,
+    sampleRate: store.audioContext.sampleRate,
   });
-  // const dataArray = new Float32Array(store.analyser.fftSize.value);
   const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
@@ -196,13 +195,29 @@ const detectPitch = () => {
     console.log("Detune" + detune.toFixed(2));
   };
 
+  const getMedian = (arr) => {
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+
   const processDetectedPitch = (detectedPitch) => {
     if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
       pitchBuffer.push(detectedPitch);
       if (pitchBuffer.length > 10) pitchBuffer.shift();
-      updateTuning(detectedPitch);
+      const medianPitch = getMedian(pitchBuffer);
+      updateTuning(medianPitch);
     }
   };
+  // const processDetectedPitch = (detectedPitch) => {
+  //   if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
+  //     pitchBuffer.push(detectedPitch);
+  //     if (pitchBuffer.length > 10) pitchBuffer.shift();
+  //     updateTuning(detectedPitch);
+  //   }
+  // };
 
   const analyze = () => {
     if (!isTuning.value) {
@@ -211,7 +226,7 @@ const detectPitch = () => {
     }
 
     try {
-      store.analyser.value.getFloatTimeDomainData(dataArray);
+      store.analyser.getFloatTimeDomainData(dataArray);
       const peakAmplitude = Math.max(...dataArray.map(Math.abs));
 
       if (peakAmplitude < amplitudeThreshold) {
@@ -232,9 +247,13 @@ const detectPitch = () => {
   analyze();
 };
 
-const normalizeFrequency = (frequency) => {
+const normalizeFrequency = (frequency, targetFrequency) => {
   const A4 = 440;
-  return A4 * Math.pow(2, Math.log2(frequency / A4) % 1);
+  const semitonesFromA4 = 12 * Math.log2(frequency / A4);
+  const targetSemitonesFromA4 = 12 * Math.log2(targetFrequency / A4);
+  const closestSemitone =
+    Math.round(semitonesFromA4 - targetSemitonesFromA4) + targetSemitonesFromA4;
+  return A4 * Math.pow(2, closestSemitone / 12);
 };
 
 onMounted(() => {

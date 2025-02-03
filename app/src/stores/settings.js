@@ -24,19 +24,15 @@ export const settingsStore = defineStore(
     const analyser = ref(null);
     const initializeAudio = async () => {
       try {
-        // Full cleanup before initialization
         cleanupAudio();
 
-        // Create fresh audio context
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
         console.log("AudioContext created");
 
-        // Resume context if needed (crucial for iOS)
         if (audioContext.value.state === "suspended") {
           await audioContext.value.resume();
         }
 
-        // Get fresh microphone stream
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
@@ -50,7 +46,6 @@ export const settingsStore = defineStore(
           console.error("AudioContext is not initialized.");
           return false;
         }
-        // Create nodes
         analyser.value = audioContext.value.createAnalyser();
         console.log("Analyser node created:", !!analyser.value);
         console.log("Analyser node details:", {
