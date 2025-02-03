@@ -1,7 +1,7 @@
 <template>
 
 
-  <div class="flex flex-col my-2 text-center">
+  <div class="flex flex-col text-center">
     <!-- Timer display -->  <button
     type="button"
     class="text-white bg-gold font-medium rounded-lg text-sm"
@@ -9,7 +9,7 @@
   >
     View History Here:
   </button>
-    <div class="text-black bg-white my-4 p-2 rounded">
+    <div class="text-black bg-white p-2 rounded">
       Timer: {{ formatTime(timer) }}
     </div>
 

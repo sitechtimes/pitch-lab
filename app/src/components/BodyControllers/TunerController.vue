@@ -5,7 +5,6 @@
     <!-- Label -->
     <div class="flex flex-col">
 
-
       <!-- Dropdown -->
       <div class="relative text-black">
         <select
@@ -20,14 +19,6 @@
             Tune to {{ option.name }}
           </option>
         </select>
-        <!-- Dropdown Arrow -->
-        <div
-          class="absolute inset-y-0 right-2 flex items-center pointer-events-none"
-        >
-          <div
-            class="w-2.5 h-2.5 border-t-2 border-r-2 rotate-45 border-purple-500"
-          ></div>
-        </div>
       </div>
     </div>
 

@@ -19,14 +19,14 @@
       <div
         class="w-[95%] bg-controllers-bg rounded-3xl p-6 "
       >    
-      <div class="flex justify-between text-center w-full text-3xl font-semibold mb-2">      
+      <div class="flex flex-row text-center w-full text-3xl font-semibold mb-2">      
         <h1 class="w-[40%]">Recorder</h1>    
         <h1 class="w-[30%]">Metronome</h1>       
         <h1 class="w-[30%]">Tuner</h1>
       </div>
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-center">
         <!-- Recorder -->
-      <div class="w-[40%] flex flex-row justify-between">
+      <div class="w-[38%] flex flex-row justify-between">
         <AudioRecorder />
     
         <div
@@ -38,11 +38,11 @@
       </div>
         
         <!-- Metronome -->
-        <div class="w-[30%]items-center">
+        <div class="w-[25%] items-center flex justify-center">
           <MetronomeController />
         </div>
         <!-- Tuner -->
-        <div class="w-[30%] ">
+        <div class="w-[30%] flex justify-center ">
           <TunerController />
         </div>
       </div>
