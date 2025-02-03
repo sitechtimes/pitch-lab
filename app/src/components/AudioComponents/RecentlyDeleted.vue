@@ -34,18 +34,16 @@
     </div>
 
     <div v-if="saving">
-      <div v-if="saving === 'delete'">
-        <button @click="autoDisappear">x</button>
-        <p>Successfully Deleted!</p>
-      </div>
-      <div v-if="saving === 'save'">
-        <button @click="autoDisappear">x</button>
-        <p>Successfully Saved!</p>
-      </div>
+      <button @click="saving = null">x</button>
+      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+      <p v-if="saving === 'save'">Successfully Saved!</p>
     </div>
 
     <div>
-      <WarningModal @died="saving = 'delete'" v-if="audioStore.warning" />
+      <WarningModal
+        @died="(saving = 'delete'), autoDisappear"
+        v-if="audioStore.warning"
+      />
     </div>
   </div>
 </template>
@@ -94,6 +92,7 @@ const restoreAudio = () => {
   audioStore.currentAudio = null;
   audioStore.fileName = null;
   saving.value = "save";
+  autoDisappear();
 };
 
 const checkName = () => {
