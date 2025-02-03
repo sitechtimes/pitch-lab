@@ -46,10 +46,20 @@ export const settingsStore = defineStore(
               { exact: persistedStore.selectedMicrophone } : undefined
           }
         });
-
+        if (!audioContext.value) {
+          console.error("AudioContext is not initialized.");
+          return false;
+        }
         // Create nodes
         analyser.value = audioContext.value.createAnalyser();
-        analyser.value.fftSize = 2048; // Reduced for better compatibility
+        console.log("Analyser node created:", !!analyser.value);
+        console.log("Analyser node details:", {
+          fftSize: analyser.value.fftSize,
+          frequencyBinCount: analyser.value.frequencyBinCount,
+          contextState: audioContext.value?.state,
+          analyserNode: analyser.value
+        });
+        analyser.value.fftSize = 2048; // Reduced for better compatibility (can be made adjustable by user later)
         inputGainNode.value = audioContext.value.createGain();
         outputGainNode.value = audioContext.value.createGain();
 
@@ -76,6 +86,10 @@ export const settingsStore = defineStore(
       } catch (error) {
         console.error("Audio initialization failed:", error);
         cleanupAudio();
+        if (audioContext.value || analyser.value) {
+          console.error("Cleanup failed to reset AudioContext or Analyser.");
+          return false;
+        }
         return false;
       }
     };
@@ -146,6 +160,8 @@ export const settingsStore = defineStore(
       persistedStore.inputVolume = Number(volume);
       if (inputGainNode.value) {
         inputGainNode.value.gain.value = Number(volume);
+      } else {
+        console.warn("Input gain node is not initialized.");
       }
     };
 
@@ -154,6 +170,8 @@ export const settingsStore = defineStore(
       persistedStore.outputVolume = Number(volume);
       if (outputGainNode.value) {
         outputGainNode.value.gain.value = Number(volume);
+      } else {
+        console.warn("Output gain node is not initialized.");
       }
     };
 

@@ -137,21 +137,17 @@ const toggleTuning = async () => {
     isTuning.value = !isTuning.value;
 
     if (isTuning.value) {
-      // Reset previous state
       store.cleanupAudio();
 
-      // Initialize fresh audio pipeline
       const success = await store.initializeAudio();
-
-      if (!success || !store.analyser?.value) {
-        throw new Error(
-          "Audio initialization failed - check microphone permissions",
-        );
+      if (!success) {
+        console.error("Failed to initialize audio context.");
+        return;
+      } else {
+        console.log("Audio context initialized.");
       }
-
-      // Add brief stabilization delay
       await new Promise((resolve) => requestAnimationFrame(resolve));
-
+      console.log("store analyser value" + store.analyser.value);
       detectPitch();
     } else {
       store.cleanupAudio();
@@ -160,14 +156,17 @@ const toggleTuning = async () => {
     console.error("Tuning error:", error);
     store.cleanupAudio();
     isTuning.value = false;
-    // Add user-facing error message here
   }
 };
 
 const detectPitch = () => {
-  if (!store.analyser?.value) return;
+  if (!store.analyser.value || !store.audioContext.value) {
+    console.error("Analyser node or AudioContext is not initialized.");
+    return;
+  } // somethings up here
 
   const analyserNode = store.analyser.value;
+  console.log(analyserNode);
   const bufferLength = analyserNode.fftSize;
   const dataArray = new Float32Array(bufferLength);
 
