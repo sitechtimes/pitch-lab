@@ -177,10 +177,13 @@ const detectPitch = () => {
   const pitchBuffer = [];
 
   const updateTuning = (detectedPitch) => {
+    console.log("detectedPitch" + detectedPitch);
     const normalizedPitch = normalizeFrequency(detectedPitch);
+    console.log("normalizedPitch" + normalizedPitch);
     const targetPitch = selectedNoteFrequency.value;
+    console.log("targetPitch" + targetPitch);
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
-
+    console.log("detune" + detune);
     pitch.value = detectedPitch;
     note.value = Object.keys(noteFrequencies).find(
       (key) => noteFrequencies[key] === selectedNoteFrequency.value,
@@ -211,13 +214,6 @@ const detectPitch = () => {
       updateTuning(medianPitch);
     }
   };
-  // const processDetectedPitch = (detectedPitch) => {
-  //   if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-  //     pitchBuffer.push(detectedPitch);
-  //     if (pitchBuffer.length > 10) pitchBuffer.shift();
-  //     updateTuning(detectedPitch);
-  //   }
-  // };
 
   const analyze = () => {
     if (!isTuning.value) {
@@ -243,17 +239,12 @@ const detectPitch = () => {
 
     requestAnimationFrame(analyze);
   };
-
   analyze();
 };
 
-const normalizeFrequency = (frequency, targetFrequency) => {
+const normalizeFrequency = (frequency) => {
   const A4 = 440;
-  const semitonesFromA4 = 12 * Math.log2(frequency / A4);
-  const targetSemitonesFromA4 = 12 * Math.log2(targetFrequency / A4);
-  const closestSemitone =
-    Math.round(semitonesFromA4 - targetSemitonesFromA4) + targetSemitonesFromA4;
-  return A4 * Math.pow(2, closestSemitone / 12);
+  return A4 * Math.pow(2, Math.log2(frequency / A4) % 1);
 };
 
 onMounted(() => {
