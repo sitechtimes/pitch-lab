@@ -1,19 +1,27 @@
 <template>
   <div>
-    <audio
-      ref="audioElement"
-      controls
-      :src="audioStore.currentAudio.audio"
-    ></audio>
+    <div>
+      <h3>Recorded Audio:</h3>
+    </div>
 
-    <a
-      :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-      download="recorded-audio.mp4"
-    ></a>
+    <div>
+      <audio
+        ref="audioElement"
+        controls
+        :src="audioStore.currentAudio.audio"
+      ></audio>
+    </div>
 
-    <button class="btn btn-ghost">
-      <img :src="url" class="download-icon" />
-    </button>
+    <div>
+      <a
+        :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
+        download="recorded-audio.mp4"
+      >
+        <button class="btn btn-ghost">
+          <img :src="url" class="download-icon" />
+        </button>
+      </a>
+    </div>
   </div>
 </template>
 

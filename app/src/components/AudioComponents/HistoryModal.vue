@@ -22,19 +22,7 @@
 
     <div v-if="audioStore.currentAudio">
       <div :key="audioStore.currentAudio.id">
-        <h3>Recorded Audio:</h3>
-        <audio
-          :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-          controls
-        ></audio>
-        <a
-          :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-          download="recorded-audio.mp4"
-        >
-          <button class="btn btn-ghost">
-            <img :src="url" class="download-icon" />
-          </button>
-        </a>
+        <AudioPlayback />
       </div>
     </div>
 
@@ -52,7 +40,7 @@
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
-import url from "../../../public/download-button.png";
+import AudioPlayback from "./AudioPlayback.vue";
 import PastAudio from "./PastAudio.vue";
 import RecentlyDeleted from "./RecentlyDeleted.vue";
 const audioStore = audioFiles();

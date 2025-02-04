@@ -37,19 +37,7 @@
 
     <!-- Display recorded audio playback and download link -->
     <div v-if="audioStore.currentAudio && !isRecording">
-      <h3>Recorded Audio:</h3>
-      <audio
-        :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-        controls
-      ></audio>
-      <a
-        :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-        download="recorded-audio.mp4"
-      >
-        <button class="btn btn-ghost">
-          <img :src="url" class="download-icon" />
-        </button>
-      </a>
+      <AudioPlayback />
       <label for="name">Name File</label>
       <input
         id="name"
@@ -71,7 +59,7 @@
 
 <script setup>
 import { ref } from "vue";
-import url from "../../../public/download-button.png";
+import AudioPlayback from "../AudioComponents/AudioPlayback.vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
