@@ -1,15 +1,15 @@
 <template>
-
-
-  <div class="flex flex-col text-center">
-    <!-- Timer display -->  <button
+<div class="flex flex-row justify-between">
+  <div>
+    <!-- Timer display -->  
+    <button
     type="button"
-    class="text-white bg-gold font-medium rounded-lg text-sm"
+    class="text-white text-center bg-gold font-medium rounded-lg text-sm"
     @click="(audioStore.viewingHistory = true), (saving = null)"
   >
     View History Here:
   </button>
-    <div class="text-black bg-white p-2 rounded">
+    <div class="text-black bg-white text-center p-2 rounded">
       Timer: {{ formatTime(timer) }}
     </div>
 
@@ -40,9 +40,9 @@
       :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       download="recorded-audio.mp4"
     >
-
+      Download
     </a>
-      <input
+    <input
       id="name"
       type="text"
       class="text-black"
@@ -51,21 +51,26 @@
     />
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>      
-    <button class="btn btn-ghost">
-        <img :src="url" class="download-icon" />
-      </button>
+
   </div>
 
-  <div v-if="saving">
-    <button @click="saving = null">x</button>
-    <p v-if="saving === 'delete'">Successfully Deleted!</p>
-    <p v-if="saving === 'save'">Successfully Saved!</p>
+  <!-- Placeholder message when there is no recording -->
+  <div v-else class="w-[60%]">
+    <p class="text-lg">No recorded audio available. Please start recording to see playback and download options.</p>
   </div>
+
+  <div v-if="saving" :class="{'fade-out': isFading}" class="modal">
+    <div class="modal-content">
+      <button @click="triggerFadeOut" class="close-button">x</button>
+      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+      <p v-if="saving === 'save'">Successfully Saved!</p>
+    </div>
+  </div>
+</div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import url from "../../../public/download-button.png";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
@@ -122,6 +127,13 @@ const stopRecording = () => {
     isRecording.value = false;
     stopTimer();
   }
+};
+const triggerFadeOut = () => {
+  isFading = true;
+  setTimeout(() => {
+    isFading = false;
+    saving.value = null;
+  }, 500);
 };
 
 const startTimer = () => {
@@ -213,16 +225,39 @@ a {
   margin-top: 10px;
 }
 
-.text-black {
-  color: black;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease;
 }
 
-.bg-white {
+.modal-content {
   background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
 }
 
-.download-icon {
-  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
-  object-fit: contain; /* Ensure the image maintains its aspect ratio */
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
 }
+
+.fade-out {
+  opacity: 0;
+}
+
+
 </style>

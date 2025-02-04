@@ -1,4 +1,5 @@
 <template>
+  <div class="flex flex-col ">
   <div
     class="flex items-center justify-between p-4 bg-gray-900 rounded-md text-white max-w-sm"
   >
@@ -44,6 +45,7 @@
         class="w-24 h-1 bg-gray-700 rounded appearance-none focus:outline-none accent-purple-500"
       />
     </div>
+  </div>
   </div>
 </template>
 

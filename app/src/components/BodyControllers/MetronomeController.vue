@@ -51,7 +51,7 @@ const toggleMetronome = () => {
 
 <template>
   <div>
-    <div>
+    <div class="h-full">
       <label for="bpm">Tempo (BPM): </label>
       <input type="number" id="bpm" class="text-black" v-model="bpm" min="30" max="300" />
     </div>

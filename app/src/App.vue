@@ -26,7 +26,7 @@
       </div>
       <div class="flex items-center justify-center">
         <!-- Recorder -->
-      <div class="w-[38%] flex flex-row justify-between">
+      <div class=" flex w-[35%] flex-col">
         <AudioRecorder />
     
         <div
