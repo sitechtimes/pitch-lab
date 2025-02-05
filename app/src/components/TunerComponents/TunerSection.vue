@@ -103,7 +103,6 @@ import { settingsStore } from "../../stores/settings";
 
 const store = settingsStore();
 const pitch = ref(null);
-const note = ref("");
 const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
@@ -117,17 +116,6 @@ const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
 
-const noteFrequencies = {
-  A: 440,
-  "B♭": 466.16,
-  C: 261.63,
-  "E♭": 311.13,
-  F: 349.23,
-};
-
-let audioContext = null;
-let analyser = null;
-
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -136,58 +124,43 @@ const indicatorPosition = computed(() => {
 });
 
 const toggleTuning = async () => {
-  isTuning.value = !isTuning.value;
+  try {
+    isTuning.value = !isTuning.value;
 
-  if (isTuning.value) {
-    try {
-      if (!audioContext) {
-        await setupAudioComponents();
+    if (isTuning.value) {
+      store.cleanupAudio();
+
+      const success = await store.initializeAudio();
+      if (!success) {
+        console.error("Failed to initialize audio context.");
+        return;
+      } else {
+        console.log("Audio initialized.");
       }
+      await new Promise((resolve) => requestAnimationFrame(resolve));
       detectPitch();
-    } catch (error) {
-      console.error("Error setting up audio components:", error);
-      isTuning.value = false;
+    } else {
+      store.cleanupAudio();
     }
-  } else {
-    if (audioContext) {
-      await audioContext.close();
-      audioContext = null;
-      analyser = null;
-    }
+  } catch (error) {
+    console.error("Tuning error:", error);
+    store.cleanupAudio();
+    isTuning.value = false;
   }
-};
-
-const setupAudioComponents = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      autoGainControl: false,
-      noiseSuppression: false,
-      echoCancellation: false,
-    },
-  });
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const source = audioContext.createMediaStreamSource(stream);
-  analyser = audioContext.createAnalyser();
-  analyser.fftSize = 8192;
-  source.connect(analyser);
-  setupHighPassFilter(source);
-};
-
-const setupHighPassFilter = (source) => {
-  const highPassFilter = audioContext.createBiquadFilter();
-  highPassFilter.type = "highpass";
-  highPassFilter.frequency.value = 50;
-  source.connect(highPassFilter).connect(analyser);
 };
 
 const detectPitch = () => {
-  if (!audioContext) {
-    console.error("Audio context is not initialized.");
+  if (!store.analyser || !store.audioContext) {
+    console.error("Analyser node or AudioContext is not initialized.");
     return;
   }
 
-  const pitchFinder = Pitchfinder.YIN({ sampleRate: audioContext.sampleRate });
-  const dataArray = new Float32Array(analyser.fftSize);
+  const bufferLength = store.analyser.fftSize;
+  const dataArray = new Float32Array(bufferLength);
+
+  const pitchFinder = Pitchfinder.YIN({
+    sampleRate: store.audioContext.sampleRate,
+  });
   const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
@@ -195,11 +168,7 @@ const detectPitch = () => {
     const normalizedPitch = normalizeFrequency(detectedPitch);
     const targetPitch = selectedNoteFrequency.value;
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
-
     pitch.value = detectedPitch;
-    note.value = Object.keys(noteFrequencies).find(
-      (key) => noteFrequencies[key] === selectedNoteFrequency.value,
-    );
     detuneValue.value = detune;
     isFlat.value = detune < -10;
     isSharp.value = detune > 10;
@@ -208,24 +177,35 @@ const detectPitch = () => {
       `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
     );
     console.log("Detune" + detune.toFixed(2));
+    console.log(`Detected Pitch: ${detectedPitch} Hz`);
+    console.log(`Normalized Pitch: ${normalizedPitch} Hz`);
+    console.log(`Target Pitch: ${targetPitch} Hz`);
+  };
+  const getMedian = (arr) => {
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
   };
 
   const processDetectedPitch = (detectedPitch) => {
     if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
       pitchBuffer.push(detectedPitch);
       if (pitchBuffer.length > 10) pitchBuffer.shift();
-      updateTuning(detectedPitch);
+      const medianPitch = getMedian(pitchBuffer);
+      updateTuning(medianPitch);
     }
   };
 
   const analyze = () => {
     if (!isTuning.value) {
       console.log("Stopping pitch detection.");
-      return; // Stop the loop
+      return;
     }
 
     try {
-      analyser.getFloatTimeDomainData(dataArray);
+      store.analyser.getFloatTimeDomainData(dataArray);
       const peakAmplitude = Math.max(...dataArray.map(Math.abs));
 
       if (peakAmplitude < amplitudeThreshold) {
@@ -233,7 +213,6 @@ const detectPitch = () => {
         requestAnimationFrame(analyze);
         return;
       }
-
       const detectedPitch = pitchFinder(dataArray);
       processDetectedPitch(detectedPitch);
     } catch (error) {
@@ -242,13 +221,22 @@ const detectPitch = () => {
 
     requestAnimationFrame(analyze);
   };
-
   analyze();
 };
 
 const normalizeFrequency = (frequency) => {
-  const A4 = 440;
-  return A4 * Math.pow(2, Math.log2(frequency / A4) % 1);
+  const targetFrequency = selectedNoteFrequency.value;
+  const octaveDifference = Math.round(Math.log2(frequency / targetFrequency));
+  const baseFrequencyInOctave = targetFrequency * Math.pow(2, octaveDifference);
+  const pitchOffset = frequency - baseFrequencyInOctave;
+  let normalizedFrequency = targetFrequency + pitchOffset;
+
+  if (normalizedFrequency < targetFrequency / 2) {
+    normalizedFrequency *= 2;
+  } else if (normalizedFrequency >= targetFrequency * 2) {
+    normalizedFrequency /= 2;
+  }
+  return normalizedFrequency;
 };
 
 onMounted(() => {

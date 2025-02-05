@@ -24,39 +24,35 @@ export const settingsStore = defineStore(
     const analyser = ref(null);
     const initializeAudio = async () => {
       try {
-        cleanupAudio();
-
-        audioContext.value = new (window.AudioContext ||
-          window.webkitAudioContext)();
+        cleanupAudio(); // Clean up any existing audio resources
+        audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
         console.log("AudioContext created");
 
         if (audioContext.value.state === "suspended") {
           await audioContext.value.resume();
         }
 
+        // Use the persisted microphone device ID
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
-            echoCancellation: false,
+            echoCancellation: true,
             autoGainControl: false,
             deviceId: persistedStore.selectedMicrophone
               ? { exact: persistedStore.selectedMicrophone }
               : undefined,
           },
         });
+
         if (!audioContext.value) {
           console.error("AudioContext is not initialized.");
           return false;
         }
+
+        // Create nodes
         analyser.value = audioContext.value.createAnalyser();
-        console.log("Analyser node created:", !!analyser.value);
-        console.log("Analyser node details:", {
-          fftSize: analyser.value.fftSize,
-          frequencyBinCount: analyser.value.frequencyBinCount,
-          contextState: audioContext.value?.state,
-          analyserNode: analyser.value,
-        });
-        analyser.value.fftSize = 2048; // Reduced for better compatibility (can be made adjustable by user later)
+        analyser.value.fftSize = 2048; // Reduced for better compatibility
+
         inputGainNode.value = audioContext.value.createGain();
         outputGainNode.value = audioContext.value.createGain();
 
@@ -70,9 +66,22 @@ export const settingsStore = defineStore(
         source
           .connect(highPassFilter)
           .connect(inputGainNode.value)
-          .connect(analyser.value)
-          .connect(outputGainNode.value)
-          .connect(audioContext.value.destination);
+          .connect(analyser.value);
+
+        // Optionally connect to outputGainNode for monitoring (if enabled by user)
+        if (persistedStore.enableMonitoring) {
+          inputGainNode.value.connect(outputGainNode.value).connect(audioContext.value.destination);
+        }
+
+        // Set the persisted output device (speaker)
+        if (persistedStore.selectedSpeaker && typeof audioElement.value?.setSinkId === "function") {
+          try {
+            await audioElement.value.setSinkId(persistedStore.selectedSpeaker);
+            console.log(`Output device set to: ${persistedStore.selectedSpeaker}`);
+          } catch (error) {
+            console.error("Error setting output device:", error);
+          }
+        }
 
         console.log("Audio nodes initialized:", {
           analyser: !!analyser.value,
@@ -83,14 +92,9 @@ export const settingsStore = defineStore(
       } catch (error) {
         console.error("Audio initialization failed:", error);
         cleanupAudio();
-        if (audioContext.value || analyser.value) {
-          console.error("Cleanup failed to reset AudioContext or Analyser.");
-          return false;
-        }
         return false;
       }
     };
-
     const cleanupAudio = () => {
       if (audioContext.value) {
         try {
@@ -119,20 +123,20 @@ export const settingsStore = defineStore(
         if (!audioElement.value) {
           audioElement.value = new Audio();
         }
-
-        // Feature detection
         if (typeof audioElement.value.setSinkId === "function") {
-          await audioElement.value.setSinkId(deviceId);
-          persistedStore.selectedSpeaker = deviceId;
+          await audioElement.value.setSinkId(deviceId || "default");
+          persistedStore.selectedSpeaker = deviceId || "default";
+          console.log(`Output device updated to: ${deviceId || "default"}`);
         } else {
           console.warn("setSinkId not supported, using default speaker");
           persistedStore.selectedSpeaker = "default";
         }
       } catch (error) {
         console.error("Error setting output device:", error);
+        persistedStore.selectedSpeaker = "default"; // Fallback to default speaker
+        throw error; // Re-throw the error for handling in the parent component
       }
     };
-
     const updateInputDevice = async (deviceId) => {
       try {
         if (audioContext.value) {
@@ -140,15 +144,23 @@ export const settingsStore = defineStore(
             audio: { deviceId: { exact: deviceId } },
           });
 
-          // Create new source and connect to gain node
-          const mediaStreamSource =
-            audioContext.value.createMediaStreamSource(stream);
+          // Disconnect the old source if it exists
+          if (inputGainNode.value) {
+            inputGainNode.value.disconnect();
+          }
+
+          // Create a new source and connect it to the gain node
+          const mediaStreamSource = audioContext.value.createMediaStreamSource(stream);
           mediaStreamSource.connect(inputGainNode.value);
 
+          // Update the persisted store
           persistedStore.selectedMicrophone = deviceId;
+
+          console.log(`Input device updated to: ${deviceId}`);
         }
       } catch (error) {
         console.error("Error setting input device:", error);
+        throw error;
       }
     };
 
@@ -184,19 +196,20 @@ export const settingsStore = defineStore(
               echoCancellation: false,
             },
           });
-          stream.getTracks().forEach((track) => track.stop());
+          stream.getTracks().forEach(track => track.stop());
         }
 
         const devices = await navigator.mediaDevices.enumerateDevices();
 
         // Firefox workaround for speaker labels
-        if (navigator.userAgent.includes("Firefox")) {
-          microphones.value = devices.filter((d) => d.kind === "audioinput");
-          speakers.value = [{ deviceId: "default", label: "Default Speaker" }];
+        if (navigator.userAgent.includes('Firefox')) {
+          microphones.value = devices.filter(d => d.kind === 'audioinput');
+          speakers.value = [{ deviceId: 'default', label: 'Default Speaker' }];
         } else {
-          microphones.value = devices.filter((d) => d.kind === "audioinput");
-          speakers.value = devices.filter((d) => d.kind === "audiooutput");
+          microphones.value = devices.filter(d => d.kind === 'audioinput');
+          speakers.value = devices.filter(d => d.kind === 'audiooutput');
         }
+
       } catch (error) {
         console.error("Error getting devices:", error);
       }
@@ -221,12 +234,12 @@ export const settingsStore = defineStore(
       setOutputVolume,
       cleanupAudio,
       getDevices,
-      analyser, // Add analyser to the returned state
+      analyser
     };
   },
   {
     persist: {
-      paths: ["inputVolume", "outputVolume"],
-    },
+      paths: ['inputVolume', 'outputVolume']
+    }
   },
 );
