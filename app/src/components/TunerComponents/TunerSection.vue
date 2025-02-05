@@ -103,7 +103,6 @@ import { settingsStore } from "../../stores/settings";
 
 const store = settingsStore();
 const pitch = ref(null);
-const note = ref("");
 const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
@@ -117,21 +116,12 @@ const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
 
-const noteFrequencies = {
-  //remove and use tuning option constants
-  A: 440,
-  "B♭": 466.16,
-  C: 261.63,
-  "E♭": 311.13,
-  F: 349.23,
-};
-
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
   let percentageOffset = (detune / maxRange) * 50;
   return `calc(50% + ${percentageOffset}%)`;
-}); // not sure if this is correct anymore
+});
 
 const toggleTuning = async () => {
   try {
@@ -179,9 +169,6 @@ const detectPitch = () => {
     const targetPitch = selectedNoteFrequency.value;
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
     pitch.value = detectedPitch;
-    note.value = Object.keys(noteFrequencies).find(
-      (key) => noteFrequencies[key] === selectedNoteFrequency.value,
-    );
     detuneValue.value = detune;
     isFlat.value = detune < -10;
     isSharp.value = detune > 10;
@@ -238,27 +225,17 @@ const detectPitch = () => {
 };
 
 const normalizeFrequency = (frequency) => {
-  const targetFrequency = selectedNoteFrequency.value; // The frequency of the note the user wants to tune to
-
-  // Calculate the octave difference between the detected frequency and the target note
+  const targetFrequency = selectedNoteFrequency.value;
   const octaveDifference = Math.round(Math.log2(frequency / targetFrequency));
-
-  // Calculate the base frequency of the detected octave
   const baseFrequencyInOctave = targetFrequency * Math.pow(2, octaveDifference);
-
-  // Calculate the pitch offset within the detected frequency's octave
   const pitchOffset = frequency - baseFrequencyInOctave;
-
-  // Map the frequency to the target note's octave while preserving the pitch offset
   let normalizedFrequency = targetFrequency + pitchOffset;
 
-  // Ensure the normalized frequency is within the target note's octave
   if (normalizedFrequency < targetFrequency / 2) {
-    normalizedFrequency *= 2; // Move up one octave if too low
+    normalizedFrequency *= 2;
   } else if (normalizedFrequency >= targetFrequency * 2) {
-    normalizedFrequency /= 2; // Move down one octave if too high
+    normalizedFrequency /= 2;
   }
-
   return normalizedFrequency;
 };
 
