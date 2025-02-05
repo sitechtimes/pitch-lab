@@ -14,14 +14,12 @@ export const persistedSettings = defineStore(
     const selectedSpeaker = ref(null);
     const inputVolume = ref(0.5);
     const outputVolume = ref(1.0);
-
     return {
       // Audio settings
       selectedMicrophone,
       selectedSpeaker,
       inputVolume,
       outputVolume,
-
       // App state
       assignedID,
       pastAudio,

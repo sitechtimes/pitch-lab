@@ -22,7 +22,6 @@
       </div>
       <div class="text-center mt-2 text-white">Time Signature</div>
     </div>
-
     <!-- Tempo Controls -->
     <div class="tempo-controls mb-6">
       <div class="flex items-center gap-4 justify-center">
@@ -32,13 +31,11 @@
         >
           -
         </button>
-
         <input
           type="number"
           v-model="tempo"
           class="w-24 text-center p-2 rounded bg-tuner-bg text-white border border-purple focus:ring-purple"
         />
-
         <button
           @click="adjustTempo(5)"
           class="px-4 py-2 bg-purple rounded-lg text-white hover:bg-[#5a0db6] transition-colors"
@@ -48,7 +45,6 @@
       </div>
       <div class="text-center mt-2 text-white">BPM</div>
     </div>
-
     <!-- Sound Selection -->
     <div class="sound-selection mb-6">
       <select
@@ -59,7 +55,6 @@
         <option value="duck">Duck Quack</option>
       </select>
     </div>
-
     <!-- Play/Stop Button -->
     <button
       @click="toggleMetronome"
@@ -72,7 +67,6 @@
     >
       {{ isPlaying ? "Stop" : "Start" }}
     </button>
-
     <!-- Visual Pulse -->
     <div
       class="visual-pulse mx-auto mt-6 rounded-full bg-purple"
@@ -90,11 +84,13 @@
 import { ref, computed, watch, onBeforeUnmount, onMounted } from "vue";
 import { persistedSettings } from "@/stores/persistedStore";
 import { settingsStore } from "@/stores/settings";
-import duckSound from "@/assets/rams-duck-quack-edited.mp3";
+import duckSound from "@/assets/metronome-quack.mp3";
+import beepSound from "@/assets/metronome-tack.mp3";
 
 const persistedStore = persistedSettings();
 const settings = settingsStore();
 
+// State variables
 const isPlaying = ref(false);
 const tempo = ref(120);
 const timeSignatureTop = ref(4);
@@ -103,15 +99,39 @@ const selectedSound = ref("beep");
 const currentBeat = ref(1);
 const pulseScale = ref(1);
 const pulseSize = 50;
-
-// Audio elements
 let beepBuffer = null;
 let duckBuffer = null;
 let timerId = null;
+let source = null;
 
+const toggleMetronome = async () => {
+  if (!isPlaying.value) {
+    try {
+      // Initialize audio resources
+      const success = await initAudio();
+      if (!success) throw new Error("Failed to initialize audio");
+
+      // Resume the audio context if suspended
+      if (settings.audioContext.state === "suspended") {
+        await settings.audioContext.resume();
+      }
+
+      // Start the metronome
+      timerId = setInterval(tick, beatInterval.value);
+    } catch (error) {
+      isPlaying.value = false; // Reset state on error
+      console.error(error);
+      return;
+    }
+  } else {
+    clearInterval(timerId);
+    currentBeat.value = 1;
+  }
+  isPlaying.value = !isPlaying.value;
+};
+// Initialize audio resources
 const initAudio = async () => {
   try {
-    // Initialize store audio first
     const success = await settings.initializeAudio();
     if (!success || !settings.audioContext) {
       throw new Error("Audio system failed to initialize");
@@ -120,15 +140,20 @@ const initAudio = async () => {
     // Load buffers only once
     if (!beepBuffer) {
       [beepBuffer, duckBuffer] = await Promise.all([
-        loadAudio("/metronome-beep.mp3"),
+        loadAudio(beepSound),
         loadAudio(duckSound),
       ]);
     }
 
-    // Connect metronome to output
-    const source = settings.audioContext.createBufferSource();
-    source.connect(settings.outputGainNode);
+    // Set the output device using the persisted speaker
+    if (persistedStore.selectedSpeaker) {
+      await settings.updateOutputDevice(persistedStore.selectedSpeaker);
+    }
 
+    // Apply the persisted output volume
+    settings.setOutputVolume(persistedStore.outputVolume);
+
+    console.log("Metronome audio initialized successfully.");
     return true;
   } catch (error) {
     console.error("Metronome audio init failed:", error);
@@ -140,7 +165,6 @@ const loadAudio = async (url) => {
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
     const arrayBuffer = await response.arrayBuffer();
     return await settings.audioContext.decodeAudioData(arrayBuffer);
   } catch (error) {
@@ -148,68 +172,58 @@ const loadAudio = async (url) => {
     throw error; // Rethrow for handling in initAudio
   }
 };
-
 const playSound = () => {
   try {
     if (!settings.audioContext)
       throw new Error("Audio context not initialized");
+    if (!settings.outputGainNode)
+      throw new Error("Output gain node not initialized");
 
+    // Select the appropriate buffer
     const buffer = selectedSound.value === "duck" ? duckBuffer : beepBuffer;
-    const source = settings.audioContext.createBufferSource();
-    source.buffer = buffer;
 
+    // Create an audio source and gain node
+    source = settings.audioContext.createBufferSource();
     const gainNode = settings.audioContext.createGain();
+
+    // Calculate playback speed and duration
+    const beatDuration = 60 / tempo.value; // Duration of one beat in seconds
+    const playbackRate = 1 / beatDuration; // Adjust playback speed to match tempo
+    source.buffer = buffer;
+    source.playbackRate.value = playbackRate;
+
+    // Volume control
     gainNode.gain.value = currentBeat.value === 1 ? 1 : 0.7;
 
+    // Connect nodes
     source.connect(gainNode);
-    gainNode.connect(settings.mediaStreamDestination);
-    source.start(0);
+    gainNode.connect(settings.outputGainNode);
 
-    settings.audioElement?.play().catch(console.error);
+    // Start and stop the sound with precise timing
+    const startTime = settings.audioContext.currentTime;
+    source.start(startTime);
+    source.stop(startTime + beatDuration);
   } catch (error) {
     console.error("Playback error:", error);
-    // Handle playback failure
   }
-  console.log("Audio Context State:", {
-    storeInitialized: !!settings.audioContext,
-    componentAudioContext: !!settings.audioContext,
-    mediaStreamDest: !!settings.mediaStreamDestination,
-    audioElement: !!settings.audioElement,
-  });
 };
-// Visual pulse animation
+
 const animatePulse = () => {
   pulseScale.value = 1.3;
   setTimeout(() => {
     pulseScale.value = 1;
-  }, 50);
+  }, 100);
 };
 
 // Metronome tick handler
 const tick = () => {
+  initAudio();
   playSound();
   animatePulse();
   currentBeat.value = (currentBeat.value % timeSignatureTop.value) + 1;
 };
 
-// Start/stop metronome
-const toggleMetronome = async () => {
-  if (!isPlaying.value) {
-    try {
-      await initAudio();
-      timerId = setInterval(tick, beatInterval.value);
-    } catch (error) {
-      isPlaying.value = false; // Reset state on error
-      console.log(error);
-      return;
-    }
-  } else {
-    clearInterval(timerId);
-    currentBeat.value = 1;
-  }
-  isPlaying.value = !isPlaying.value;
-};
-// Tempo adjustment
+// Adjust tempo
 const adjustTempo = (change) => {
   tempo.value = Math.max(20, Math.min(300, tempo.value + change));
 };
@@ -224,16 +238,16 @@ watch(tempo, () => {
 
 // Initialize devices on mount
 onMounted(async () => {
-  await settings.getDevices();
-  // Initialize with store's selected speaker
+  await settings.getDevices(); // Fetch available devices
   if (persistedStore.selectedSpeaker) {
-    await settings.updateOutputDevice(persistedStore.selectedSpeaker);
+    await settings.updateOutputDevice(persistedStore.selectedSpeaker); // Set the persisted speaker
   }
 });
+
 // Cleanup
 onBeforeUnmount(() => {
   if (timerId) clearInterval(timerId);
-  settings.cleanupAudio(); // Use store's cleanup method
+  settings.cleanupAudio(); // Clean up audio resources
 });
 
 // Computed beat interval
@@ -248,7 +262,6 @@ const beatInterval = computed(() => {
   transition: all 0.1s ease-in-out;
   box-shadow: 0 0 15px rgba(114, 16, 227, 0.3);
 }
-
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

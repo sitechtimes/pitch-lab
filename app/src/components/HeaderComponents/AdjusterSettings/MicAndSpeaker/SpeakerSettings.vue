@@ -124,33 +124,44 @@ const drawVisualizer = () => {
 
 const shortId = (id) => id.slice(0, 5);
 
-// Initialize audio devices
 onMounted(async () => {
+  isLoading.value = true;
   try {
+    // First initialize audio to ensure permission
     await store.initializeAudio();
     await store.getDevices();
+
+    if (!persistedStore.selectedSpeaker && store.speakers.length > 0) {
+      persistedStore.selectedSpeaker = store.speakers[0].deviceId;
+    }
+
+    selectedSpeaker.value = persistedStore.selectedSpeaker;
+
     setupVisualizer();
 
-    // Select first speaker if none selected
-    if (!selectedSpeaker.value && store.speakers.length > 0) {
-      selectedSpeaker.value = store.speakers[0].deviceId;
-    }
+    console.log(`Speaker initialized: ${selectedSpeaker.value}`);
   } catch (error) {
-    errorMessage.value = `Failed to initialize audio: ${error.message}`;
+    errorMessage.value = "Please allow speaker access to continue";
+    console.error(error);
   } finally {
     isLoading.value = false;
   }
 });
 
-// Handle speaker change
 const handleSpeakerChange = async () => {
   try {
     if (selectedSpeaker.value) {
+      // Update the persisted store first
+      persistedStore.selectedSpeaker = selectedSpeaker.value;
+
+      // Update the output device in the audio pipeline
       await store.updateOutputDevice(selectedSpeaker.value);
-      setupVisualizer(); // Reconnect analyser
+
+      console.log(`Speaker updated to: ${selectedSpeaker.value}`);
     }
   } catch (error) {
     errorMessage.value = `Failed to switch speaker: ${error.message}`;
+    // Revert selection on error
     selectedSpeaker.value = persistedStore.selectedSpeaker;
   }
 };
