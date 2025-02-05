@@ -1,82 +1,91 @@
 <template>
   <div
-    class="metronome-container p-8 max-w-md mx-auto rounded-xl"
+    class="metronome-container p-8 max-w-2xl mx-auto rounded-xl"
     style="background: #120e1d"
   >
-    <!-- Time Signature Controls -->
-    <div class="time-signature mb-6">
-      <div class="flex gap-4 justify-center">
+    <div class="flex items-center gap-6 justify-between">
+      <!-- Time Signature -->
+      <div class="time-signature">
+        <div class="flex gap-2 items-center">
+          <select
+            v-model="timeSignatureTop"
+            class="p-2 w-16 text-center rounded bg-tuner-bg text-white focus:ring-purple focus:border-purple"
+          >
+            <option v-for="n in 7" :value="n + 1" :key="n">{{ n + 1 }}</option>
+          </select>
+          <div class="text-white">/</div>
+          <select
+            v-model="timeSignatureBottom"
+            class="p-2 w-16 text-center rounded bg-tuner-bg text-white focus:ring-purple focus:border-purple"
+          >
+            <option value="4">4</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+        <div class="text-center mt-2 text-white text-sm">Time Signature</div>
+      </div>
+
+      <!-- Tempo Controls -->
+      <div class="tempo-controls">
+        <div class="flex items-center gap-3">
+          <button
+            @click="adjustTempo(-5)"
+            class="px-4 py-2 bg-purple rounded-lg text-white hover:bg-[#5a0db6] transition-colors"
+          >
+            -
+          </button>
+          <div class="relative">
+            <input
+              type="number"
+              v-model="tempo"
+              class="w-24 text-center p-2 rounded bg-tuner-bg text-white border border-purple focus:ring-purple"
+            />
+            <div class="text-white text-sm mt-1">BPM</div>
+          </div>
+          <button
+            @click="adjustTempo(5)"
+            class="px-4 py-2 bg-purple rounded-lg text-white hover:bg-[#5a0db6] transition-colors"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <!-- Sound Selection -->
+      <div class="sound-selection w-40">
         <select
-          v-model="timeSignatureTop"
-          class="p-2 rounded bg-tuner-bg text-white focus:ring-purple focus:border-purple"
+          v-model="selectedSound"
+          class="w-full p-2 rounded bg-tuner-bg text-white border border-purple focus:ring-purple"
         >
-          <option v-for="n in 7" :value="n + 1" :key="n">{{ n + 1 }}</option>
-        </select>
-        <select
-          v-model="timeSignatureBottom"
-          class="p-2 rounded bg-tuner-bg text-white focus:ring-purple focus:border-purple"
-        >
-          <option value="4">4</option>
-          <option value="8">8</option>
+          <option value="beep">Default Beep</option>
+          <option value="duck">Duck Quack</option>
         </select>
       </div>
-      <div class="text-center mt-2 text-white">Time Signature</div>
-    </div>
-    <!-- Tempo Controls -->
-    <div class="tempo-controls mb-6">
-      <div class="flex items-center gap-4 justify-center">
+
+      <!-- Play/Stop Button & Pulse -->
+      <div class="flex flex-col items-center gap-2">
         <button
-          @click="adjustTempo(-5)"
-          class="px-4 py-2 bg-purple rounded-lg text-white hover:bg-[#5a0db6] transition-colors"
+          @click="toggleMetronome"
+          :class="[
+            'px-8 py-3 rounded-xl font-bold transition-colors',
+            isPlaying
+              ? 'bg-purple hover:bg-[#5a0db6]'
+              : 'bg-purple/80 hover:bg-purple',
+          ]"
         >
-          -
+          {{ isPlaying ? "Stop" : "Start" }}
         </button>
-        <input
-          type="number"
-          v-model="tempo"
-          class="w-24 text-center p-2 rounded bg-tuner-bg text-white border border-purple focus:ring-purple"
-        />
-        <button
-          @click="adjustTempo(5)"
-          class="px-4 py-2 bg-purple rounded-lg text-white hover:bg-[#5a0db6] transition-colors"
-        >
-          +
-        </button>
+        <div
+          class="visual-pulse rounded-full bg-purple"
+          :style="{
+            width: pulseSize + 'px',
+            height: pulseSize + 'px',
+            opacity: currentBeat === 1 ? 1 : 0.6,
+            transform: `scale(${pulseScale})`,
+          }"
+        ></div>
       </div>
-      <div class="text-center mt-2 text-white">BPM</div>
     </div>
-    <!-- Sound Selection -->
-    <div class="sound-selection mb-6">
-      <select
-        v-model="selectedSound"
-        class="w-full p-2 rounded bg-tuner-bg text-white border border-purple focus:ring-purple"
-      >
-        <option value="beep">Default Beep</option>
-        <option value="duck">Duck Quack</option>
-      </select>
-    </div>
-    <!-- Play/Stop Button -->
-    <button
-      @click="toggleMetronome"
-      :class="[
-        'w-full py-4 rounded-xl font-bold transition-colors',
-        isPlaying
-          ? 'bg-purple hover:bg-[#5a0db6]'
-          : 'bg-purple/80 hover:bg-purple',
-      ]"
-    >
-      {{ isPlaying ? "Stop" : "Start" }}
-    </button>
-    <!-- Visual Pulse -->
-    <div
-      class="visual-pulse mx-auto mt-6 rounded-full bg-purple"
-      :style="{
-        width: pulseSize + 'px',
-        height: pulseSize + 'px',
-        opacity: currentBeat === 1 ? 1 : 0.6,
-        transform: `scale(${pulseScale})`,
-      }"
-    ></div>
   </div>
 </template>
 
