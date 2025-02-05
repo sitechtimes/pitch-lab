@@ -38,14 +38,10 @@
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
-import { ref, onUnmounted } from "vue";
+import { ref } from "vue";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 const saving = ref(null);
-
-onUnmounted(() => {
-  saving.value = null;
-});
 
 const checkName = () => {
   if (audioStore.fileName !== null) {
@@ -80,6 +76,7 @@ const saveAudio = () => {
   }
   audioStore.fileName = null;
   saving.value = "save";
+  autoDisappear()
 };
 
 const deleteAudio = () => {
@@ -118,5 +115,12 @@ const deleteAudio = () => {
   audioStore.currentAudio = null;
   audioStore.fileName = null;
   saving.value = "delete";
+  autoDisappear()
+};
+
+const autoDisappear = () => {
+  setTimeout(() => {
+    saving.value = null;
+  }, 3000);
 };
 </script>

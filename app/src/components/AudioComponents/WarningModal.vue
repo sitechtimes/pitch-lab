@@ -22,6 +22,8 @@ const killIt = () => {
     deleteRecent();
   } else {
     persistedStore.recentlyDeleted = [];
+    audioStore.currentAudio = null;
+    audioStore.warning = false;
   }
   emit("died");
 };
