@@ -118,6 +118,7 @@ const handleResize = () => {
 };
 
 const noteFrequencies = {
+  //remove and use tuning option constants
   A: 440,
   "B♭": 466.16,
   C: 261.63,
@@ -130,7 +131,7 @@ const indicatorPosition = computed(() => {
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
   let percentageOffset = (detune / maxRange) * 50;
   return `calc(50% + ${percentageOffset}%)`;
-});
+}); // not sure if this is correct anymore
 
 const toggleTuning = async () => {
   try {
@@ -147,7 +148,6 @@ const toggleTuning = async () => {
         console.log("Audio initialized.");
       }
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      console.log("store analyser value" + store.analyser);
       detectPitch();
     } else {
       store.cleanupAudio();
@@ -165,9 +165,7 @@ const detectPitch = () => {
     return;
   }
 
-  const analyserNode = store.analyser;
-  console.log(analyserNode);
-  const bufferLength = analyserNode.fftSize;
+  const bufferLength = store.analyser.fftSize;
   const dataArray = new Float32Array(bufferLength);
 
   const pitchFinder = Pitchfinder.YIN({
@@ -177,13 +175,9 @@ const detectPitch = () => {
   const pitchBuffer = [];
 
   const updateTuning = (detectedPitch) => {
-    console.log("detectedPitch" + detectedPitch);
     const normalizedPitch = normalizeFrequency(detectedPitch);
-    console.log("normalizedPitch" + normalizedPitch);
     const targetPitch = selectedNoteFrequency.value;
-    console.log("targetPitch" + targetPitch);
     const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
-    console.log("detune" + detune);
     pitch.value = detectedPitch;
     note.value = Object.keys(noteFrequencies).find(
       (key) => noteFrequencies[key] === selectedNoteFrequency.value,
@@ -196,8 +190,10 @@ const detectPitch = () => {
       `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
     );
     console.log("Detune" + detune.toFixed(2));
+    console.log(`Detected Pitch: ${detectedPitch} Hz`);
+    console.log(`Normalized Pitch: ${normalizedPitch} Hz`);
+    console.log(`Target Pitch: ${targetPitch} Hz`);
   };
-
   const getMedian = (arr) => {
     const sorted = [...arr].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
@@ -218,7 +214,7 @@ const detectPitch = () => {
   const analyze = () => {
     if (!isTuning.value) {
       console.log("Stopping pitch detection.");
-      return; // Stop the loop
+      return;
     }
 
     try {
@@ -230,7 +226,6 @@ const detectPitch = () => {
         requestAnimationFrame(analyze);
         return;
       }
-
       const detectedPitch = pitchFinder(dataArray);
       processDetectedPitch(detectedPitch);
     } catch (error) {
@@ -243,8 +238,28 @@ const detectPitch = () => {
 };
 
 const normalizeFrequency = (frequency) => {
-  const A4 = 440;
-  return A4 * Math.pow(2, Math.log2(frequency / A4) % 1);
+  const targetFrequency = selectedNoteFrequency.value; // The frequency of the note the user wants to tune to
+
+  // Calculate the octave difference between the detected frequency and the target note
+  const octaveDifference = Math.round(Math.log2(frequency / targetFrequency));
+
+  // Calculate the base frequency of the detected octave
+  const baseFrequencyInOctave = targetFrequency * Math.pow(2, octaveDifference);
+
+  // Calculate the pitch offset within the detected frequency's octave
+  const pitchOffset = frequency - baseFrequencyInOctave;
+
+  // Map the frequency to the target note's octave while preserving the pitch offset
+  let normalizedFrequency = targetFrequency + pitchOffset;
+
+  // Ensure the normalized frequency is within the target note's octave
+  if (normalizedFrequency < targetFrequency / 2) {
+    normalizedFrequency *= 2; // Move up one octave if too low
+  } else if (normalizedFrequency >= targetFrequency * 2) {
+    normalizedFrequency /= 2; // Move down one octave if too high
+  }
+
+  return normalizedFrequency;
 };
 
 onMounted(() => {

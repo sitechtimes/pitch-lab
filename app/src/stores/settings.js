@@ -219,7 +219,7 @@ export const settingsStore = defineStore(
       setOutputVolume,
       cleanupAudio,
       getDevices,
-      analyser // Add analyser to the returned state
+      analyser
     };
   },
   {
