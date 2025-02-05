@@ -3,9 +3,16 @@
   <div
     class="flex items-center justify-between p-4 bg-gray-900 rounded-md text-white max-w-sm"
   >
-    <!-- Label -->
-    <div class="flex flex-col">
 
+    <!-- Listen Button -->
+    <button
+      @click="togglePlay"
+      class="bg-[#A3D10A] rounded-full p-2"
+    >
+      {{ isPlaying ? "Stop Listening" : "Listen" }}
+    </button>
+<div>
+    <!-- Label -->
       <!-- Dropdown -->
       <div class="relative text-black">
         <select
@@ -20,17 +27,7 @@
             Tune to {{ option.name }}
           </option>
         </select>
-      </div>
     </div>
-
-    <!-- Listen Button -->
-    <button
-      @click="togglePlay"
-      class="bg-blue-600 hover:bg-blue-700 text-gray-100 font-bold py-2 px-4 rounded shadow-md transition duration-200"
-    >
-      {{ isPlaying ? "Stop Listening" : "Listen" }}
-    </button>
-
     <!-- Volume Slider -->
     <div class="flex items-center ml-4">
       <div class="text-gray-300 mr-2">
@@ -45,6 +42,7 @@
         class="w-24 h-1 bg-gray-700 rounded appearance-none focus:outline-none accent-purple-500"
       />
     </div>
+  </div>
   </div>
   </div>
 </template>

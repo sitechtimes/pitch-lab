@@ -58,13 +58,10 @@
   <div v-else class="w-[60%]">
     <p class="text-lg">No recorded audio available. Please start recording to see playback and download options.</p>
   </div>
-
-  <div v-if="saving" :class="{'fade-out': isFading}" class="modal">
-    <div class="modal-content">
-      <button @click="triggerFadeOut" class="close-button">x</button>
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
-      <p v-if="saving === 'save'">Successfully Saved!</p>
-    </div>
+  <div v-if="saving">
+    <button @click="saving = null">x</button>
+    <p v-if="saving === 'delete'">Successfully Deleted!</p>
+    <p v-if="saving === 'save'">Successfully Saved!</p>
   </div>
 </div>
 </template>
@@ -225,25 +222,6 @@ a {
   margin-top: 10px;
 }
 
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: opacity 0.5s ease;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-}
 
 .close-button {
   background: none;
