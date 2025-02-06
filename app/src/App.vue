@@ -24,7 +24,8 @@
         <h1 class="w-[30%]">Metronome</h1>       
         <h1 class="w-[30%]">Tuner</h1>
       </div>
-      <div class="flex items-center justify-center">
+      <div class="flex items-center justify-center bg-[#120e1d]
+">
         <!-- Recorder -->
       <div class=" flex w-[35%] flex-col">
         <AudioRecorder />
@@ -38,11 +39,11 @@
       </div>
         
         <!-- Metronome -->
-        <div class="w-[25%] items-center flex justify-center">
+        <div class="w-[35%] items-center flex justify-center">
           <MetronomeController />
         </div>
         <!-- Tuner -->
-        <div class="w-[30%] flex justify-center ">
+        <div class="w-[20%] flex justify-center ">
           <TunerController />
         </div>
       </div>

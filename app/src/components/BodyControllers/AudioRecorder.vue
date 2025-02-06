@@ -36,12 +36,7 @@
       :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       controls
     ></audio>
-    <a
-      :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-      download="recorded-audio.mp4"
-    >
-      Download
-    </a>
+   
     <input
       id="name"
       type="text"
@@ -49,9 +44,16 @@
       v-model="audioStore.fileName"
       placeholder="Name File"
     />
+    <div>
     <button @click="saveAudio">Save To History</button>
     <button @click="deleteAudio">Delete</button>      
-
+    <a
+      :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
+      download="recorded-audio.mp4"
+    >
+      Download
+    </a>
+  </div>
   </div>
 
   <!-- Placeholder message when there is no recording -->
@@ -62,7 +64,7 @@
     <button @click="saving = null">x</button>
     <p v-if="saving === 'delete'">Successfully Deleted!</p>
     <p v-if="saving === 'save'">Successfully Saved!</p>
-  </div>
+  </div> 
 </div>
 </template>
 

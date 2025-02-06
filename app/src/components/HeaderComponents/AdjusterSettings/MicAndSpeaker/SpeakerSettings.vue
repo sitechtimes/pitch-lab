@@ -53,14 +53,6 @@
       />
     </div>
 
-    <!-- Audio Visualization -->
-    <div class="visualization-container mb-6">
-      <canvas
-        ref="visualizerCanvas"
-        class="w-full h-32 bg-tuner-bg rounded-lg"
-      ></canvas>
-    </div>
-
     <!-- Error Message -->
     <div v-if="errorMessage" class="text-red-500 text-sm">
       {{ errorMessage }}
@@ -79,6 +71,7 @@ const visualizerCanvas = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 const animationFrameId = ref(null);
+const selectedSpeaker = ref(persistedStore.selectedSpeaker);
 
 // Visualization setup
 let analyser = null;
