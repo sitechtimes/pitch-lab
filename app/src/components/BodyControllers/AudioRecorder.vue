@@ -214,9 +214,4 @@ a {
 .bg-white {
   background-color: white;
 }
-
-.download-icon {
-  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
-  object-fit: contain; /* Ensure the image maintains its aspect ratio */
-}
 </style>

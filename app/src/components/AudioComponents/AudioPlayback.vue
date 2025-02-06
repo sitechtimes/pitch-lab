@@ -17,16 +17,13 @@
         :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
         download="recorded-audio.mp4"
       >
-        <button class="btn btn-ghost">
-          <img :src="url" class="download-icon" />
-        </button>
+        Download
       </a>
     </div>
   </div>
 </template>
 
 <script setup>
-import url from "../../../public/download-button.png";
 import { audioFiles } from "@/stores/audioFiles";
 const audioStore = audioFiles();
 </script>
