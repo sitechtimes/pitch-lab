@@ -178,6 +178,7 @@ const saveAudio = () => {
   audioStore.fileName = null;
   saving.value = "save";
   timer.value = 0;
+  autoDisappear();
 };
 
 const deleteAudio = () => {
@@ -203,6 +204,13 @@ const deleteAudio = () => {
   audioStore.fileName = null;
   saving.value = "delete";
   timer.value = 0;
+  autoDisappear();
+};
+
+const autoDisappear = () => {
+  setTimeout(() => {
+    saving.value = null;
+  }, 3000);
 };
 </script>
 

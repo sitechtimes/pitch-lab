@@ -8,20 +8,16 @@
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[38%] relative"
     >
       <SpeakerSettings />
-      <hr class="my-4 border-[.12rem] border-[#A3D10A] w-[80%] mx-auto" />
-      <MicrophoneSettings />   
-      <button
-        class="btn btn-outline btn-success bg-[#7210E3] mr-4"
-        @click="saveSettings"
-      >
-        Save
-      </button>  
-      <button
+
+      <!-- Modal Footer -->
+      <div class="space-x-4">
+        <button
           class="btn btn-outline btn-error"
           @click="store.showSettingsModal"
         >
           Exit
         </button>
+      </div>
       </div>
 
     <!-- Modal Footer -->
@@ -35,11 +31,6 @@ import MicrophoneSettings from "./MicAndSpeaker/MicrophoneSettings.vue";
 
 import { settingsStore } from "../../../stores/settings.js";
 const store = settingsStore();
-
-const saveSettings = () => {
-  store.initializeAudio();
-  store.showSettingsModal = false;
-};
 </script>
 
 <style scoped></style>
