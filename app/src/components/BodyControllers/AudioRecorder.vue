@@ -1,75 +1,65 @@
 <template>
-  <div class="flex justify-between">
-    <h1 class="text-white text-3xl">Recorder</h1>
-  </div>
-
-  <button
-    type="button"
-    class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
-    @click="(audioStore.viewingHistory = true), (saving = null)"
-  >
-    View History Here:
-  </button>
-
-  <div class="flex flex-col">
-    <!-- Timer display -->
-    <div class="text-black bg-white my-4 p-2 rounded">
-      Timer: {{ formatTime(timer) }}
+  <div>
+    <div class="flex justify-between">
+      <h1 class="text-white text-3xl">Recorder</h1>
     </div>
-  </div>
-  <div class="flex w-1/6 flex-col my-2">
-    <button
-      class="bg-[#36C4E4] rounded-full"
-      @click="startRecording"
-      v-if="!isRecording"
-    >
-      Start Recording
-    </button>
-    <button
-      class="bg-[#A3D10A] rounded-full"
-      @click="stopRecording"
-      v-if="isRecording"
-    >
-      Stop Recording
-    </button>
-  </div>
 
-  <!-- Display recorded audio playback and download link -->
-  <div v-if="audioStore.currentAudio && !isRecording">
-    <h3>Recorded Audio:</h3>
-    <audio
-      :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-      controls
-    ></audio>
-    <a
-      :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-      download="recorded-audio.mp4"
+    <button
+      type="button"
+      class="text-white bg-gold font-medium rounded-lg text-sm px-10 py-4 mb-5"
+      @click="(audioStore.viewingHistory = true), (saving = null)"
     >
-      <button class="btn btn-ghost">
-        <img :src="url" class="download-icon" />
+      View History Here:
+    </button>
+
+    <div class="flex flex-col">
+      <!-- Timer display -->
+      <div class="text-black bg-white my-4 p-2 rounded">
+        Timer: {{ formatTime(timer) }}
+      </div>
+    </div>
+    <div class="flex w-1/6 flex-col my-2">
+      <button
+        class="bg-[#36C4E4] rounded-full"
+        @click="startRecording"
+        v-if="!isRecording"
+      >
+        Start Recording
       </button>
-    </a>
-    <label for="name">Name File</label>
-    <input
-      id="name"
-      type="text"
-      class="text-black"
-      v-model="audioStore.fileName"
-    />
-    <button @click="saveAudio">Save To History</button>
-    <button @click="deleteAudio">Delete</button>
-  </div>
+      <button
+        class="bg-[#A3D10A] rounded-full"
+        @click="stopRecording"
+        v-if="isRecording"
+      >
+        Stop Recording
+      </button>
+    </div>
 
-  <div v-if="saving">
-    <button @click="saving = null">x</button>
-    <p v-if="saving === 'delete'">Successfully Deleted!</p>
-    <p v-if="saving === 'save'">Successfully Saved!</p>
+    <!-- Display recorded audio playback and download link -->
+    <div v-if="audioStore.currentAudio && !isRecording">
+      <AudioPlayback />
+      <label for="name">Name File</label>
+      <input
+        id="name"
+        type="text"
+        class="text-black"
+        v-model="audioStore.fileName"
+      />
+      <button @click="saveAudio">Save To History</button>
+      <button @click="deleteAudio">Delete</button>
+    </div>
+
+    <div v-if="saving">
+      <button @click="saving = null">x</button>
+      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+      <p v-if="saving === 'save'">Successfully Saved!</p>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import url from "../../../public/download-button.png";
+import AudioPlayback from "../AudioComponents/AudioPlayback.vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
@@ -173,7 +163,6 @@ const saveAudio = () => {
   audioStore.fileName = null;
   saving.value = "save";
   timer.value = 0;
-  autoDisappear();
 };
 
 const deleteAudio = () => {
@@ -199,13 +188,6 @@ const deleteAudio = () => {
   audioStore.fileName = null;
   saving.value = "delete";
   timer.value = 0;
-  autoDisappear();
-};
-
-const autoDisappear = () => {
-  setTimeout(() => {
-    saving.value = null;
-  }, 3000);
 };
 </script>
 
