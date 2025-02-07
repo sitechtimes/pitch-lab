@@ -1,7 +1,6 @@
 <template>
   <div
     class="metronome-container p-8 max-w-2xl mx-auto rounded-xl"
-    style="background: #120e1d"
   >
     <div class="flex items-center gap-6 justify-between">
       <!-- Time Signature -->

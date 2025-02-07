@@ -12,8 +12,6 @@
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 
-const emit = defineEmits(["died"]);
-
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 
@@ -25,7 +23,6 @@ const killIt = () => {
     audioStore.currentAudio = null;
     audioStore.warning = false;
   }
-  emit("died");
 };
 
 const deleteRecent = () => {

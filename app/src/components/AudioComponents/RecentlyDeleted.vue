@@ -5,7 +5,7 @@
         >Recently Deleted</label
       >
       <select
-        class="bg-gray-700 text-white p-2 rounded"
+        class="bg-gray-700 text-black rounded"
         v-model="audioStore.currentAudio"
       >
         History:
@@ -53,7 +53,6 @@ import { ref } from "vue";
 import WarningModal from "./WarningModal.vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
-
 const persistedStore = persistedSettings();
 const audioStore = audioFiles();
 const saving = ref(null);

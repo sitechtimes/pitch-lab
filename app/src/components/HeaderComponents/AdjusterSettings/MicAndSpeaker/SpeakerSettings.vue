@@ -2,9 +2,14 @@
   <div>
     <!-- Speaker Selection -->
     <div class="mb-6">
-      <label for="speaker" class="block text-white text-sm mb-2">
-        Select Speaker:
-      </label>
+      <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
+      <button
+        @click="testSpeaker"
+        class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4"
+      >
+        Test Speaker
+      </button>
+
       <select
         id="speaker"
         v-model="selectedSpeaker"
@@ -46,14 +51,6 @@
         class="w-full range range-purple"
         @input="store.setOutputVolume(store.outputVolume)"
       />
-    </div>
-
-    <!-- Audio Visualization -->
-    <div class="visualization-container mb-6">
-      <canvas
-        ref="visualizerCanvas"
-        class="w-full h-32 bg-tuner-bg rounded-lg"
-      ></canvas>
     </div>
 
     <!-- Error Message -->

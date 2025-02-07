@@ -1,4 +1,5 @@
 <template>
+  <div class="flex flex-col ">
   <div
     class="flex items-center justify-between p-4 bg-gray-900 rounded-md text-white max-w-sm"
   >
@@ -8,7 +9,7 @@
         Tuner
       </label>
       <!-- Dropdown -->
-      <div class="relative">
+      <div class="relative text-black">
         <select
           v-model="store.selectedNote"
           class="bg-gray-800 text-gray-300 border border-gray-600 rounded px-4 py-1 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -16,20 +17,11 @@
           <option
             v-for="option in tuningOptions"
             :key="option.name"
-            :value="option"
+            :value="option" 
           >
             Tune to {{ option.name }}
           </option>
         </select>
-        <!-- Dropdown Arrow -->
-        <div
-          class="absolute inset-y-0 right-2 flex items-center pointer-events-none"
-        >
-          <div
-            class="w-2.5 h-2.5 border-t-2 border-r-2 rotate-45 border-purple-500"
-          ></div>
-        </div>
-      </div>
     </div>
     <!-- Listen Button -->
     <button
@@ -52,6 +44,8 @@
         class="w-24 h-1 bg-gray-700 rounded appearance-none focus:outline-none accent-purple-500"
       />
     </div>
+  </div>
+  </div>
   </div>
 </template>
 
@@ -156,6 +150,6 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<!-- <style scoped>
 /* Tailwind classes are already applied inline */
-</style>
+</style> -->

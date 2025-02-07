@@ -3,7 +3,7 @@
     <div>
       <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
       <select
-        class="bg-gray-700 text-white p-2 rounded w-[90%]"
+        class="bg-gray-700 text-black rounded w-[90%]"
         v-model="audioStore.currentAudio"
       >
         History:
@@ -25,12 +25,6 @@
 
       <button @click="saveAudio">Rename File</button>
       <button @click="deleteAudio">Delete</button>
-
-      <div v-if="saving">
-        <button @click="saving = null">x</button>
-        <p v-if="saving === 'delete'">Successfully Deleted!</p>
-        <p v-if="saving === 'save'">Successfully Saved!</p>
-      </div>
     </div>
   </div>
 </template>
