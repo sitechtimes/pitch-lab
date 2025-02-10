@@ -8,7 +8,7 @@
       <audio
         ref="audioElement"
         controls
-        :src="audioStore.currentAudio.audio"
+        :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       ></audio>
     </div>
 
