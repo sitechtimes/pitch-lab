@@ -4,7 +4,7 @@
       <h3>Recorded Audio:</h3>
     </div>
 
-    <div>
+    <div :key="audioStore.currentAudio.id">
       <audio
         ref="audioElement"
         controls

@@ -1,71 +1,64 @@
 <template>
-<div class="flex flex-row justify-between">
-  <div>
-    <!-- Timer display -->  
-    <button
-    type="button"
-    class="text-white text-center bg-gold font-medium rounded-lg text-sm"
-    @click="(audioStore.viewingHistory = true), (saving = null)"
-  >
-    View History Here:
-  </button>
-    <div class="text-black bg-white text-center p-2 rounded">
-      Timer: {{ formatTime(timer) }}
+  <div class="flex flex-row justify-between">
+    <div>
+      <!-- Timer display -->
+      <button
+        type="button"
+        class="text-white text-center bg-gold font-medium rounded-lg text-sm"
+        @click="(audioStore.viewingHistory = true), (saving = null)"
+      >
+        View History Here:
+      </button>
+      <div class="text-black bg-white text-center p-2 rounded">
+        Timer: {{ formatTime(timer) }}
+      </div>
+
+      <button
+        class="bg-[#36C4E4] rounded-full p-2"
+        @click="startRecording"
+        v-if="!isRecording"
+      >
+        Start Recording
+      </button>
+      <button
+        class="bg-[#A3D10A] rounded-full p-2"
+        @click="stopRecording"
+        v-if="isRecording"
+      >
+        Stop Recording
+      </button>
     </div>
 
-    <button
-      class="bg-[#36C4E4] rounded-full p-2"
-      @click="startRecording"
-      v-if="!isRecording" 
-    >
-      Start Recording
-    </button>
-    <button
-      class="bg-[#A3D10A] rounded-full p-2"
-      @click="stopRecording"
-      v-if="isRecording"
-    >
-      Stop Recording
-    </button>
-  </div>
+    <!-- Display recorded audio playback and download link -->
+    <div v-if="audioStore.currentAudio && !isRecording">
+      <AudioPlayback />
 
-  <!-- Display recorded audio playback and download link -->
-  <div v-if="audioStore.currentAudio && !isRecording">
-    <h3>Recorded Audio:</h3>
-    <audio
-      :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-      controls
-    ></audio>
-   
-    <input
-      id="name"
-      type="text"
-      class="text-black"
-      v-model="audioStore.fileName"
-      placeholder="Name File"
-    />
-    <div>
-    <button @click="saveAudio">Save To History</button>
-    <button @click="deleteAudio">Delete</button>      
-    <a
-      :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
-      download="recorded-audio.mp4"
-    >
-      Download
-    </a>
-  </div>
-  </div>
+      <input
+        id="name"
+        type="text"
+        class="text-black"
+        v-model="audioStore.fileName"
+        placeholder="Name File"
+      />
+      <div>
+        <button @click="saveAudio">Save To History</button>
+        <button @click="deleteAudio">Delete</button>
+      </div>
+    </div>
 
-  <!-- Placeholder message when there is no recording -->
-  <div v-else class="w-[60%]">
-    <p class="text-lg">No recorded audio available. Please start recording to see playback and download options.</p>
+    <!-- Placeholder message when there is no recording -->
+    <div v-else class="w-[60%]">
+      <p class="text-lg">
+        No recorded audio available. Please start recording to see playback and
+        download options.
+      </p>
+    </div>
+    <div v-if="saving">
+      <button @click="saving = null">x</button>
+      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+      <p v-if="saving === 'save'">Successfully Saved!</p>
+    </div>
   </div>
-  <div v-if="saving">
-    <button @click="saving = null">x</button>
-    <p v-if="saving === 'delete'">Successfully Deleted!</p>
-    <p v-if="saving === 'save'">Successfully Saved!</p>
-  </div> 
-</div>
 </template>
 
 <script setup>
@@ -127,13 +120,6 @@ const stopRecording = () => {
     isRecording.value = false;
     stopTimer();
   }
-};
-const triggerFadeOut = () => {
-  isFading = true;
-  setTimeout(() => {
-    isFading = false;
-    saving.value = null;
-  }, 500);
 };
 
 const startTimer = () => {
@@ -232,7 +218,6 @@ audio {
 a {
   margin-top: 10px;
 }
-
 
 .close-button {
   background: none;
