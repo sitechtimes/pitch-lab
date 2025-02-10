@@ -5,7 +5,7 @@ export const audioFiles = defineStore(
   "audioFiles",
   () => {
     //how we select stuff to delete or view and renaming maybeeee
-    const fileName = ref(null);
+    const fileName = ref(currentAudio.value.audio.fileName || null);
     const currentAudio = ref(null);
 
     //toggles to show history / recently deleted menus/modals
