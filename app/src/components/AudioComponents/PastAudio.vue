@@ -11,6 +11,7 @@
           v-for="file in persistedStore.pastAudio"
           :key="file.id"
           :value="{ audio: file.audio, id: file.id }"
+          @change="audioStore.fileName = file.name"
         >
           {{ file.name }} recorded on {{ file.date }}
         </option>
