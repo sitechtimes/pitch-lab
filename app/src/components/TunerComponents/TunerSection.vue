@@ -161,7 +161,7 @@ const detectPitch = () => {
   const pitchFinder = Pitchfinder.YIN({
     sampleRate: store.audioContext.sampleRate,
   });
-  const amplitudeThreshold = 0.02; //adjust sensitivity here maybe put in settings
+  const amplitudeThreshold = 0.005; //adjust sensitivity here maybe put in settings
   const pitchBuffer = [];
 
   const updateTuning = (detectedPitch) => {
