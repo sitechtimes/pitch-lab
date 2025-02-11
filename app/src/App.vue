@@ -15,38 +15,36 @@
 
     <!-- Main Control Panel -->
     <div class="flex justify-center mt-8">
-  
-      <div
-        class="w-[95%] bg-controllers-bg rounded-3xl p-6 "
-      >    
-      <div class="flex flex-row text-center w-full text-3xl font-semibold mb-2">      
-        <h1 class="w-[40%]">Recorder</h1>    
-        <h1 class="w-[30%]">Metronome</h1>       
-        <h1 class="w-[30%]">Tuner</h1>
-      </div>
-      <div class="flex items-center justify-center bg-[#120e1d]
-">
-        <!-- Recorder -->
-      <div class=" flex w-[35%] flex-col">
-        <AudioRecorder />
-    
+      <div class="w-[95%] bg-controllers-bg rounded-3xl p-6">
         <div
-          v-if="audioStore.viewingHistory"
-          class="absolute inset-0 bg-black/30 p-4"
+          class="flex flex-row text-center w-full text-3xl font-semibold mb-2"
         >
-          <HistoryModal />
-        </div>  
-      </div>
-        
-        <!-- Metronome -->
-        <div class="w-[35%] items-center flex justify-center">
-          <MetronomeController />
+          <h1 class="w-[40%]">Recorder</h1>
+          <h1 class="w-[30%]">Metronome</h1>
+          <h1 class="w-[30%]">Tuner</h1>
         </div>
-        <!-- Tuner -->
-        <div class="w-[20%] flex justify-center ">
-          <TunerController />
+        <div class="flex items-center justify-center bg-[#120e1d]">
+          <!-- Recorder -->
+          <div class="flex w-[35%] flex-col">
+            <AudioRecorder />
+
+            <div
+              v-if="audioStore.viewingHistory"
+              class="absolute inset-0 bg-black/30 p-4"
+            >
+              <HistoryModal />
+            </div>
+          </div>
+
+          <!-- Metronome -->
+          <div class="w-[35%] items-center flex justify-center">
+            <MetronomeController />
+          </div>
+          <!-- Tuner -->
+          <div class="w-[20%] flex justify-center">
+            <TunerController />
+          </div>
         </div>
-      </div>
       </div>
     </div>
 
@@ -54,7 +52,6 @@
     <div class="mt-5 bg-entire-bg">
       <TunerSection />
     </div>
-
   </div>
 </template>
 
@@ -66,7 +63,7 @@ import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/Devic
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
-import TunerSection from "./components/TunerComponents/TunerSection.vue";
+import TunerSection from "./components/TunerComponents/TunerSection2.vue";
 
 import { audioFiles } from "./stores/audioFiles";
 import { settingsStore } from "./stores/settings.js";
