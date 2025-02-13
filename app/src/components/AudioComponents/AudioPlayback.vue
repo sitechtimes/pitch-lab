@@ -36,7 +36,7 @@ import { ref, onMounted } from 'vue';
 import { audioFiles } from "@/stores/audioFiles";
 // import WaveSurfer from 'wavesurfer.js';
 
-// const audioStore = audioFiles();
+const audioStore = audioFiles();
 // const showWaveform = ref(false);
 // const waveformCanvas = ref(null);
 // const audioElement = ref(null);

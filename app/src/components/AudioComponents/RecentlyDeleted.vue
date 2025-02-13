@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <div>
-      <label for="note-selection" class="text-gray-400 mr-4"
+  <div>      <label for="note-selection" class="text-gray-400 mr-4"
         >Recently Deleted</label
       >
+    <div>
+
       <select
         class="bg-gray-700 text-black rounded"
         v-model="audioStore.currentAudio"
