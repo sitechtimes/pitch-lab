@@ -107,8 +107,6 @@ const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
 const isInTune = ref(false);
-const selectedNoteName = computed(() => store.selectedNote.name);
-const selectedNoteFrequency = computed(() => store.selectedNote.frequency);
 const isTuning = ref(false);
 const windowWidth = ref(window.innerWidth);
 

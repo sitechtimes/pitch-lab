@@ -14,13 +14,13 @@
             v-model="store.selectedNote"
             class="bg-gray-800 text-gray-300 border border-gray-600 rounded px-4 py-1 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option
+            <!-- <option
               v-for="option in tuningOptions"
               :key="option.name"
               :value="option"
             >
               Tune to {{ option.name }}
-            </option>
+            </option> -->
           </select>
         </div>
         <!-- Listen Button -->
@@ -52,7 +52,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { settingsStore } from "@/stores/settings";
-import { tuningOptions } from "@/constants/NoteFrequencies";
+// import { tuningOptions } from "@/constants/NoteFrequencies";
 import { persistedSettings } from "@/stores/persistedStore";
 
 const store = settingsStore();

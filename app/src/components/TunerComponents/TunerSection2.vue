@@ -69,6 +69,13 @@ function calculateDetune(detectedFreq, targetFreq) {
   return 1200 * Math.log2(detectedFreq / targetFreq);
 }
 
+// detuneValue.value = detune;
+//     isFlat.value = detune < -10;
+//     isSharp.value = detune > 10;
+//     isInTune.value = Math.abs(detune) <= 10;
+//     console.log(
+//       `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
+
 // Start tracking audio input
 async function startTracking() {
   audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
@@ -77,7 +84,7 @@ async function startTracking() {
 
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
-      deviceId: { ideal: persistedSettings.selectedMicrophone },
+      deviceId: { ideal: persistedSettings().selectedMicrophone },
     },
   });
   source.value = audioContext.value.createMediaStreamSource(stream);
