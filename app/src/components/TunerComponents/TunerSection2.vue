@@ -1,24 +1,103 @@
 <template>
-  <div class="audio-tracker">
-    <h1>Audio Frequency Tracker</h1>
-    <p v-if="frequency">Detected Frequency: {{ frequency.toFixed(2) }} Hz</p>
-    <p v-if="closestNote">
-      Closest Note: {{ closestNote.note }} ({{
-        closestNote.frequency.toFixed(2)
-      }}
-      Hz)
-    </p>
-    <p v-if="detuneValue !== null">
-      Detune: {{ detuneValue.toFixed(2) }} cents
-    </p>
-    <p v-else>No audio input detected.</p>
-    <button @click="toggleTracking">
-      {{ isTracking ? "Stop Tracking" : "Start Tracking" }}
-    </button>
+  <div class="flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-screen-xl">
+      <div
+        class="relative flex justify-center items-center h-[30vh] bg-tuner-bg py-12 my-12 px-6 rounded-lg shadow-lg"
+        style="width: 100%"
+      >
+        <div class="relative w-full" style="height: 100%">
+          <div
+            v-for="i in 21"
+            :key="i"
+            class="absolute bg-white w-[1px]"
+            :class="{
+              'h-[16vh]': i % 2 === 1,
+              'h-[10vh]': i % 2 !== 1,
+            }"
+            :style="{
+              left: `${(i - 1) * 5}%`,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }"
+          ></div>
+          <div
+            class="w-2 h-16 bg-yellow-500 absolute"
+            :style="{
+              left: indicatorPosition,
+              transform: 'translateX(-50%) translateY(-50%)',
+              top: '50%',
+              border: '4px solid yellow',
+            }"
+          ></div>
+          <div
+            v-for="j in 11"
+            :key="`label-${j}`"
+            class="absolute text-2xl text-white"
+            :style="{
+              left: `${(2 * j - 2) * 5}%`,
+              bottom: '-30px',
+              transform: 'translateX(-50%)',
+            }"
+          >
+            {{ (j - 6) * 10 }}
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between w-1/3 mx-auto">
+        <div
+          :class="{
+            'bg-tuner-bg': !isFlat,
+            'bg-orange': isFlat,
+            'px-5': true,
+            'py-3': true,
+            'text-3xl': true,
+            'rounded-full': true,
+            'text-white': true,
+          }"
+        >
+          b
+        </div>
+        <div
+          :class="{
+            'bg-tuner-bg': !isInTune,
+            'bg-green': isInTune,
+            'text-4xl': true,
+            'px-5': true,
+            'py-3': true,
+            'rounded-lg': true,
+            'text-white': true,
+          }"
+        >
+          {{ closestNote ? closestNote.note : "" }}
+        </div>
+        <div
+          :class="{
+            'bg-tuner-bg': !isSharp,
+            'bg-orange': isSharp,
+            'px-5': true,
+            'py-3': true,
+            'text-3xl': true,
+            'rounded-full': true,
+            'text-white': true,
+          }"
+        >
+          #
+        </div>
+      </div>
+      <div class="flex flex-col items-center py-9">
+        <button
+          class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
+          @click="toggleTuning"
+        >
+          {{ isTuning ? "Stop Tuning" : "Start Tuning" }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
+
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onUnmounted, onMounted } from "vue";
 import * as Pitchfinder from "pitchfinder";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
 import { persistedSettings } from "@/stores/persistedStore";
@@ -28,10 +107,24 @@ const audioContext = ref(null);
 const analyser = ref(null);
 const source = ref(null);
 const frequency = ref(null);
-const isTracking = ref(false);
+const isTuning = ref(false);
 const detectPitch = ref(null);
 const closestNote = ref(null);
-const detuneValue = ref(null);
+const detuneValue = ref(0);
+const isFlat = ref(false);
+const isSharp = ref(false);
+const isInTune = ref(false);
+const windowWidth = ref(window.innerWidth);
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+};
+const indicatorPosition = computed(() => {
+  const maxRange = 50;
+  let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
+  let percentageOffset = (detune / maxRange) * 50;
+  return `calc(50% + ${percentageOffset}%)`;
+});
 
 // Binary search to find the closest note
 function findClosestNote(freq) {
@@ -69,15 +162,13 @@ function calculateDetune(detectedFreq, targetFreq) {
   return 1200 * Math.log2(detectedFreq / targetFreq);
 }
 
-// detuneValue.value = detune;
-//     isFlat.value = detune < -10;
-//     isSharp.value = detune > 10;
-//     isInTune.value = Math.abs(detune) <= 10;
-//     console.log(
-//       `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
-
+function updateTuning() {
+  isFlat.value = detuneValue.value < -10;
+  isSharp.value = detuneValue.value > 10;
+  isInTune.value = Math.abs(detuneValue.value) <= 10;
+}
 // Start tracking audio input
-async function startTracking() {
+async function startTuning() {
   audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
   analyser.value = audioContext.value.createAnalyser();
   analyser.value.fftSize = 4096;
@@ -91,12 +182,12 @@ async function startTracking() {
   source.value.connect(analyser.value);
 
   detectPitch.value = new Pitchfinder.YIN();
-  isTracking.value = true;
+  isTuning.value = true;
   trackFrequency();
 }
 
 // Stop tracking audio input
-function stopTracking() {
+function stopTuning() {
   if (source.value) {
     source.value.disconnect();
     source.value = null;
@@ -105,30 +196,30 @@ function stopTracking() {
     audioContext.value.close();
     audioContext.value = null;
   }
-  isTracking.value = false;
+  isTuning.value = false;
   frequency.value = null;
   closestNote.value = null;
   detuneValue.value = null;
 }
 
 // Toggle tracking on/off
-function toggleTracking() {
-  if (isTracking.value) {
-    stopTracking();
+function toggleTuning() {
+  if (isTuning.value) {
+    stopTuning();
   } else {
-    startTracking();
+    startTuning();
   }
 }
 
 // Track frequency continuously
 function trackFrequency() {
-  if (!isTracking.value) return;
+  if (!isTuning.value) return;
 
   const bufferLength = analyser.value.fftSize;
   const dataArray = new Float32Array(bufferLength);
 
   const updateFrequency = () => {
-    if (!isTracking.value) return;
+    if (!isTuning.value) return;
 
     analyser.value.getFloatTimeDomainData(dataArray);
     const pitch = detectPitch.value(dataArray);
@@ -140,6 +231,7 @@ function trackFrequency() {
       const note = findClosestNote(pitch);
       closestNote.value = note;
       detuneValue.value = calculateDetune(pitch, note.frequency);
+      updateTuning();
     }
 
     requestAnimationFrame(updateFrequency);
@@ -147,4 +239,11 @@ function trackFrequency() {
 
   updateFrequency();
 }
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
