@@ -68,7 +68,7 @@
             'text-white': true,
           }"
         >
-          {{ selectedNoteName }}
+          {{ closestNote ? closestNote.note : "" }}
         </div>
         <div
           :class="{
@@ -97,23 +97,28 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import Pitchfinder from "pitchfinder";
-import { settingsStore } from "../../stores/settings";
+import { ref, computed, onUnmounted, onMounted } from "vue";
+import * as Pitchfinder from "pitchfinder";
+import { noteFrequencies } from "@/constants/NoteFrequencies";
+import { persistedSettings } from "@/stores/persistedStore";
 
-const store = settingsStore();
-const pitch = ref(null);
+// Reactive state
+const audioContext = ref(null);
+const analyser = ref(null);
+const source = ref(null);
+const frequency = ref(null);
+const isTuning = ref(false);
+const detectPitch = ref(null);
+const closestNote = ref(null);
 const detuneValue = ref(0);
 const isFlat = ref(false);
 const isSharp = ref(false);
 const isInTune = ref(false);
-const isTuning = ref(false);
 const windowWidth = ref(window.innerWidth);
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
-
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -121,122 +126,122 @@ const indicatorPosition = computed(() => {
   return `calc(50% + ${percentageOffset}%)`;
 });
 
-const toggleTuning = async () => {
-  try {
-    isTuning.value = !isTuning.value;
+// Binary search to find the closest note
+function findClosestNote(freq) {
+  let left = 0;
+  let right = noteFrequencies.length - 1;
 
-    if (isTuning.value) {
-      store.cleanupAudio();
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const noteFreq = noteFrequencies[mid].frequency;
 
-      const success = await store.initializeAudio();
-      if (!success) {
-        console.error("Failed to initialize audio context.");
-        return;
-      } else {
-        console.log("Audio initialized.");
-      }
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      detectPitch();
+    if (noteFreq === freq) {
+      return noteFrequencies[mid];
+    } else if (noteFreq < freq) {
+      left = mid + 1;
     } else {
-      store.cleanupAudio();
+      right = mid - 1;
     }
-  } catch (error) {
-    console.error("Tuning error:", error);
-    store.cleanupAudio();
-    isTuning.value = false;
-  }
-};
-
-const detectPitch = () => {
-  if (!store.analyser || !store.audioContext) {
-    console.error("Analyser node or AudioContext is not initialized.");
-    return;
   }
 
-  const bufferLength = store.analyser.fftSize;
+  // Compare the two closest notes
+  const lowerNote = noteFrequencies[right >= 0 ? right : 0];
+  const upperNote =
+    noteFrequencies[
+      left < noteFrequencies.length ? left : noteFrequencies.length - 1
+    ];
+
+  const lowerDiff = Math.abs(lowerNote.frequency - freq);
+  const upperDiff = Math.abs(upperNote.frequency - freq);
+
+  return lowerDiff < upperDiff ? lowerNote : upperNote;
+}
+
+// Calculate detune in cents
+function calculateDetune(detectedFreq, targetFreq) {
+  return 1200 * Math.log2(detectedFreq / targetFreq);
+}
+
+function updateTuning() {
+  isFlat.value = detuneValue.value < -10;
+  isSharp.value = detuneValue.value > 10;
+  isInTune.value = Math.abs(detuneValue.value) <= 10;
+  console.log("detune: ", detuneValue.value);
+  console.log("frequency: ", frequency.value);
+  console.log("closestNote: ", closestNote.value.note);
+}
+// Start tracking audio input
+async function startTuning() {
+  audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
+  analyser.value = audioContext.value.createAnalyser();
+  analyser.value.fftSize = 4096;
+
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      deviceId: { ideal: persistedSettings().selectedMicrophone },
+    },
+  });
+  source.value = audioContext.value.createMediaStreamSource(stream);
+  source.value.connect(analyser.value);
+
+  detectPitch.value = new Pitchfinder.YIN();
+  isTuning.value = true;
+  trackFrequency();
+}
+
+// Stop tracking audio input
+function stopTuning() {
+  if (source.value) {
+    source.value.disconnect();
+    source.value = null;
+  }
+  if (audioContext.value) {
+    audioContext.value.close();
+    audioContext.value = null;
+  }
+  isTuning.value = false;
+  frequency.value = null;
+  closestNote.value = null;
+  detuneValue.value = null;
+}
+
+// Toggle tracking on/off
+function toggleTuning() {
+  if (isTuning.value) {
+    stopTuning();
+  } else {
+    startTuning();
+  }
+}
+
+// Track frequency continuously
+function trackFrequency() {
+  if (!isTuning.value) return;
+
+  const bufferLength = analyser.value.fftSize;
   const dataArray = new Float32Array(bufferLength);
 
-  const pitchFinder = Pitchfinder.YIN({
-    sampleRate: store.audioContext.sampleRate,
-  });
-  const amplitudeThreshold = 0.005; //adjust sensitivity here maybe put in settings
-  const pitchBuffer = [];
+  const updateFrequency = () => {
+    if (!isTuning.value) return;
 
-  const updateTuning = (detectedPitch) => {
-    const normalizedPitch = normalizeFrequency(detectedPitch);
-    const targetPitch = selectedNoteFrequency.value;
-    const detune = 1200 * Math.log2(normalizedPitch / targetPitch);
-    pitch.value = detectedPitch;
-    detuneValue.value = detune;
-    isFlat.value = detune < -10;
-    isSharp.value = detune > 10;
-    isInTune.value = Math.abs(detune) <= 10;
-    console.log(
-      `Pitch: ${normalizedPitch.toFixed(2)} Hz, In Tune: ${isInTune.value}`,
-    );
-    console.log("Detune" + detune.toFixed(2));
-    console.log(`Detected Pitch: ${detectedPitch} Hz`);
-    console.log(`Normalized Pitch: ${normalizedPitch} Hz`);
-    console.log(`Target Pitch: ${targetPitch} Hz`);
-  };
-  const getMedian = (arr) => {
-    const sorted = [...arr].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 !== 0
-      ? sorted[mid]
-      : (sorted[mid - 1] + sorted[mid]) / 2;
-  };
+    analyser.value.getFloatTimeDomainData(dataArray);
+    const pitch = detectPitch.value(dataArray);
 
-  const processDetectedPitch = (detectedPitch) => {
-    if (detectedPitch && detectedPitch > 50 && detectedPitch < 2000) {
-      pitchBuffer.push(detectedPitch);
-      if (pitchBuffer.length > 10) pitchBuffer.shift();
-      const medianPitch = getMedian(pitchBuffer);
-      updateTuning(medianPitch);
-    }
-  };
+    if (pitch) {
+      frequency.value = pitch;
 
-  const analyze = () => {
-    if (!isTuning.value) {
-      console.log("Stopping pitch detection.");
-      return;
+      // Find closest note and calculate detune
+      const note = findClosestNote(pitch);
+      closestNote.value = note;
+      detuneValue.value = calculateDetune(pitch, note.frequency);
+      updateTuning();
     }
 
-    try {
-      store.analyser.getFloatTimeDomainData(dataArray);
-      const peakAmplitude = Math.max(...dataArray.map(Math.abs));
-
-      if (peakAmplitude < amplitudeThreshold) {
-        console.log("Weak signal detected.");
-        requestAnimationFrame(analyze);
-        return;
-      }
-      const detectedPitch = pitchFinder(dataArray);
-      processDetectedPitch(detectedPitch);
-    } catch (error) {
-      console.error("Error during pitch detection:", error);
-    }
-
-    requestAnimationFrame(analyze);
+    requestAnimationFrame(updateFrequency);
   };
-  analyze();
-};
 
-const normalizeFrequency = (frequency) => {
-  const targetFrequency = selectedNoteFrequency.value;
-  const octaveDifference = Math.round(Math.log2(frequency / targetFrequency));
-  const baseFrequencyInOctave = targetFrequency * Math.pow(2, octaveDifference);
-  const pitchOffset = frequency - baseFrequencyInOctave;
-  let normalizedFrequency = targetFrequency + pitchOffset;
-
-  if (normalizedFrequency < targetFrequency / 2) {
-    normalizedFrequency *= 2;
-  } else if (normalizedFrequency >= targetFrequency * 2) {
-    normalizedFrequency /= 2;
-  }
-  return normalizedFrequency;
-};
-
+  updateFrequency();
+}
 onMounted(() => {
   window.addEventListener("resize", handleResize);
 });

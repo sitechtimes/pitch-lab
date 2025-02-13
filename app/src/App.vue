@@ -63,7 +63,7 @@ import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/Devic
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
-import TunerSection from "./components/TunerComponents/TunerSection2.vue";
+import TunerSection from "./components/TunerComponents/TunerSection.vue";
 
 import { audioFiles } from "./stores/audioFiles";
 import { settingsStore } from "./stores/settings.js";
