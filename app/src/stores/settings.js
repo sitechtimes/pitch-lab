@@ -69,13 +69,6 @@ export const settingsStore = defineStore(
           .connect(inputGainNode.value)
           .connect(analyser.value);
 
-        // Optionally connect to outputGainNode for monitoring (if enabled by user)
-        if (persistedStore.enableMonitoring) {
-          inputGainNode.value
-            .connect(outputGainNode.value)
-            .connect(audioContext.value.destination);
-        }
-
         // Set the persisted output device (speaker)
         if (
           persistedStore.selectedSpeaker &&
@@ -103,6 +96,71 @@ export const settingsStore = defineStore(
         return false;
       }
     };
+
+    const currentStream = ref(null);
+    let microphone;
+    const javascriptNode = ref(null);
+
+    const testMic = () => {
+      console.log("hi");
+
+      if (currentStream.value) {
+        const tracks = currentStream.value.getTracks();
+        tracks.forEach((track) => track.stop());
+        currentStream.value = null;
+        analyser.value.disconnect();
+        javascriptNode.value.disconnect();
+        console.log("Stream stopped and disconnected.");
+        return;
+      }
+
+      console.log("passed if");
+
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: { deviceId: persistedStore.selectedMicrophone },
+        })
+        .then((stream) => {
+          currentStream.value = stream; // Store the current stream
+
+          // Initialize the audio context and nodes
+          analyser.value = audioContext.value.createAnalyser(); // .value because audioContext is a ref
+          microphone = audioContext.value.createMediaStreamSource(stream);
+          javascriptNode.value = audioContext.value.createScriptProcessor(
+            2048,
+            1,
+            1,
+          );
+
+          analyser.value.smoothingTimeConstant = 0.3;
+          analyser.value.fftSize = 1024;
+
+          // Connect the nodes
+          microphone.connect(analyser);
+          analyser.value.connect(javascriptNode);
+          javascriptNode.value.connect(audioContext.value.destination); // Assuming `audioContext.value` is a ref.
+
+          // Handle audio processing
+          javascriptNode.value.onaudioprocess = () => {
+            let array = new Uint8Array(analyser.value.frequencyBinCount);
+            analyser.value.getByteFrequencyData(array);
+            let values = 0;
+
+            const length = array.length;
+            for (let i = 0; i < length; i++) {
+              values += array[i];
+            }
+
+            const average = values / length;
+            console.log(Math.round(average));
+          };
+        })
+        .catch((err) => {
+          console.error("Error accessing microphone:", err);
+          alert("Could not access microphone. Please check permissions.");
+        });
+    };
+
     const cleanupAudio = () => {
       if (audioContext.value) {
         try {
@@ -234,6 +292,7 @@ export const settingsStore = defineStore(
       inputVolume,
       outputVolume,
       initializeAudio,
+      testMic,
       showSettingsModal,
       selectedNote,
       updateOutputDevice,

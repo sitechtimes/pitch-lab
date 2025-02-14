@@ -28,6 +28,21 @@
       </select>
     </div>
 
+    <div>
+      <button
+        v-if="!isTesting"
+        @click="settingsStore.testMic(), (isTesting = true)"
+      >
+        test mic
+      </button>
+      <button
+        v-if="isTesting"
+        @click="settingsStore.testMic(), (isTesting = false)"
+      >
+        Stop testing
+      </button>
+    </div>
+
     <!-- Volume Control -->
     <div class="audio-controls mb-6">
       <label for="input-volume" class="block text-white text-sm mb-2">
@@ -61,6 +76,7 @@ const store = settingsStore();
 const persistedStore = persistedSettings();
 const isLoading = ref(true);
 const errorMessage = ref("");
+const isTesting = ref(false);
 
 // Device selection
 const selectedMicrophone = ref(persistedStore.selectedMicrophone);
