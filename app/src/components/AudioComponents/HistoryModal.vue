@@ -7,20 +7,20 @@
     >
     <div class="w-[90%] flex flex-row justify-between mb-[1%]">
       <h1 class="text-3xl font-semibold mb-2">History</h1>       
-         <Button
+         <button
             v-if="!audioStore.viewingDeleted"
             @click="audioStore.viewingDeleted = true"
             class="text-xl bg-purple rounded-full p-1 mb-2"
           >
             Go to recently deleted
-          </Button>         
-          <Button
+          </button>         
+          <button
             v-if="audioStore.viewingDeleted"
             @click="audioStore.viewingDeleted = false"
             class="text-xl bg-purple rounded-full p-1 mb-2"
           >
             Go back to history
-          </Button>
+          </button>
         </div>
       <div class="flex flex-row justify-center">
         <div class="flex items-center h-full">

@@ -5,9 +5,6 @@
   >
     <!-- Label -->
     <div class="flex flex-col">
-      <label for="tuning" class="text-lg font-semibold mb-2 text-gray-300">
-        Tuner
-      </label>
       <!-- Dropdown -->
       <div class="relative text-black">
         <select
