@@ -178,6 +178,8 @@ async function startTuning() {
 
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
+      noiseSuppression: false,
+      autoGainControl: false,
       deviceId: { ideal: persistedSettings().selectedMicrophone },
     },
   });
@@ -203,6 +205,7 @@ function stopTuning() {
   frequency.value = null;
   closestNote.value = null;
   detuneValue.value = null;
+  console.log("killed");
 }
 
 // Toggle tracking on/off
@@ -214,32 +217,48 @@ function toggleTuning() {
   }
 }
 
-// Track frequency continuously
 function trackFrequency() {
   if (!isTuning.value) return;
-
-  const bufferLength = analyser.value.fftSize;
-  const dataArray = new Float32Array(bufferLength);
 
   const updateFrequency = () => {
     if (!isTuning.value) return;
 
-    analyser.value.getFloatTimeDomainData(dataArray);
-    const pitch = detectPitch.value(dataArray);
+    const bufferLength = analyser.value.frequencyBinCount;
+    const dataArray = new Float32Array(bufferLength);
+    analyser.value.getFloatFrequencyData(dataArray);
 
-    if (pitch) {
-      frequency.value = pitch;
+    let maxAmplitude = -Infinity;
+    let maxIndex = 0;
 
-      // Find closest note and calculate detune
-      const note = findClosestNote(pitch);
+    // Find the bin with the highest amplitude
+    for (let i = 0; i < dataArray.length; i++) {
+      if (dataArray[i] > maxAmplitude) {
+        maxAmplitude = dataArray[i];
+        maxIndex = i;
+      }
+    }
+
+    const sampleRate = audioContext.value.sampleRate;
+    const detectedFreq = (maxIndex * sampleRate) / analyser.value.fftSize;
+
+    // Reset display if frequency exceeds 17640 Hz
+    if (detectedFreq > 17640) {
+      frequency.value = null;
+      closestNote.value = null;
+      detuneValue.value = null;
+      isFlat.value = false;
+      isSharp.value = false;
+      isInTune.value = false;
+    } else if (detectedFreq) {
+      frequency.value = detectedFreq;
+      const note = findClosestNote(detectedFreq);
       closestNote.value = note;
-      detuneValue.value = calculateDetune(pitch, note.frequency);
+      detuneValue.value = calculateDetune(detectedFreq, note.frequency);
       updateTuning();
     }
 
     requestAnimationFrame(updateFrequency);
   };
-
   updateFrequency();
 }
 onMounted(() => {

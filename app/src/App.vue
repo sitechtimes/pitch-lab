@@ -51,6 +51,7 @@
     <!-- Tuning Section -->
     <div class="mt-5 bg-entire-bg">
       <TunerSection />
+      <FreqDetector />
     </div>
   </div>
 </template>
@@ -64,6 +65,7 @@ import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
 import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
 import TunerSection from "./components/TunerComponents/TunerSection.vue";
+import FreqDetector from "./components/TunerComponents/FreqDetector.vue";
 
 import { audioFiles } from "./stores/audioFiles";
 import { settingsStore } from "./stores/settings.js";
