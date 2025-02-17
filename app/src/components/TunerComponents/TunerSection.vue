@@ -101,11 +101,11 @@ import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
 import { persistedSettings } from "@/stores/persistedStore";
 
-// Reactive state
 const audioContext = ref(null);
 const analyser = ref(null);
 const source = ref(null);
 const frequency = ref(null);
+const lastValidFrequency = ref(null);
 const isTuning = ref(false);
 const closestNote = ref(null);
 const detuneValue = ref(0);
@@ -114,9 +114,11 @@ const isSharp = ref(false);
 const isInTune = ref(false);
 const windowWidth = ref(window.innerWidth);
 
-// Frequency smoothing settings
 const frequencyHistory = [];
 const maxHistorySize = 5;
+
+const MAX_FREQUENCY = 4186;
+const MIN_FREQUENCY = 27.5;
 
 // Indicator position for UI
 const indicatorPosition = computed(() => {
@@ -153,25 +155,22 @@ function findClosestNote(freq) {
     : upperNote;
 }
 
-// Calculate detune in cents
 function calculateDetune(detectedFreq, targetFreq) {
   return 1200 * Math.log2(detectedFreq / targetFreq);
 }
 
-// Update tuning status
 function updateTuning() {
   isFlat.value = detuneValue.value < -10;
   isSharp.value = detuneValue.value > 10;
   isInTune.value = Math.abs(detuneValue.value) <= 10;
 }
 
-// Start tracking audio input
 async function startTuning() {
   try {
     audioContext.value = new (window.AudioContext ||
       window.webkitAudioContext)();
     analyser.value = audioContext.value.createAnalyser();
-    analyser.value.fftSize = 8192; // Increased FFT size for better resolution
+    analyser.value.fftSize = 16384;
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         noiseSuppression: false,
@@ -189,7 +188,6 @@ async function startTuning() {
   }
 }
 
-// Stop tracking audio input
 function stopTuning() {
   if (source.value) source.value.disconnect();
   if (audioContext.value) audioContext.value.close();
@@ -199,12 +197,10 @@ function stopTuning() {
   detuneValue.value = null;
 }
 
-// Toggle tuning on/off
 function toggleTuning() {
   isTuning.value ? stopTuning() : startTuning();
 }
 
-// Track frequency with parabolic interpolation and zero padding
 function trackFrequency() {
   const bufferLength = analyser.value.frequencyBinCount;
   const dataArray = new Float32Array(bufferLength);
@@ -212,14 +208,10 @@ function trackFrequency() {
   function update() {
     if (!isTuning.value) return;
 
-    // Get FFT data
     analyser.value.getFloatFrequencyData(dataArray);
 
-    // Zero Padding: Extend array
     const paddedArray = new Float32Array(analyser.value.fftSize);
-    paddedArray.set(dataArray); // Copy original data (remaining elements are zero)
-
-    // Find the index of the maximum amplitude
+    paddedArray.set(dataArray);
     let maxIndex = 0;
     let maxAmplitude = -Infinity;
     for (let i = 0; i < bufferLength; i++) {
@@ -229,7 +221,6 @@ function trackFrequency() {
       }
     }
 
-    // Apply parabolic interpolation to refine the peak frequency
     const sampleRate = audioContext.value.sampleRate;
     const detectedFreq = parabolicInterpolation(
       paddedArray,
@@ -237,33 +228,32 @@ function trackFrequency() {
       sampleRate,
     );
 
-    // Rolling average for smoother frequency detection
-    if (detectedFreq > 0) {
+    if (detectedFreq >= MIN_FREQUENCY && detectedFreq <= MAX_FREQUENCY) {
+      lastValidFrequency.value = detectedFreq;
+
       frequencyHistory.push(detectedFreq);
       if (frequencyHistory.length > maxHistorySize) frequencyHistory.shift();
+
+      frequency.value =
+        frequencyHistory.reduce((sum, freq) => sum + freq, 0) /
+          frequencyHistory.length || 0;
+
+      const note = findClosestNote(frequency.value);
+      closestNote.value = note;
+      detuneValue.value = calculateDetune(frequency.value, note.frequency);
+      updateTuning();
+    } else {
+      frequency.value = lastValidFrequency.value || 0;
     }
-    frequency.value =
-      frequencyHistory.reduce((sum, freq) => sum + freq, 0) /
-        frequencyHistory.length || 0;
-
-    // Update closest note and detune value
-    const note = findClosestNote(frequency.value);
-    closestNote.value = note;
-    detuneValue.value = calculateDetune(frequency.value, note.frequency);
-    updateTuning();
-
-    // Schedule next frame
     requestAnimationFrame(update);
   }
 
   update();
 }
 
-// Parabolic interpolation for frequency refinement
 function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
   const fftSize = analyser.value.fftSize;
 
-  // Ensure indices are within bounds
   const leftIndex = Math.max(0, peakIndex - 1);
   const rightIndex = Math.min(spectrum.length - 1, peakIndex + 1);
 
@@ -279,7 +269,6 @@ function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
   return (interpolatedIndex * sampleRate) / fftSize;
 }
 
-// Handle window resize for responsive UI
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
