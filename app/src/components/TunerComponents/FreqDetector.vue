@@ -68,15 +68,27 @@ function detectFrequency() {
     let maxIndex = 0;
     let maxAmplitude = -Infinity;
 
-    for (let i = 0; i < bufferLength; i++) {
+    // Find the bin with the highest amplitude
+    for (let i = 1; i < bufferLength - 1; i++) {
       if (dataArray[i] > maxAmplitude) {
         maxAmplitude = dataArray[i];
         maxIndex = i;
       }
     }
 
+    // Parabolic Interpolation for better frequency estimation
+    let trueIndex = maxIndex;
+    if (maxIndex > 0 && maxIndex < bufferLength - 1) {
+      const alpha = dataArray[maxIndex - 1];
+      const beta = dataArray[maxIndex];
+      const gamma = dataArray[maxIndex + 1];
+
+      const peakOffset = (0.5 * (alpha - gamma)) / (alpha - 2 * beta + gamma);
+      trueIndex = maxIndex + peakOffset;
+    }
+
     const sampleRate = audioContext.value.sampleRate;
-    detectedFrequency.value = (maxIndex * sampleRate) / analyser.value.fftSize;
+    detectedFrequency.value = (trueIndex * sampleRate) / analyser.value.fftSize;
 
     animationFrameId = requestAnimationFrame(update);
   }
