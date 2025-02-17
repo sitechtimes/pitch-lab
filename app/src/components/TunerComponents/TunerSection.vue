@@ -98,7 +98,6 @@
 
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
-import * as Pitchfinder from "pitchfinder";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
 import { persistedSettings } from "@/stores/persistedStore";
 
@@ -108,7 +107,6 @@ const analyser = ref(null);
 const source = ref(null);
 const frequency = ref(null);
 const isTuning = ref(false);
-const detectPitch = ref(null);
 const closestNote = ref(null);
 const detuneValue = ref(0);
 const isFlat = ref(false);
@@ -116,9 +114,14 @@ const isSharp = ref(false);
 const isInTune = ref(false);
 const windowWidth = ref(window.innerWidth);
 
+// Frequency smoothing settings
+const frequencyHistory = [];
+const maxHistorySize = 5;
+
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
+
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -144,17 +147,17 @@ function findClosestNote(freq) {
     }
   }
 
-  // Compare the two closest notes
+  // Compare closest notes
   const lowerNote = noteFrequencies[right >= 0 ? right : 0];
   const upperNote =
     noteFrequencies[
       left < noteFrequencies.length ? left : noteFrequencies.length - 1
     ];
 
-  const lowerDiff = Math.abs(lowerNote.frequency - freq);
-  const upperDiff = Math.abs(upperNote.frequency - freq);
-
-  return lowerDiff < upperDiff ? lowerNote : upperNote;
+  return Math.abs(lowerNote.frequency - freq) <
+    Math.abs(upperNote.frequency - freq)
+    ? lowerNote
+    : upperNote;
 }
 
 // Calculate detune in cents
@@ -166,15 +169,15 @@ function updateTuning() {
   isFlat.value = detuneValue.value < -10;
   isSharp.value = detuneValue.value > 10;
   isInTune.value = Math.abs(detuneValue.value) <= 10;
-  console.log("detune: ", detuneValue.value);
-  console.log("frequency: ", frequency.value);
-  console.log("closestNote: ", closestNote.value.note);
 }
+
 // Start tracking audio input
 async function startTuning() {
   audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
   analyser.value = audioContext.value.createAnalyser();
-  analyser.value.fftSize = 4096;
+
+  // Increased FFT size for better resolution
+  analyser.value.fftSize = 8192;
 
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
@@ -183,57 +186,50 @@ async function startTuning() {
       deviceId: { ideal: persistedSettings().selectedMicrophone },
     },
   });
+
   source.value = audioContext.value.createMediaStreamSource(stream);
   source.value.connect(analyser.value);
 
-  detectPitch.value = new Pitchfinder.YIN();
   isTuning.value = true;
   trackFrequency();
 }
 
 // Stop tracking audio input
 function stopTuning() {
-  if (source.value) {
-    source.value.disconnect();
-    source.value = null;
-  }
-  if (audioContext.value) {
-    audioContext.value.close();
-    audioContext.value = null;
-  }
+  if (source.value) source.value.disconnect();
+  if (audioContext.value) audioContext.value.close();
   isTuning.value = false;
   frequency.value = null;
   closestNote.value = null;
   detuneValue.value = null;
-  console.log("killed");
 }
 
 // Toggle tracking on/off
 function toggleTuning() {
-  if (isTuning.value) {
-    stopTuning();
-  } else {
-    startTuning();
-  }
+  isTuning.value ? stopTuning() : startTuning();
 }
 
 function trackFrequency() {
   if (!isTuning.value) return;
 
-  const updateFrequency = () => {
+  const bufferLength = analyser.value.frequencyBinCount;
+  const dataArray = new Float32Array(bufferLength);
+
+  function update() {
     if (!isTuning.value) return;
 
-    const bufferLength = analyser.value.frequencyBinCount;
-    const dataArray = new Float32Array(bufferLength);
     analyser.value.getFloatFrequencyData(dataArray);
 
-    let maxAmplitude = -Infinity;
-    let maxIndex = 0;
+    // Zero Padding: Extend array
+    const paddedArray = new Float32Array(analyser.value.fftSize);
+    paddedArray.set(dataArray);
 
-    // Find the bin with the highest amplitude
-    for (let i = 0; i < dataArray.length; i++) {
-      if (dataArray[i] > maxAmplitude) {
-        maxAmplitude = dataArray[i];
+    let maxIndex = 0;
+    let maxAmplitude = -Infinity;
+
+    for (let i = 0; i < bufferLength; i++) {
+      if (paddedArray[i] > maxAmplitude) {
+        maxAmplitude = paddedArray[i];
         maxIndex = i;
       }
     }
@@ -241,31 +237,27 @@ function trackFrequency() {
     const sampleRate = audioContext.value.sampleRate;
     const detectedFreq = (maxIndex * sampleRate) / analyser.value.fftSize;
 
-    // Reset display if frequency exceeds 17640 Hz
-    if (detectedFreq > 17640) {
-      frequency.value = null;
-      closestNote.value = null;
-      detuneValue.value = null;
-      isFlat.value = false;
-      isSharp.value = false;
-      isInTune.value = false;
-    } else if (detectedFreq) {
-      frequency.value = detectedFreq;
-      const note = findClosestNote(detectedFreq);
-      closestNote.value = note;
-      detuneValue.value = calculateDetune(detectedFreq, note.frequency);
-      updateTuning();
+    // Rolling average
+    if (detectedFreq > 0) {
+      frequencyHistory.push(detectedFreq);
+      if (frequencyHistory.length > maxHistorySize) frequencyHistory.shift();
     }
 
-    requestAnimationFrame(updateFrequency);
-  };
-  updateFrequency();
-}
-onMounted(() => {
-  window.addEventListener("resize", handleResize);
-});
+    frequency.value =
+      frequencyHistory.reduce((sum, freq) => sum + freq, 0) /
+        frequencyHistory.length || 0;
 
-onUnmounted(() => {
-  window.removeEventListener("resize", handleResize);
-});
+    const note = findClosestNote(frequency.value);
+    closestNote.value = note;
+    detuneValue.value = calculateDetune(frequency.value, note.frequency);
+    updateTuning();
+
+    requestAnimationFrame(update);
+  }
+
+  update();
+}
+
+onMounted(() => window.addEventListener("resize", handleResize));
+onUnmounted(() => window.removeEventListener("resize", handleResize));
 </script>
