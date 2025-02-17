@@ -118,10 +118,7 @@ const windowWidth = ref(window.innerWidth);
 const frequencyHistory = [];
 const maxHistorySize = 5;
 
-const handleResize = () => {
-  windowWidth.value = window.innerWidth;
-};
-
+// Indicator position for UI
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -133,11 +130,9 @@ const indicatorPosition = computed(() => {
 function findClosestNote(freq) {
   let left = 0;
   let right = noteFrequencies.length - 1;
-
   while (left <= right) {
     const mid = Math.floor((left + right) / 2);
     const noteFreq = noteFrequencies[mid].frequency;
-
     if (noteFreq === freq) {
       return noteFrequencies[mid];
     } else if (noteFreq < freq) {
@@ -146,14 +141,12 @@ function findClosestNote(freq) {
       right = mid - 1;
     }
   }
-
   // Compare closest notes
   const lowerNote = noteFrequencies[right >= 0 ? right : 0];
   const upperNote =
     noteFrequencies[
       left < noteFrequencies.length ? left : noteFrequencies.length - 1
     ];
-
   return Math.abs(lowerNote.frequency - freq) <
     Math.abs(upperNote.frequency - freq)
     ? lowerNote
@@ -165,6 +158,7 @@ function calculateDetune(detectedFreq, targetFreq) {
   return 1200 * Math.log2(detectedFreq / targetFreq);
 }
 
+// Update tuning status
 function updateTuning() {
   isFlat.value = detuneValue.value < -10;
   isSharp.value = detuneValue.value > 10;
@@ -173,25 +167,26 @@ function updateTuning() {
 
 // Start tracking audio input
 async function startTuning() {
-  audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
-  analyser.value = audioContext.value.createAnalyser();
-
-  // Increased FFT size for better resolution
-  analyser.value.fftSize = 8192;
-
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      noiseSuppression: false,
-      autoGainControl: false,
-      deviceId: { ideal: persistedSettings().selectedMicrophone },
-    },
-  });
-
-  source.value = audioContext.value.createMediaStreamSource(stream);
-  source.value.connect(analyser.value);
-
-  isTuning.value = true;
-  trackFrequency();
+  try {
+    audioContext.value = new (window.AudioContext ||
+      window.webkitAudioContext)();
+    analyser.value = audioContext.value.createAnalyser();
+    analyser.value.fftSize = 8192; // Increased FFT size for better resolution
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        noiseSuppression: false,
+        autoGainControl: false,
+        deviceId: { ideal: persistedSettings().selectedMicrophone },
+      },
+    });
+    source.value = audioContext.value.createMediaStreamSource(stream);
+    source.value.connect(analyser.value);
+    isTuning.value = true;
+    trackFrequency();
+  } catch (error) {
+    console.error("Error starting tuning:", error);
+    stopTuning();
+  }
 }
 
 // Stop tracking audio input
@@ -204,29 +199,29 @@ function stopTuning() {
   detuneValue.value = null;
 }
 
-// Toggle tracking on/off
+// Toggle tuning on/off
 function toggleTuning() {
   isTuning.value ? stopTuning() : startTuning();
 }
 
+// Track frequency with parabolic interpolation and zero padding
 function trackFrequency() {
-  if (!isTuning.value) return;
-
   const bufferLength = analyser.value.frequencyBinCount;
   const dataArray = new Float32Array(bufferLength);
 
   function update() {
     if (!isTuning.value) return;
 
+    // Get FFT data
     analyser.value.getFloatFrequencyData(dataArray);
 
     // Zero Padding: Extend array
     const paddedArray = new Float32Array(analyser.value.fftSize);
-    paddedArray.set(dataArray);
+    paddedArray.set(dataArray); // Copy original data (remaining elements are zero)
 
+    // Find the index of the maximum amplitude
     let maxIndex = 0;
     let maxAmplitude = -Infinity;
-
     for (let i = 0; i < bufferLength; i++) {
       if (paddedArray[i] > maxAmplitude) {
         maxAmplitude = paddedArray[i];
@@ -234,30 +229,60 @@ function trackFrequency() {
       }
     }
 
+    // Apply parabolic interpolation to refine the peak frequency
     const sampleRate = audioContext.value.sampleRate;
-    const detectedFreq = (maxIndex * sampleRate) / analyser.value.fftSize;
+    const detectedFreq = parabolicInterpolation(
+      paddedArray,
+      maxIndex,
+      sampleRate,
+    );
 
-    // Rolling average
+    // Rolling average for smoother frequency detection
     if (detectedFreq > 0) {
       frequencyHistory.push(detectedFreq);
       if (frequencyHistory.length > maxHistorySize) frequencyHistory.shift();
     }
-
     frequency.value =
       frequencyHistory.reduce((sum, freq) => sum + freq, 0) /
         frequencyHistory.length || 0;
 
+    // Update closest note and detune value
     const note = findClosestNote(frequency.value);
     closestNote.value = note;
     detuneValue.value = calculateDetune(frequency.value, note.frequency);
     updateTuning();
 
+    // Schedule next frame
     requestAnimationFrame(update);
   }
 
   update();
 }
 
+// Parabolic interpolation for frequency refinement
+function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
+  const fftSize = analyser.value.fftSize;
+
+  // Ensure indices are within bounds
+  const leftIndex = Math.max(0, peakIndex - 1);
+  const rightIndex = Math.min(spectrum.length - 1, peakIndex + 1);
+
+  const alpha = spectrum[leftIndex];
+  const beta = spectrum[peakIndex];
+  const gamma = spectrum[rightIndex];
+
+  // Parabolic interpolation formula
+  const delta = (0.5 * (alpha - gamma)) / (alpha - 2 * beta + gamma);
+  const interpolatedIndex = peakIndex + delta;
+
+  // Convert interpolated index to frequency
+  return (interpolatedIndex * sampleRate) / fftSize;
+}
+
+// Handle window resize for responsive UI
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+};
 onMounted(() => window.addEventListener("resize", handleResize));
 onUnmounted(() => window.removeEventListener("resize", handleResize));
 </script>
