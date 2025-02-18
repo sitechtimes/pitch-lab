@@ -5,6 +5,10 @@ import { persistedSettings } from "./persistedStore";
 export const settingsStore = defineStore(
   "settings",
   () => {
+    const isTunerFullScreen = ref(false);
+    function toggleTunerFullScreen() {
+      isTunerFullScreen.value = !isTunerFullScreen.value;
+    }
     const persistedStore = persistedSettings();
 
     const microphones = ref([]);
@@ -243,6 +247,7 @@ export const settingsStore = defineStore(
       cleanupAudio,
       getDevices,
       analyser,
+      toggleTunerFullScreen
     };
   },
   {
