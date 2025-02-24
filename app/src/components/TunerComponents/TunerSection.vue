@@ -94,12 +94,12 @@
         </button>
       </div>
       <div class="flex flex-col items-center py-9">
-        <button
+        <router-link
+          to="/tuner"
           class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
-          @click="goToFullScreenTuner"
         >
           Full Screen Tuner
-        </button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -109,11 +109,7 @@
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
 import { persistedSettings } from "@/stores/persistedStore";
-import { useRouter } from "vue-router"; // Import Vue Router
-const router = useRouter();
-function goToFullScreenTuner() {
-  router.push("/tuner");
-}
+
 const audioContext = ref(null);
 const analyser = ref(null);
 const source = ref(null);
