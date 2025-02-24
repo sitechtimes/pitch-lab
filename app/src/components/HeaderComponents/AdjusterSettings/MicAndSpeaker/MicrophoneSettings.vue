@@ -7,7 +7,7 @@
       </label>
       <select
         id="microphone"
-        v-model="selectedMicrophone"
+        v-model="persistedStore.selectedMicrophone"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
         :disabled="isLoading"
         @change="handleDeviceChange"
@@ -107,17 +107,11 @@ onMounted(async () => {
 
 const handleDeviceChange = async () => {
   try {
-    if (selectedMicrophone.value) {
-      persistedStore.selectedMicrophone = selectedMicrophone.value;
-
-      await store.updateInputDevice(selectedMicrophone.value);
-
-      console.log(`Microphone updated to: ${selectedMicrophone.value}`);
-    }
+    await store.updateInputDevice(persistedStore.selectedMicrophone);
+    console.log(`Microphone updated to: ${persistedStore.selectedMicrophone}`);
   } catch (error) {
     errorMessage.value = `Failed to switch microphone: ${error.message}`;
-    // Revert selection on error
-    selectedMicrophone.value = persistedStore.selectedMicrophone;
+    console.error(error);
   }
 };
 </script>

@@ -39,9 +39,7 @@ export const settingsStore = defineStore(
             noiseSuppression: false,
             echoCancellation: true,
             autoGainControl: false,
-            deviceId: persistedStore.selectedMicrophone
-              ? { exact: persistedStore.selectedMicrophone }
-              : undefined,
+            deviceId: persistedStore.selectedMicrophone,
           },
         });
 
@@ -55,7 +53,9 @@ export const settingsStore = defineStore(
         analyser.value.fftSize = 2048; // Reduced for better compatibility
 
         inputGainNode.value = audioContext.value.createGain();
+        inputGainNode.value.gain.value = persistedStore.inputVolume || 0.5;
         outputGainNode.value = audioContext.value.createGain();
+        outputGainNode.value.gain.value = persistedStore.outputVolume || 1.0;
 
         // Create processing chain
         const source = audioContext.value.createMediaStreamSource(stream);
@@ -68,22 +68,6 @@ export const settingsStore = defineStore(
           .connect(highPassFilter)
           .connect(inputGainNode.value)
           .connect(analyser.value);
-
-        // Set the persisted output device (speaker)
-        if (
-          persistedStore.selectedSpeaker &&
-          typeof audioElement.value?.setSinkId === "function"
-        ) {
-          try {
-            await audioElement.value.setSinkId(persistedStore.selectedSpeaker);
-            console.log(
-              `Output device set to: ${persistedStore.selectedSpeaker}`,
-            );
-          } catch (error) {
-            console.error("Error setting output device:", error);
-          }
-        }
-
         console.log("Audio nodes initialized:", {
           analyser: !!analyser.value,
           context: audioContext.value.state,
@@ -184,30 +168,11 @@ export const settingsStore = defineStore(
       console.log("Audio resources cleaned");
     };
 
-    const updateOutputDevice = async (deviceId) => {
-      try {
-        if (!audioElement.value) {
-          audioElement.value = new Audio();
-        }
-        if (typeof audioElement.value.setSinkId === "function") {
-          await audioElement.value.setSinkId(deviceId || "default");
-          persistedStore.selectedSpeaker = deviceId || "default";
-          console.log(`Output device updated to: ${deviceId || "default"}`);
-        } else {
-          console.warn("setSinkId not supported, using default speaker");
-          persistedStore.selectedSpeaker = "default";
-        }
-      } catch (error) {
-        console.error("Error setting output device:", error);
-        persistedStore.selectedSpeaker = "default"; // Fallback to default speaker
-        throw error; // Re-throw the error for handling in the parent component
-      }
-    };
-    const updateInputDevice = async (deviceId) => {
+    const updateInputDevice = async () => {
       try {
         if (audioContext.value) {
           const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: { exact: deviceId } },
+            audio: { deviceId: persistedStore.selectedMicrophone },
           });
 
           // Disconnect the old source if it exists
@@ -220,10 +185,9 @@ export const settingsStore = defineStore(
             audioContext.value.createMediaStreamSource(stream);
           mediaStreamSource.connect(inputGainNode.value);
 
-          // Update the persisted store
-          persistedStore.selectedMicrophone = deviceId;
-
-          console.log(`Input device updated to: ${deviceId}`);
+          console.log(
+            `Input device updated to: ${persistedStore.selectedMicrophone}`,
+          );
         }
       } catch (error) {
         console.error("Error setting input device:", error);
@@ -295,7 +259,6 @@ export const settingsStore = defineStore(
       testMic,
       showSettingsModal,
       selectedNote,
-      updateOutputDevice,
       updateInputDevice,
       setInputVolume,
       setOutputVolume,

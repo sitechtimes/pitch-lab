@@ -12,7 +12,7 @@
 
       <select
         id="speaker"
-        v-model="selectedSpeaker"
+        v-model="persistedStore.selectedSpeaker"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
         :disabled="isLoading"
         @change="handleSpeakerChange"
@@ -71,7 +71,6 @@ const visualizerCanvas = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 const animationFrameId = ref(null);
-const selectedSpeaker = ref(persistedStore.selectedSpeaker);
 
 // Visualization setup
 let analyser = null;
@@ -131,52 +130,12 @@ onMounted(async () => {
     if (!persistedStore.selectedSpeaker && store.speakers.length > 0) {
       persistedStore.selectedSpeaker = store.speakers[0].deviceId;
     }
-
-    selectedSpeaker.value = persistedStore.selectedSpeaker;
-
     setupVisualizer();
-
-    console.log(`Speaker initialized: ${selectedSpeaker.value}`);
   } catch (error) {
     errorMessage.value = "Please allow speaker access to continue";
     console.error(error);
   } finally {
     isLoading.value = false;
-  }
-});
-
-const handleSpeakerChange = async () => {
-  try {
-    if (selectedSpeaker.value) {
-      // Update the persisted store first
-      persistedStore.selectedSpeaker = selectedSpeaker.value;
-
-      // Update the output device in the audio pipeline
-      await store.updateOutputDevice(selectedSpeaker.value);
-
-      console.log(`Speaker updated to: ${selectedSpeaker.value}`);
-    }
-  } catch (error) {
-    errorMessage.value = `Failed to switch speaker: ${error.message}`;
-    // Revert selection on error
-    selectedSpeaker.value = persistedStore.selectedSpeaker;
-  }
-};
-
-// Cleanup
-
-onMounted(async () => {
-  try {
-    await store.initializeAudio();
-    await store.getDevices();
-
-    // Handle default speaker
-    if (!persistedStore.selectedSpeaker) {
-      await store.updateOutputDevice(""); // System default
-    }
-  } catch (error) {
-    errorMessage.value = "Error initializing audio output";
-    console.log(error);
   }
 });
 </script>
