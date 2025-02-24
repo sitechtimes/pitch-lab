@@ -1,73 +1,33 @@
 <template>
-  <div class="w-screen bg-entire-bg text-white">
-    <!-- Header -->
+  <div class="w-screen bg-entire-bg text-white min-h-screen">
     <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
       <HeaderTitle />
-      <SettingsIcon />
+      <div class="flex items-center gap-4">
+        <router-link to="/" class="text-xl hover:underline">Home</router-link>
+        <router-link to="/tuner" class="text-xl hover:underline"
+          >Tuner</router-link
+        >
+        <SettingsIcon />
+      </div>
     </header>
 
-    <!-- Settings Modal -->
     <DeviceSelector
       v-if="settings.showSettingsModal"
-      name="History"
-      class="absolute inset-0 bg-black/30 p-4"
+      name="Settings"
+      class="absolute inset-0 bg-black/30 p-4 z-10"
     />
 
-    <!-- Main Control Panel -->
-    <div class="flex justify-center mt-8">
-      <div class="w-[95%] bg-controllers-bg rounded-3xl p-6">
-        <div
-          class="flex flex-row text-center w-full text-3xl font-semibold mb-2"
-        >
-          <h1 class="w-[40%]">Recorder</h1>
-          <h1 class="w-[30%]">Metronome</h1>
-          <h1 class="w-[30%]">Tuner</h1>
-        </div>
-        <div class="flex items-center justify-center bg-[#120e1d]">
-          <!-- Recorder -->
-          <div class="flex w-[35%] flex-col">
-            <AudioRecorder />
-
-            <div
-              v-if="audioStore.viewingHistory"
-              class="absolute inset-0 bg-black/30 p-4"
-            >
-              <HistoryModal />
-            </div>
-          </div>
-
-          <!-- Metronome -->
-          <div class="w-[35%] items-center flex justify-center">
-            <MetronomeController />
-          </div>
-          <!-- Tuner -->
-          <div class="w-[20%] flex justify-center">
-            <TunerController />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tuning Section -->
-    <div class="mt-5 bg-entire-bg">
-      <TunerSection @toggle-fullscreen="settings.toggleTunerFullScreen" />
+    <div class="mt-8">
+      <router-view />
     </div>
   </div>
 </template>
 
 <script setup>
-import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
-import AudioRecorder from "./components/BodyControllers/AudioRecorder.vue";
-import TunerController from "./components/BodyControllers/TunerController.vue";
-import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
-import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
-import MetronomeController from "./components/BodyControllers/MetronomeController.vue";
-import HistoryModal from "./components/AudioComponents/HistoryModal.vue";
-import TunerSection from "./components/TunerComponents/TunerSection.vue";
-
-import { audioFiles } from "./stores/audioFiles";
 import { settingsStore } from "./stores/settings.js";
+import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
+import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
+import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
 
-const audioStore = audioFiles();
 const settings = settingsStore();
 </script>
