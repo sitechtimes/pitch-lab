@@ -146,7 +146,6 @@ watch([bpm, selectedSound], () => {
 
 <style scoped>
 .metronome-container {
-  background-color: #1a1a1a;
   color: white;
   padding: 20px;
   text-align: center;
@@ -173,7 +172,6 @@ button {
 }
 
 button:disabled {
-  background-color: #4a4a4a;
   cursor: not-allowed;
 }
 
