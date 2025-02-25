@@ -75,6 +75,8 @@ const isLoading = ref(true);
 const errorMessage = ref("");
 const isTesting = ref(false);
 const source = ref(null);
+const averageVolume = ref(0);
+let loop = null;
 
 onMounted(async () => {
   isLoading.value = true;
@@ -112,7 +114,7 @@ const testMic = async () => {
     },
   });
   const analyser = store.audioContext.createAnalyser();
-  analyser.fftSize = 256;
+  analyser.fftSize = 512;
 
   source.value = store.audioContext.createMediaStreamSource(stream);
   source.value.connect(analyser);
@@ -125,16 +127,17 @@ const testMic = async () => {
     for (let i = 0; i < bufferLength; i++) {
       sum += dataArray[i];
     }
-    const averageVolume = sum / bufferLength;
+    averageVolume.value = sum / bufferLength;
 
     console.log("Average Volume:", averageVolume);
   }
-  const loop = setInterval(calculateVolume, 100);
+  loop = setInterval(calculateVolume, 100);
 
   watch(isTesting, () => {
     if (isTesting.value === false) {
       source.value.disconnect();
       clearInterval(loop);
+      loop = null;
     }
   });
 };
