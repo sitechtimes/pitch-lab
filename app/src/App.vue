@@ -18,41 +18,6 @@
     />
 
     <div class="mt-8">
-          <!-- Main Control Panel -->
-    <div class="flex justify-center mt-8">
-  
-      <div
-        class="w-[95%] bg-controllers-bg rounded-3xl p-6 "
-      >    
-      <div class="flex flex-row text-center w-full text-3xl font-semibold mb-2">      
-        <h1 class="w-[40%]">Recorder</h1>    
-        <h1 class="w-[30%]">Metronome</h1>       
-        <h1 class="w-[30%]">Tuner</h1>
-      </div>
-      <div class="flex items-center justify-center
-">
-        <!-- Recorder -->
-      <div class=" flex w-[35%] flex-col">
-        <AudioRecorder />
-    
-        <div
-          v-if="audioStore.viewingHistory"
-          class="absolute inset-0 bg-black/30 p-4"
-        >
-          <HistoryModal />
-        </div>  
-      </div>
-        
-        <!-- Metronome -->
-        <div class="w-[35%] items-center flex justify-center">
-          <MetronomeController />
-        </div>
-        <!-- Tuner -->
-        <div class="w-[20%] flex justify-center ">
-          <TunerController />
-        </div>
-      </div>
-      </div>
       <router-view />
     </div>
   </div>

@@ -1,52 +1,53 @@
 <template>
-  <div>      <label for="note-selection" class="text-gray-400 mr-4"
-        >Recently Deleted</label
-      >
-    <div>
-
-      <select
-        class="bg-gray-700 text-black rounded"
-        v-model="audioStore.currentAudio"
-      >
-        History:
-        <option
-          v-for="file in persistedStore.recentlyDeleted"
-          :key="file.id"
-          :value="{ audio: file.audio, id: file.id }"
-          @change="audioStore.fileName = file.name"
-        >
-          {{ file.name }} recorded on {{ file.date }}
-        </option>
-      </select>
+  <div>
+        <label for="note-selection" class="text-gray-400 mr-4">Recently Deleted</label>
+        <div>
+          <select
+            class="bg-gray-700 text-black rounded"
+            v-model="audioStore.currentAudio"
+          >
+            History:
+            <option
+              v-for="file in persistedStore.recentlyDeleted"
+              :key="file.id"
+              :value="{ audio: file.audio, id: file.id }"
+              @change="audioStore.fileName = file.name"
+            >
+              {{ file.name }} recorded on {{ file.date }}
+            </option>
+          </select>
+        </div>
+        <!-- buttons to clear recently deleted -->
+        <div class="flex flex-row justify-between w-[80%]">
+          <button @click="restoreAudio">Restore to History</button>
+          <button
+            @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
+          >
+            Delete
+          </button>
+          <button
+            @click="(audioStore.warning = true), (showAlert = true), (audioStore.deleteFunc = 'all')"
+          >
+            Clear Recently Deleted
+          </button>
+        </div>
+    <div v-if="showAlert" class="popup-alert text-white">
+      <div class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
+        <span class="close-btn" @click="showAlert = false">&times;</span>
+          <div v-if="saving">
+            <button @click="saving = null">Exit</button>
+            <p v-if="saving === 'delete'">Successfully Deleted!</p>
+            <p v-if="saving === 'save'">Successfully Saved!</p>
+          </div>
+          <div>
+            <WarningModal
+              @died="(saving = 'delete'), autoDisappear"
+              v-if="audioStore.warning"
+            />
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- buttons to clear recently deleted -->
-    <div>
-      <button @click="restoreAudio">Restore to History</button>
-      <button
-        @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
-      >
-        Delete
-      </button>
-      <button
-        @click="(audioStore.warning = true), (audioStore.deleteFunc = 'all')"
-      >
-        Clear Recently Deleted
-      </button>
-    </div>
-
-    <div v-if="saving">
-      <button @click="saving = null">x</button>
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
-      <p v-if="saving === 'save'">Successfully Saved!</p>
-    </div>
-
-    <div>
-      <WarningModal
-        @died="(saving = 'delete'), autoDisappear"
-        v-if="audioStore.warning"
-      />
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -57,6 +58,7 @@ import { persistedSettings } from "@/stores/persistedStore";
 const persistedStore = persistedSettings();
 const audioStore = audioFiles();
 const saving = ref(null);
+const showAlert = ref(false);
 
 const autoDisappear = () => {
   setTimeout(() => {
@@ -103,3 +105,26 @@ const checkName = () => {
   }
 };
 </script>
+
+<style scoped>
+.popup-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+</style>
