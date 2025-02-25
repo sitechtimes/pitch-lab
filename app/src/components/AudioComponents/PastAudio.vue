@@ -11,6 +11,7 @@
           v-for="file in persistedStore.pastAudio"
           :key="file.id"
           :value="{ audio: file.audio, id: file.id }"
+          @change="audioStore.fileName = file.name"
         >
           {{ file.name }} recorded on {{ file.date }}
         </option>
@@ -25,6 +26,12 @@
 
       <button @click="saveAudio">Rename File</button>
       <button @click="deleteAudio">Delete</button>
+    </div>
+
+    <div v-if="saving">
+      <button @click="saving = null">x</button>
+      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+      <p v-if="saving === 'save'">Successfully Saved!</p>
     </div>
   </div>
 </template>
@@ -70,7 +77,7 @@ const saveAudio = () => {
   }
   audioStore.fileName = null;
   saving.value = "save";
-  autoDisappear()
+  autoDisappear();
 };
 
 const deleteAudio = () => {
@@ -109,7 +116,7 @@ const deleteAudio = () => {
   audioStore.currentAudio = null;
   audioStore.fileName = null;
   saving.value = "delete";
-  autoDisappear()
+  autoDisappear();
 };
 
 const autoDisappear = () => {

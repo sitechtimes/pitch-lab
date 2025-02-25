@@ -5,6 +5,7 @@ import { persistedSettings } from "./persistedStore";
 export const settingsStore = defineStore(
   "settings",
   () => {
+
     const persistedStore = persistedSettings();
 
     const microphones = ref([]);
