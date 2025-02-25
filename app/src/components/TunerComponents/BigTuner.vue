@@ -1,18 +1,18 @@
 <template>
-  <div class="flex flex-col items-center justify-center p-4">
-    <div class="w-full max-w-screen-xl">
+  <div class="flex flex-col items-center justify-center px-8">
+    <div class="w-full max-w-screen-2xl">
       <div
-        class="relative flex justify-center items-center h-[30vh] bg-tuner-bg py-12 my-12 px-6 rounded-lg shadow-lg"
+        class="relative flex justify-center items-center h-[50vh] bg-tuner-bg py-16 my-16 px-12 rounded-xl shadow-xl"
         style="width: 100%"
       >
         <div class="relative w-full" style="height: 100%">
           <div
             v-for="i in 21"
             :key="i"
-            class="absolute bg-white w-[1px]"
+            class="absolute bg-white w-[2px]"
             :class="{
-              'h-[16vh]': i % 2 === 1,
-              'h-[10vh]': i % 2 !== 1,
+              'h-[30vh]': i % 2 === 1,
+              'h-[20vh]': i % 2 !== 1,
             }"
             :style="{
               left: `${(i - 1) * 5}%`,
@@ -21,21 +21,21 @@
             }"
           ></div>
           <div
-            class="w-2 h-16 bg-yellow-500 absolute"
+            class="w-4 h-24 bg-yellow-500 absolute"
             :style="{
               left: indicatorPosition,
               transform: 'translateX(-50%) translateY(-50%)',
               top: '50%',
-              border: '4px solid yellow',
+              border: '6px solid yellow',
             }"
           ></div>
           <div
             v-for="j in 11"
             :key="`label-${j}`"
-            class="absolute text-2xl text-white"
+            class="absolute text-4xl text-white font-semibold"
             :style="{
               left: `${(2 * j - 2) * 5}%`,
-              bottom: '-30px',
+              bottom: '-50px',
               transform: 'translateX(-50%)',
             }"
           >
@@ -43,14 +43,14 @@
           </div>
         </div>
       </div>
-      <div class="flex items-center justify-between w-1/3 mx-auto">
+      <div class="flex items-center justify-between w-1/2 mx-auto gap-8">
         <div
           :class="{
             'bg-tuner-bg': !isFlat,
             'bg-orange': isFlat,
-            'px-5': true,
-            'py-3': true,
-            'text-3xl': true,
+            'px-8': true,
+            'py-5': true,
+            'text-5xl': true,
             'rounded-full': true,
             'text-white': true,
           }"
@@ -61,10 +61,10 @@
           :class="{
             'bg-tuner-bg': !isInTune,
             'bg-green': isInTune,
-            'text-4xl': true,
-            'px-5': true,
-            'py-3': true,
-            'rounded-lg': true,
+            'text-6xl': true,
+            'px-8': true,
+            'py-5': true,
+            'rounded-xl': true,
             'text-white': true,
           }"
         >
@@ -74,9 +74,9 @@
           :class="{
             'bg-tuner-bg': !isSharp,
             'bg-orange': isSharp,
-            'px-5': true,
-            'py-3': true,
-            'text-3xl': true,
+            'px-8': true,
+            'py-5': true,
+            'text-5xl': true,
             'rounded-full': true,
             'text-white': true,
           }"
@@ -84,22 +84,13 @@
           #
         </div>
       </div>
-
-      <div class="flex flex-col items-center py-9">
+      <div class="flex flex-col items-center py-12">
         <button
-          class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
+          class="bg-tuner-bg text-white font-bold py-4 px-8 text-4xl rounded-xl shadow-lg"
           @click="toggleTuning"
         >
           {{ isTuning ? "Stop Tuning" : "Start Tuning" }}
         </button>
-      </div>
-      <div class="flex flex-col items-center py-9">
-        <router-link
-          to="/tuner"
-          class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
-        >
-          Full Screen Tuner
-        </router-link>
       </div>
     </div>
   </div>
@@ -152,7 +143,6 @@ function findClosestNote(freq) {
       right = mid - 1;
     }
   }
-  // Compare closest notes
   const lowerNote = noteFrequencies[right >= 0 ? right : 0];
   const upperNote =
     noteFrequencies[
@@ -270,11 +260,9 @@ function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
   const beta = spectrum[peakIndex];
   const gamma = spectrum[rightIndex];
 
-  // Parabolic interpolation formula
   const delta = (0.5 * (alpha - gamma)) / (alpha - 2 * beta + gamma);
   const interpolatedIndex = peakIndex + delta;
 
-  // Convert interpolated index to frequency
   return (interpolatedIndex * sampleRate) / fftSize;
 }
 
