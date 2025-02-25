@@ -78,25 +78,14 @@ const isLoading = ref(true);
 const errorMessage = ref("");
 const isTesting = ref(false);
 
-// Device selection
-const selectedMicrophone = ref(persistedStore.selectedMicrophone);
-
 onMounted(async () => {
   isLoading.value = true;
   try {
-    // First initialize audio to ensure permission
     await store.initializeAudio();
     await store.getDevices();
-
-    // Set default microphone if none is selected
     if (!persistedStore.selectedMicrophone && store.microphones.length > 0) {
       persistedStore.selectedMicrophone = store.microphones[0].deviceId;
     }
-
-    // Sync the local state with the persisted store
-    selectedMicrophone.value = persistedStore.selectedMicrophone;
-
-    console.log(`Microphone initialized: ${selectedMicrophone.value}`);
   } catch (error) {
     errorMessage.value = "Please allow microphone access to continue";
     console.error(error);
