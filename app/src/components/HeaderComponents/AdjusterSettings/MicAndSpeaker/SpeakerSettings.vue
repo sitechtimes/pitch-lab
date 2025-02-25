@@ -15,7 +15,6 @@
         v-model="persistedStore.selectedSpeaker"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
         :disabled="isLoading"
-        @change="handleSpeakerChange"
       >
         <option v-if="isLoading" value="" disabled>Loading speakers...</option>
         <option
@@ -119,6 +118,16 @@ const drawVisualizer = () => {
 };
 
 const shortId = (id) => id.slice(0, 5);
+
+const testSpeaker = async () => {
+  if (!persistedStore.selectedSpeaker) return;
+
+  const audio = new Audio();
+  audio.src =
+    "data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAABAA";
+  audio.setSinkId(persistedStore.selectedSpeaker);
+  audio.play();
+};
 
 onMounted(async () => {
   isLoading.value = true;
