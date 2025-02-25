@@ -29,15 +29,12 @@
     </div>
 
     <div>
-      <button
-        v-if="!isTesting"
-        @click="settingsStore.testMic(), (isTesting = true)"
-      >
+      <button v-if="!isTesting" @click="testMic(), (isTesting = true)">
         test mic
       </button>
       <button
         v-if="isTesting"
-        @click="settingsStore.testMic(), (isTesting = false)"
+        @click="(isTesting = false), console.log(isTesting)"
       >
         Stop testing
       </button>
@@ -68,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { settingsStore } from "../../../../stores/settings";
 import { persistedSettings } from "../../../../stores/persistedStore";
 
@@ -77,6 +74,7 @@ const persistedStore = persistedSettings();
 const isLoading = ref(true);
 const errorMessage = ref("");
 const isTesting = ref(false);
+const source = ref(null);
 
 onMounted(async () => {
   isLoading.value = true;
@@ -102,5 +100,42 @@ const handleDeviceChange = async () => {
     errorMessage.value = `Failed to switch microphone: ${error.message}`;
     console.error(error);
   }
+};
+
+const testMic = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      noiseSuppression: false,
+      echoCancellation: true,
+      autoGainControl: false,
+      deviceId: persistedStore.selectedMicrophone,
+    },
+  });
+  const analyser = store.audioContext.createAnalyser();
+  analyser.fftSize = 256;
+
+  source.value = store.audioContext.createMediaStreamSource(stream);
+  source.value.connect(analyser);
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function calculateVolume() {
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      sum += dataArray[i];
+    }
+    const averageVolume = sum / bufferLength;
+
+    console.log("Average Volume:", averageVolume);
+  }
+  const loop = setInterval(calculateVolume, 100);
+
+  watch(isTesting, () => {
+    if (isTesting.value === false) {
+      source.value.disconnect();
+      clearInterval(loop);
+    }
+  });
 };
 </script>

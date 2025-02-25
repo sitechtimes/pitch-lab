@@ -5,7 +5,6 @@ import { persistedSettings } from "./persistedStore";
 export const settingsStore = defineStore(
   "settings",
   () => {
-
     const persistedStore = persistedSettings();
 
     const microphones = ref([]);
@@ -21,6 +20,7 @@ export const settingsStore = defineStore(
     const inputGainNode = ref(null);
     const outputGainNode = ref(null);
     const mediaStreamDestination = ref(null);
+    const stream = ref(null);
     const audioElement = ref(null);
     const analyser = ref(null);
     const initializeAudio = async () => {
@@ -35,7 +35,7 @@ export const settingsStore = defineStore(
         }
 
         // Use the persisted microphone device ID
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream.value = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
             echoCancellation: true,
@@ -59,7 +59,7 @@ export const settingsStore = defineStore(
         outputGainNode.value.gain.value = persistedStore.outputVolume || 1.0;
 
         // Create processing chain
-        const source = audioContext.value.createMediaStreamSource(stream);
+        const source = audioContext.value.createMediaStreamSource(stream.value);
         const highPassFilter = audioContext.value.createBiquadFilter();
         highPassFilter.type = "highpass";
         highPassFilter.frequency.value = 50;
@@ -80,70 +80,6 @@ export const settingsStore = defineStore(
         cleanupAudio();
         return false;
       }
-    };
-
-    const currentStream = ref(null);
-    let microphone;
-    const javascriptNode = ref(null);
-
-    const testMic = () => {
-      console.log("hi");
-
-      if (currentStream.value) {
-        const tracks = currentStream.value.getTracks();
-        tracks.forEach((track) => track.stop());
-        currentStream.value = null;
-        analyser.value.disconnect();
-        javascriptNode.value.disconnect();
-        console.log("Stream stopped and disconnected.");
-        return;
-      }
-
-      console.log("passed if");
-
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: { deviceId: persistedStore.selectedMicrophone },
-        })
-        .then((stream) => {
-          currentStream.value = stream; // Store the current stream
-
-          // Initialize the audio context and nodes
-          analyser.value = audioContext.value.createAnalyser(); // .value because audioContext is a ref
-          microphone = audioContext.value.createMediaStreamSource(stream);
-          javascriptNode.value = audioContext.value.createScriptProcessor(
-            2048,
-            1,
-            1,
-          );
-
-          analyser.value.smoothingTimeConstant = 0.3;
-          analyser.value.fftSize = 1024;
-
-          // Connect the nodes
-          microphone.connect(analyser);
-          analyser.value.connect(javascriptNode);
-          javascriptNode.value.connect(audioContext.value.destination); // Assuming `audioContext.value` is a ref.
-
-          // Handle audio processing
-          javascriptNode.value.onaudioprocess = () => {
-            let array = new Uint8Array(analyser.value.frequencyBinCount);
-            analyser.value.getByteFrequencyData(array);
-            let values = 0;
-
-            const length = array.length;
-            for (let i = 0; i < length; i++) {
-              values += array[i];
-            }
-
-            const average = values / length;
-            console.log(Math.round(average));
-          };
-        })
-        .catch((err) => {
-          console.error("Error accessing microphone:", err);
-          alert("Could not access microphone. Please check permissions.");
-        });
     };
 
     const cleanupAudio = () => {
@@ -256,8 +192,8 @@ export const settingsStore = defineStore(
       speakers,
       inputVolume,
       outputVolume,
+      stream,
       initializeAudio,
-      testMic,
       showSettingsModal,
       selectedNote,
       updateInputDevice,
