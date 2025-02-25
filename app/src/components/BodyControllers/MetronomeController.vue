@@ -34,7 +34,9 @@
 </template>
 
 <script setup>
+import { persistedSettings } from "@/stores/persistedStore";
 import { ref, onMounted, watch } from "vue";
+const persistedStore = persistedSettings();
 
 // State
 const timeSignature = ref("4"); // Default to 4/4
@@ -57,6 +59,8 @@ const loadSound = () => {
       ? "quack.mp3"
       : `${selectedSound.value}.mp3`;
   audio = new Audio(`${basePath}${soundFile}`);
+  audio.setSinkId(persistedStore.selectedSpeaker);
+  audio.volume = persistedStore.outputVolume;
   audio.load();
   isLoading.value = false;
 };
@@ -142,6 +146,21 @@ watch([bpm, selectedSound], () => {
     startMetronome();
   }
 });
+
+watch(
+  () => persistedStore.selectedSpeaker,
+  (newSpeaker) => {
+    audio.setSinkId(newSpeaker);
+    audio.volume = persistedStore.outputVolume;
+  },
+);
+
+watch(
+  () => persistedStore.outputVolume,
+  (newVolume) => {
+    audio.volume = newVolume;
+  },
+);
 </script>
 
 <style scoped>
