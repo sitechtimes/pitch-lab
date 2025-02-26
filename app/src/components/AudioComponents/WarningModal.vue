@@ -3,7 +3,7 @@
     <h2>Warning!</h2>
     <p>Selecting delete will cause these files to be lost forever.</p>
     <p>Do you want to proceed?</p>
-    <button @click="audioStore.warning = false">Cancel</button>
+    <button @click="(audioStore.warning = false), (showAlert = false)">Cancel</button>
     <button @click="killIt">Yes</button>
   </div>
 </template>
@@ -35,4 +35,3 @@ const deleteRecent = () => {
   audioStore.warning = false;
 };
 </script>
-``

@@ -6,7 +6,9 @@
             class="bg-gray-700 text-black rounded"
             v-model="audioStore.currentAudio"
           >
-            History:
+            <option v-if="persistedStore.recentlyDeleted.length === 0" disabled>
+              No recently deleted recordings
+            </option>
             <option
               v-for="file in persistedStore.recentlyDeleted"
               :key="file.id"
@@ -19,23 +21,24 @@
         </div>
         <!-- buttons to clear recently deleted -->
         <div class="flex flex-row justify-between w-[80%]">
-          <button @click="restoreAudio">Restore to History</button>
+          <button @click="restoreAudio" :disabled="persistedStore.recentlyDeleted.length === 0">Restore to History</button>
           <button
             @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
+            :disabled="persistedStore.recentlyDeleted.length === 0"
           >
             Delete
           </button>
           <button
             @click="(audioStore.warning = true), (showAlert = true), (audioStore.deleteFunc = 'all')"
+            :disabled="persistedStore.recentlyDeleted.length === 0"
           >
             Clear Recently Deleted
           </button>
         </div>
-    <div v-if="showAlert" class="popup-alert text-white">
-      <div class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
-        <span class="close-btn" @click="showAlert = false">&times;</span>
+    <div v-if="showAlert" class="popup-alert w-full">
+      <div class=" absolute inset-0 flex items-center justify-center">
           <div v-if="saving">
-            <button @click="saving = null">Exit</button>
+            <button @click="saving = null, showAlert = false">Exit</button>
             <p v-if="saving === 'delete'">Successfully Deleted!</p>
             <p v-if="saving === 'save'">Successfully Saved!</p>
           </div>
@@ -111,7 +114,6 @@ const checkName = () => {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
