@@ -40,6 +40,8 @@
       </button>
     </div>
 
+    <div v-if="isTesting" id="dynamic-bar" :style="barStyle"></div>
+
     <!-- Volume Control -->
     <div class="audio-controls mb-6">
       <label for="input-volume" class="block text-white text-sm mb-2">
@@ -65,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { settingsStore } from "../../../../stores/settings";
 import { persistedSettings } from "../../../../stores/persistedStore";
 
@@ -141,4 +143,27 @@ const testMic = async () => {
     }
   });
 };
+
+const barStyle = computed(() => {
+  // Calculate opacity (0 to 1)
+  const opacity = averageVolume.value / 100;
+
+  return {
+    backgroundColor: `rgb(0, ${Math.min(255, averageVolume.value * 2.55)}, 0)`, // Green (R=0, G changes with value, B=0)
+    opacity: opacity,
+    width: "100%",
+    height: "30px",
+    transition: "background-color 0.3s, opacity 0.3s",
+  };
+});
 </script>
+
+<style scoped>
+#dynamic-bar {
+  width: 100%;
+  height: 30px;
+  transition:
+    background-color 0.3s,
+    opacity 0.3s;
+}
+</style>
