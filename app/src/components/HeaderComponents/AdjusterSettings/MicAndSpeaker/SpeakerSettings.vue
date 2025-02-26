@@ -4,10 +4,18 @@
     <div class="mb-6">
       <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
       <button
+        v-if="!isTesting"
         @click="testSpeaker"
         class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4"
       >
         Test Speaker
+      </button>
+      <button
+        v-if="isTesting"
+        @click="stopTesting"
+        class="bg-[#A3D10A] text-black w-[20%] rounded-lg"
+      >
+        Stop Testing
       </button>
 
       <select
@@ -70,6 +78,8 @@ const visualizerCanvas = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 const animationFrameId = ref(null);
+const isTesting = ref(false);
+const loop = ref(null);
 
 // Visualization setup
 let analyser = null;
@@ -120,13 +130,20 @@ const drawVisualizer = () => {
 const shortId = (id) => id.slice(0, 5);
 
 const testSpeaker = async () => {
+  isTesting.value = true;
   if (!persistedStore.selectedSpeaker) return;
 
   const audio = new Audio();
-  audio.src =
-    "data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAABAA";
+  audio.src = "/quack.mp3";
   audio.setSinkId(persistedStore.selectedSpeaker);
-  audio.play();
+  loop.value = setInterval(() => {
+    audio.play();
+  }, 100);
+};
+
+const stopTesting = () => {
+  isTesting.value = false;
+  clearInterval(loop.value);
 };
 
 onMounted(async () => {
