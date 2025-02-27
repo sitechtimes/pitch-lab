@@ -48,7 +48,6 @@ let intervalId = null;
 let audio = null;
 
 const availableSounds = ref(["quack", "tack"]); // Add more as needed
-const basePath = "/"; // Path to public folder
 
 const loadSound = () => {
   isLoading.value = true;
@@ -56,7 +55,7 @@ const loadSound = () => {
     selectedSound.value === "quack"
       ? "quack.mp3"
       : `${selectedSound.value}.mp3`;
-  audio = new Audio(`${basePath}${soundFile}`);
+  audio = new Audio(`/${soundFile}`);
   audio.load();
   isLoading.value = false;
 };
