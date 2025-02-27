@@ -21,8 +21,9 @@
         </div>
         <!-- buttons to clear recently deleted -->
         <div class="flex flex-row justify-between w-[80%]">
-          <button @click="restoreAudio" :disabled="persistedStore.recentlyDeleted.length === 0">Restore to History</button>
+          <button v-if="audioStore.currentAudio" @click="restoreAudio" :disabled="persistedStore.recentlyDeleted.length === 0">Restore to History</button>
           <button
+          
             @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
             :disabled="persistedStore.recentlyDeleted.length === 0"
           >
@@ -35,10 +36,10 @@
             Clear Recently Deleted
           </button>
         </div>
-    <div v-if="showAlert" class="popup-alert w-full">
-      <div class=" absolute inset-0 flex items-center justify-center">
+    <!-- <div v-if="showAlert" class=" w-full"> -->
+      <div class="absolute inset-0 flex items-center justify-center">
           <div v-if="saving">
-            <button @click="saving = null, showAlert = false">Exit</button>
+            <button @click="saving = null">Exit</button>
             <p v-if="saving === 'delete'">Successfully Deleted!</p>
             <p v-if="saving === 'save'">Successfully Saved!</p>
           </div>
@@ -50,7 +51,7 @@
           </div>
         </div>
       </div>
-    </div>
+    <!-- </div> -->
 </template>
 
 <script setup>
@@ -110,23 +111,5 @@ const checkName = () => {
 </script>
 
 <style scoped>
-.popup-alert {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
 </style>
