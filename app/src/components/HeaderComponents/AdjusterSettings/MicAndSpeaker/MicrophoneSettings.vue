@@ -10,7 +10,7 @@
         v-model="persistedStore.selectedMicrophone"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
         :disabled="isLoading"
-        @change="handleDeviceChange"
+        @change="store.updateInputDevice(persistedStore.selectedMicrophone)"
       >
         <option v-if="isLoading" value="" disabled>
           Loading microphones...
@@ -91,16 +91,6 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
-
-const handleDeviceChange = async () => {
-  try {
-    await store.updateInputDevice(persistedStore.selectedMicrophone);
-    console.log(`Microphone updated to: ${persistedStore.selectedMicrophone}`);
-  } catch (error) {
-    errorMessage.value = `Failed to switch microphone: ${error.message}`;
-    console.error(error);
-  }
-};
 
 const testMic = async () => {
   const stream = await navigator.mediaDevices.getUserMedia({
