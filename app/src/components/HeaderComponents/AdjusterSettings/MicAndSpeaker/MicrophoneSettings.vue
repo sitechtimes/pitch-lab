@@ -41,8 +41,6 @@
     </div>
 
     <div v-if="isTesting" id="dynamic-bar" :style="barStyle"></div>
-
-    <!-- Volume Control -->
     <div class="audio-controls mb-6">
       <label for="input-volume" class="block text-white text-sm mb-2">
         Input Volume: {{ store.inputVolume.toFixed(2) }}
@@ -58,8 +56,6 @@
         @input="store.setInputVolume(store.inputVolume)"
       />
     </div>
-
-    <!-- Error Message -->
     <div v-if="errorMessage" class="text-red-500 text-sm">
       {{ errorMessage }}
     </div>
@@ -130,8 +126,6 @@ const testMic = async () => {
       sum += dataArray[i];
     }
     averageVolume.value = sum / bufferLength;
-
-    console.log("Average Volume:", averageVolume);
   }
   loop = setInterval(calculateVolume, 100);
 
@@ -145,11 +139,9 @@ const testMic = async () => {
 };
 
 const barStyle = computed(() => {
-  // Calculate opacity (0 to 1)
   const opacity = averageVolume.value / 100;
-
   return {
-    backgroundColor: `rgb(0, ${Math.min(255, averageVolume.value * 2.55)}, 0)`, // Green (R=0, G changes with value, B=0)
+    backgroundColor: `rgb(0, ${Math.min(255, averageVolume.value * 2.55)}, 0)`,
     opacity: opacity,
     width: "100%",
     height: "30px",
