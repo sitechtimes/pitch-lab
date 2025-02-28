@@ -130,9 +130,8 @@ const drawVisualizer = () => {
 const shortId = (id) => id.slice(0, 5);
 
 const testSpeaker = async () => {
-  isTesting.value = true;
   if (!persistedStore.selectedSpeaker) return;
-
+  isTesting.value = true;
   const audio = new Audio();
   audio.src = "/quack.mp3";
   audio.setSinkId(persistedStore.selectedSpeaker);
