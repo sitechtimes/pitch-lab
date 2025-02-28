@@ -50,15 +50,11 @@ let intervalId = null;
 let audio = null;
 
 const availableSounds = ref(["quack", "tack"]); // Add more as needed
-const basePath = "/"; // Path to public folder
 
 const loadSound = () => {
   isLoading.value = true;
-  const soundFile =
-    selectedSound.value === "quack"
-      ? "quack.mp3"
-      : `${selectedSound.value}.mp3`;
-  audio = new Audio(`${basePath}${soundFile}`);
+  const soundFile = `${selectedSound.value}.mp3`;
+  audio = new Audio(`/${soundFile}`);
   audio.setSinkId(persistedStore.selectedSpeaker);
   audio.volume = persistedStore.outputVolume;
   audio.load();
