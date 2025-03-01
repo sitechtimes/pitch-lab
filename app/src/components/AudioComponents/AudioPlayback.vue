@@ -25,30 +25,31 @@
 </template>
 
 <script setup>
-import { watch, onMounted } from "vue";
+import { watch, onMounted, useTemplateRef } from "vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
-const audio = document.getElementById("audio");
+const audio = useTemplateRef("audioElement");
 
 onMounted(() => {
-  audio.volume = persistedStore.outputVolume;
-  audio.setSinkId(persistedStore.selectedSpeaker);
+  console.log(audio);
+  audio.value.volume = persistedStore.outputVolume;
+  audio.value.setSinkId(persistedStore.selectedSpeaker);
 });
 
 watch(
   () => persistedStore.selectedSpeaker,
   (newSpeaker) => {
-    audio.setSinkId(newSpeaker);
-    audio.volume = persistedStore.outputVolume;
+    audio.value.setSinkId(newSpeaker);
+    audio.value.volume = persistedStore.outputVolume;
   },
 );
 
 watch(
   () => persistedStore.outputVolume,
   (newVolume) => {
-    audio.volume = newVolume;
+    audio.value.volume = newVolume;
   },
 );
 </script>

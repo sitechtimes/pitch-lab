@@ -41,7 +41,7 @@ const persistedStore = persistedSettings();
 // State
 const timeSignature = ref("4"); // Default to 4/4
 const timeSignatureDenominator = ref("4"); // Default denominator
-const selectedSound = ref("duck"); // Default sound
+const selectedSound = ref("quack"); // Default sound
 const bpm = ref(120);
 const isPlaying = ref(false);
 const isBeating = ref(false);
@@ -53,8 +53,7 @@ const availableSounds = ref(["quack", "tack"]); // Add more as needed
 
 const loadSound = () => {
   isLoading.value = true;
-  const soundFile = `${selectedSound.value}.mp3`;
-  audio = new Audio(`/${soundFile}`);
+  audio = new Audio(`/${selectedSound.value}.mp3`);
   audio.setSinkId(persistedStore.selectedSpeaker);
   audio.volume = persistedStore.outputVolume;
   audio.load();
