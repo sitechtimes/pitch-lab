@@ -50,7 +50,6 @@ let intervalId = null;
 let audio = null;
 
 const availableSounds = ref(["quack", "tack"]); // Add more as needed
-const basePath = "/"; // Path to public folder
 
 const loadSound = () => {
   isLoading.value = true;
