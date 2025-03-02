@@ -57,7 +57,7 @@ const loadSound = () => {
     selectedSound.value === "quack"
       ? "quack.mp3"
       : `${selectedSound.value}.mp3`;
-  audio = new Audio(`${basePath}${soundFile}`);
+  audio = new Audio(`/${soundFile}`);
   audio.setSinkId(persistedStore.selectedSpeaker);
   audio.volume = persistedStore.outputVolume;
   audio.load();
