@@ -10,9 +10,6 @@ export const settingsStore = defineStore(
     const microphones = ref([]);
     const speakers = ref([]);
 
-    const inputVolume = ref(persistedStore.inputVolume || 0.5);
-    const outputVolume = ref(persistedStore.outputVolume || 1.0);
-
     const showSettingsModal = ref(false);
     const selectedNote = ref(persistedStore.defaultNote);
 
@@ -132,24 +129,12 @@ export const settingsStore = defineStore(
       }
     };
 
-    // Volume controls
     const setInputVolume = (volume) => {
-      inputVolume.value = Number(volume);
-      persistedStore.inputVolume = Number(volume);
+      console.log(volume);
       if (inputGainNode.value) {
-        inputGainNode.value.gain.value = Number(volume);
+        inputGainNode.value.gain.value = volume;
       } else {
         console.warn("Input gain node is not initialized.");
-      }
-    };
-
-    const setOutputVolume = (volume) => {
-      outputVolume.value = Number(volume);
-      persistedStore.outputVolume = Number(volume);
-      if (outputGainNode.value) {
-        outputGainNode.value.gain.value = Number(volume);
-      } else {
-        console.warn("Output gain node is not initialized.");
       }
     };
 
@@ -190,15 +175,12 @@ export const settingsStore = defineStore(
       audioElement,
       microphones,
       speakers,
-      inputVolume,
-      outputVolume,
       stream,
       initializeAudio,
       showSettingsModal,
       selectedNote,
       updateInputDevice,
       setInputVolume,
-      setOutputVolume,
       cleanupAudio,
       getDevices,
       analyser,

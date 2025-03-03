@@ -30,20 +30,20 @@
 
     <div>
       <button v-if="!isTesting" @click="testMic(), (isTesting = true)">
-        test mic
+        Test Mic
       </button>
       <button
         v-if="isTesting"
-        @click="(isTesting = false), console.log(isTesting)"
+        @click="(isTesting = false), (barStyle.opacity = 0)"
       >
         Stop testing
       </button>
     </div>
 
-    <div v-if="isTesting" id="dynamic-bar" :style="barStyle"></div>
+    <div id="dynamic-bar" :style="barStyle"></div>
     <div class="audio-controls mb-6">
       <label for="input-volume" class="block text-white text-sm mb-2">
-        Input Volume: {{ store.inputVolume.toFixed(2) }}
+        Input Volume: {{ persistedStore.inputVolume }}
       </label>
       <input
         id="input-volume"
@@ -51,9 +51,8 @@
         min="0"
         max="1"
         step="0.01"
-        v-model.number="store.inputVolume"
+        v-model="persistedStore.inputVolume"
         class="w-full range range-purple"
-        @input="store.setInputVolume(store.inputVolume)"
       />
     </div>
     <div v-if="errorMessage" class="text-red-500 text-sm">
@@ -91,6 +90,13 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+watch(
+  () => persistedStore.inputVolume,
+  (newVolume) => {
+    store.setInputVolume(newVolume);
+  },
+);
 
 const testMic = async () => {
   const stream = await navigator.mediaDevices.getUserMedia({
