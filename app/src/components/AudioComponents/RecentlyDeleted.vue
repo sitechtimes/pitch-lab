@@ -37,7 +37,7 @@
           </button>
         </div>
     <!-- <div v-if="showAlert" class=" w-full"> -->
-      <div class="absolute inset-0 flex items-center justify-center">
+      <div class="flex items-center justify-center">
           <div v-if="saving">
             <button @click="saving = null">Exit</button>
             <p v-if="saving === 'delete'">Successfully Deleted!</p>
