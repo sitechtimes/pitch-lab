@@ -48,7 +48,7 @@
 
     <!-- Placeholder message when there is no recording -->
     <div v-else class="w-[60%]">
-      <p class="text-lg">
+      <p class="text-lg text-center">
         No recorded audio available. Please start recording to see playback and
         download options.
       </p>

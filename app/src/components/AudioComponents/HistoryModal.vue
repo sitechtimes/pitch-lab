@@ -5,23 +5,27 @@
     <div
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
     >
-      <h1 class="text-3xl font-semibold mb-2">History</h1>
-      <div class="flex flex-row justify-center">
-        <div>
-          <Button
+    <div class="w-[90%] flex flex-row justify-between mb-[1%]">
+      <h1 class="text-3xl font-semibold mb-2">History</h1>       
+         <button
             v-if="!audioStore.viewingDeleted"
             @click="audioStore.viewingDeleted = true"
             class="text-xl bg-purple rounded-full p-1 mb-2"
           >
             Go to recently deleted
-          </Button>
-          <Button
+          </button>         
+          <button
             v-if="audioStore.viewingDeleted"
             @click="audioStore.viewingDeleted = false"
             class="text-xl bg-purple rounded-full p-1 mb-2"
           >
             Go back to history
-          </Button>
+          </button>
+        </div>
+      <div class="flex flex-row justify-center">
+        <div class="flex items-center h-full">
+
+ 
           <PastAudio v-if="!audioStore.viewingDeleted" />
           <RecentlyDeleted v-if="audioStore.viewingDeleted" />
         </div>
@@ -50,8 +54,5 @@ const audioStore = audioFiles();
 </script>
 
 <style scoped>
-.download-icon {
-  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
-  object-fit: contain; /* Ensure the image maintains its aspect ratio */
-}
+
 </style>

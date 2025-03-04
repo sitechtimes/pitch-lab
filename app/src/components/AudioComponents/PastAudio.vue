@@ -122,6 +122,6 @@ const deleteAudio = () => {
 const autoDisappear = () => {
   setTimeout(() => {
     saving.value = null;
-  }, 3000);
+  }, 1000);
 };
 </script>
