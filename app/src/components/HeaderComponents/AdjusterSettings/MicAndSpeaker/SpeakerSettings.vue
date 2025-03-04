@@ -46,7 +46,7 @@
     <!-- Volume Control -->
     <div class="audio-controls mb-6">
       <label for="output-volume" class="block text-white text-sm mb-2">
-        Output Volume: {{ store.outputVolume.toFixed(2) }}
+        Output Volume: {{ store.outputVolume }}
       </label>
       <input
         id="output-volume"
@@ -56,7 +56,6 @@
         step="0.01"
         v-model.number="store.outputVolume"
         class="w-full range range-purple"
-        @input="store.setOutputVolume(store.outputVolume)"
       />
     </div>
 
