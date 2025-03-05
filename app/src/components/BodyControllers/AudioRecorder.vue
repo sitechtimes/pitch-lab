@@ -1,59 +1,58 @@
 <template>
   <div class="flex flex-row justify-between">
-    <div>
+    <div class="flex flex-col items-center w-[30%]">
       <!-- Timer display -->
       <button
-        type="button"
-        class="text-white text-center bg-gold font-medium rounded-lg text-sm"
-        @click="(audioStore.viewingHistory = true), (saving = null)"
-      >
-        View History Here:
-      </button>
-      <div class="text-black bg-white text-center p-2 rounded">
-        Timer: {{ formatTime(timer) }}
-      </div>
-
-      <button
-        class="bg-[#36C4E4] rounded-full p-2"
+        class="bg-[#36C4E4] rounded p-2 w-full"
         @click="startRecording"
         v-if="!isRecording"
       >
         Start Recording
       </button>
       <button
-        class="bg-[#A3D10A] rounded-full p-2"
+        class="bg-[#A3D10A] rounded p-2 w-full"
         @click="stopRecording"
         v-if="isRecording"
       >
         Stop Recording
       </button>
+   
+      <div class="text-black bg-white text-center p-2 rounded w-full">
+        Timer: {{ formatTime(timer) }}
+      </div>
+      <button
+        type="button"
+        class="text-white text-center bg-gold font-medium rounded-lg text-sm bg-purple p-2 w-full"
+        @click="(audioStore.viewingHistory = true), (saving = null)"
+      >
+Saved Recordings      </button>
     </div>
 
     <!-- Display recorded audio playback and download link -->
-    <div v-if="audioStore.currentAudio && !isRecording">
+    <div v-if="audioStore.currentAudio && !isRecording" class="w-full">
       <AudioPlayback />
 
       <input
         id="name"
         type="text"
-        class="text-black"
+        class="text-black w-full"
         v-model="audioStore.fileName"
         placeholder="Name File"
       />
-      <div>
-        <button @click="saveAudio">Save To History</button>
-        <button @click="deleteAudio">Delete</button>
+      <div class="flex justify-between">
+        <button class="w-full" @click="saveAudio">Save To History</button>
+        <button class="w-full" @click="deleteAudio">Delete</button>
       </div>
     </div>
 
     <!-- Placeholder message when there is no recording -->
-    <div v-else class="w-[60%]">
-      <p class="text-lg text-center">
+    <div v-else class="w-full flex items-center">
+      <p class="text-2xl text-center w-full">
         No recorded audio available. Please start recording to see playback and
         download options.
       </p>
     </div>
-    <div v-if="saving">
+    <div v-if="saving" class="w-full">
       <button @click="saving = null">x</button>
       <p v-if="saving === 'delete'">Successfully Deleted!</p>
       <p v-if="saving === 'save'">Successfully Saved!</p>

@@ -5,7 +5,7 @@
     <div
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
     >
-    <div class="w-[90%] flex flex-row justify-between mb-[1%]">
+    <div class="w-full flex flex-row justify-between mb-[1%]">
       <h1 class="text-3xl font-semibold mb-2">History</h1>       
          <button
             v-if="!audioStore.viewingDeleted"

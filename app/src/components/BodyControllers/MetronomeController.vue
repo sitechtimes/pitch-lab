@@ -1,6 +1,5 @@
 <template>
   <div class="metronome-container">
-    <h1>Metronome</h1>
     <div class="controls">
       <select v-model="timeSignature" @change="updateTempo">
         <option value="3">3</option>

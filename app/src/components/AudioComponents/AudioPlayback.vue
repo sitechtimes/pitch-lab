@@ -1,8 +1,5 @@
 <template>
   <div>
-    <div>
-      <h3>Recorded Audio:</h3>
-    </div>
 
     <div :key="audioStore.currentAudio.id">
       <audio

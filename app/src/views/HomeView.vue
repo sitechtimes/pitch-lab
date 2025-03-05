@@ -5,7 +5,7 @@
       <h1 class="w-[30%]">Metronome</h1>
       <h1 class="w-[30%]">Tuner</h1>
     </div>
-    <div class="flex items-center justify-center bg-[#120e1d]">
+    <div class="flex items-center justify-center ">
       <!-- Recorder -->
       <div class="flex w-[35%] flex-col relative">
         <AudioRecorder />
