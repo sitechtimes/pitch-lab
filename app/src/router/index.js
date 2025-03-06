@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import TunerView from "../views/TunerView.vue";
+import LandingView from "@/views/LandingView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: "/tuner",
       name: "tuner",
       component: TunerView,
+    },
+    {
+      path: "/landing",
+      name: "landing",
+      component: LandingView,
     },
   ],
 });
