@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row justify-between">
+  <div class="flex flex-row">
     <div class="flex flex-col items-center w-[30%]">
       <!-- Timer display -->
       <button
@@ -35,7 +35,7 @@ Saved Recordings      </button>
       <input
         id="name"
         type="text"
-        class="text-black w-full"
+        class="text-black w-[40%]"
         v-model="audioStore.fileName"
         placeholder="Name File"
       />
@@ -46,11 +46,13 @@ Saved Recordings      </button>
     </div>
 
     <!-- Placeholder message when there is no recording -->
-    <div v-else class="w-full flex items-center">
-      <p class="text-2xl text-center w-full">
-        No recorded audio available. Please start recording to see playback and
-        download options.
-      </p>
+    <div v-else class="w-full flex items-center justify-center">
+      <div class="w-[70%]">
+        <p class="text-xl text-center w-full">
+          No recorded audio available. Please start recording to see playback and
+          download options.
+        </p>
+      </div>
     </div>
     <div v-if="saving" class="w-full">
       <button @click="saving = null">x</button>

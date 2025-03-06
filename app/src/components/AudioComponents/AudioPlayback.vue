@@ -1,15 +1,11 @@
 <template>
   <div>
-
-    <div :key="audioStore.currentAudio.id">
+    <div :key="audioStore.currentAudio.id" class="flex flex-col items-center">
       <audio
         ref="audioElement"
         controls
         :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       ></audio>
-    </div>
-
-    <div>
       <a
         :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
         download="recorded-audio.mp4"
