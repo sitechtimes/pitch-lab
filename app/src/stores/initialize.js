@@ -1,28 +1,25 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { persistedSettings } from "./persistedStore";
-
+import { getDevices, devices } from "./devices";
 export const initialize = defineStore(
   "initialize",
   () => {
-
+    const devices = devices();
     const persistedStore = persistedSettings();
-
-    const microphones = ref([]);
-    const speakers = ref([]);
-
-    const showSettingsModal = ref(false);
 
     const audioContext = ref(null);
     const inputGainNode = ref(null);
     const outputGainNode = ref(null);
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
-    const audioElement = ref(null);
     const analyser = ref(null);
+    const isInitialized = ref(false)
+
     const initializeAudio = async () => {
       try {
         cleanupAudio(); // Clean up any existing audio resources
+        getDevices()
         audioContext.value = new (window.AudioContext ||
           window.webkitAudioContext)();
         console.log("AudioContext created");
@@ -31,13 +28,11 @@ export const initialize = defineStore(
           await audioContext.value.resume();
         }
 
-        // Use the persisted microphone device ID
-        stream.value = await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
-            echoCancellation: true,
             autoGainControl: false,
-            deviceId: persistedStore.selectedMicrophone,
+            deviceId: { ideal: persistedSettings().selectedMicrophone },
           },
         });
 
@@ -52,8 +47,6 @@ export const initialize = defineStore(
 
         inputGainNode.value = audioContext.value.createGain();
         inputGainNode.value.gain.value = persistedStore.inputVolume || 0.5;
-        outputGainNode.value = audioContext.value.createGain();
-        outputGainNode.value.gain.value = persistedStore.outputVolume || 1.0;
 
         // Create processing chain
         const source = audioContext.value.createMediaStreamSource(stream.value);
@@ -138,50 +131,20 @@ export const initialize = defineStore(
       }
     };
 
-    const getDevices = async () => {
-      try {
-        // Only request mic permission if needed
-        if (!persistedStore.selectedMicrophone) {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-              autoGainControl: false,
-              noiseSuppression: false,
-              echoCancellation: false,
-            },
-          });
-          stream.getTracks().forEach((track) => track.stop());
-        }
 
-        const devices = await navigator.mediaDevices.enumerateDevices();
-
-        // Firefox workaround for speaker labels
-        if (navigator.userAgent.includes("Firefox")) {
-          microphones.value = devices.filter((d) => d.kind === "audioinput");
-          speakers.value = [{ deviceId: "default", label: "Default Speaker" }];
-        } else {
-          microphones.value = devices.filter((d) => d.kind === "audioinput");
-          speakers.value = devices.filter((d) => d.kind === "audiooutput");
-        }
-      } catch (error) {
-        console.error("Error getting devices:", error);
-      }
-    };
 
     return {
       audioContext,
       inputGainNode,
       outputGainNode,
       mediaStreamDestination,
-      audioElement,
-      microphones,
-      speakers,
+
       stream,
       initializeAudio,
-      showSettingsModal,
       updateInputDevice,
       setInputVolume,
       cleanupAudio,
-      getDevices,
+
       analyser,
     };
   },
