@@ -1,6 +1,7 @@
 <template>
   <div class="metronome-container">
     <div class="controls">
+      <div>
       <select v-model="timeSignature" @change="updateTempo">
         <option value="3">3</option>
         <option value="4">4</option>
@@ -16,7 +17,8 @@
           {{ sound }}
         </option>
       </select>
-
+      </div>
+      <div>
       <button @click="toggleMetronome" :disabled="isLoading">
         {{ isPlaying ? "Stop" : "Start" }}
       </button>
@@ -26,7 +28,7 @@
         <span>{{ bpm }} BPM</span>
         <button @click="increaseBPM" :disabled="bpm >= 240">+</button>
       </div>
-
+    </div>
       <div class="beat-circle" :class="{ beat: isBeating }"></div>
     </div>
   </div>

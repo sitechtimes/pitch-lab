@@ -5,27 +5,26 @@
     <div
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
     >
-    <div class="w-full flex flex-row justify-between mb-[1%]">
-      <h1 class="text-3xl font-semibold mb-2">History</h1>       
-         <button
-            v-if="!audioStore.viewingDeleted"
-            @click="audioStore.viewingDeleted = true"
-            class="text-xl bg-purple rounded-full p-1 mb-2"
-          >
-            Go to recently deleted
-          </button>         
-          <button
-            v-if="audioStore.viewingDeleted"
-            @click="audioStore.viewingDeleted = false"
-            class="text-xl bg-purple rounded-full p-1 mb-2"
-          >
-            Go back to history
-          </button>
-        </div>
+      <div class="w-full flex flex-row justify-between mb-[1%]">
+        <h1 class="text-3xl font-semibold mb-2" v-if="!audioStore.viewingDeleted">History</h1>
+        <h1 class="text-3xl font-semibold mb-2" v-if="audioStore.viewingDeleted">Recently Deleted</h1>
+        <button
+          v-if="!audioStore.viewingDeleted"
+          @click="audioStore.viewingDeleted = true"
+          class="text-xl bg-purple rounded-full p-1 mb-2"
+        >
+          Go to recently deleted
+        </button>
+        <button
+          v-if="audioStore.viewingDeleted"
+          @click="audioStore.viewingDeleted = false"
+          class="text-xl bg-purple rounded-full p-1 mb-2"
+        >
+          Go back to history
+        </button>
+      </div>
       <div class="flex flex-row justify-center">
         <div class="flex items-center h-full">
-
- 
           <PastAudio v-if="!audioStore.viewingDeleted" />
           <RecentlyDeleted v-if="audioStore.viewingDeleted" />
         </div>
@@ -35,7 +34,7 @@
       </div>
       <button
         @click="
-          (audioStore.viewingHistory = false), (audioStore.currentAudio = null)
+          (audioStore.viewingHistory = false), (audioStore.currentAudio = null), (audioStore.viewingDeleted = false)
         "
         class="text-xl"
       >

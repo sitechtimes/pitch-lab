@@ -23,27 +23,47 @@
       <button
         type="button"
         class="text-white text-center bg-gold font-medium rounded-lg text-sm bg-purple p-2 w-full"
-        @click="(audioStore.viewingHistory = true), (saving = null)"
+        @click="(audioStore.viewingHistory = true), (saving = null), (audioStore.viewingDeleted = false)"
       >
-Saved Recordings      </button>
+Saved Recordings      
+</button>
     </div>
 
     <!-- Display recorded audio playback and download link -->
     <div v-if="audioStore.currentAudio && !isRecording" class="w-full">
-      <AudioPlayback />
-
-      <input
+      <div class="flex flex-row justify-between">
+      <div :key="audioStore.currentAudio.id" class="flex flex-col items-center">
+      <audio
+        ref="audioElement"
+        controls
+        :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
+      ></audio>
+      <div class="w-[90%] mt-2 flex flex-row justify-between">
+        <input
         id="name"
         type="text"
-        class="text-black w-[40%]"
+        class="text-black w-[full]"
         v-model="audioStore.fileName"
         placeholder="Name File"
-      />
-      <div class="flex justify-between">
-        <button class="w-full" @click="saveAudio">Save To History</button>
-        <button class="w-full" @click="deleteAudio">Delete</button>
+        />        
+        <div
+        :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
+        download="recorded-audio.mp4"
+      >
+        Download
       </div>
     </div>
+    </div>
+
+      <div class="flex  flex-col justify-between">
+        <button class="w-full" @click="saveAudio">Save To History</button>
+        <button class="w-full" @click="deleteAudio">Delete</button>     
+ 
+      </div>
+    </div>
+  </div>
+
+
 
     <!-- Placeholder message when there is no recording -->
     <div v-else class="w-full flex items-center justify-center">
@@ -69,6 +89,7 @@ import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
+
 
 const saving = ref(null);
 const isRecording = ref(false);
