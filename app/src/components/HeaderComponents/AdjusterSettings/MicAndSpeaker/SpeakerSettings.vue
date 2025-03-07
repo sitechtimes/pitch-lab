@@ -4,18 +4,25 @@
     <div class="mb-6">
       <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
       <button
+        v-if="!isTesting"
         @click="testSpeaker"
         class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4"
       >
         Test Speaker
       </button>
+      <button
+        v-if="isTesting"
+        @click="stopTesting"
+        class="bg-[#A3D10A] text-black w-[20%] rounded-lg"
+      >
+        Stop Testing
+      </button>
 
       <select
         id="speaker"
-        v-model="selectedSpeaker"
+        v-model="persistedStore.selectedSpeaker"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
         :disabled="isLoading"
-        @change="handleSpeakerChange"
       >
         <option v-if="isLoading" value="" disabled>Loading speakers...</option>
         <option
@@ -39,7 +46,7 @@
     <!-- Volume Control -->
     <div class="audio-controls mb-6">
       <label for="output-volume" class="block text-white text-sm mb-2">
-        Output Volume: {{ store.outputVolume.toFixed(2) }}
+        Output Volume: {{ store.outputVolume }}
       </label>
       <input
         id="output-volume"
@@ -49,7 +56,6 @@
         step="0.01"
         v-model.number="store.outputVolume"
         class="w-full range range-purple"
-        @input="store.setOutputVolume(store.outputVolume)"
       />
     </div>
 
@@ -71,7 +77,8 @@ const visualizerCanvas = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 const animationFrameId = ref(null);
-const selectedSpeaker = ref(persistedStore.selectedSpeaker);
+const isTesting = ref(false);
+const loop = ref(null);
 
 // Visualization setup
 let analyser = null;
@@ -121,6 +128,22 @@ const drawVisualizer = () => {
 
 const shortId = (id) => id.slice(0, 5);
 
+const testSpeaker = async () => {
+  if (!persistedStore.selectedSpeaker) return;
+  isTesting.value = true;
+  const audio = new Audio();
+  audio.src = "/quack.mp3";
+  audio.setSinkId(persistedStore.selectedSpeaker);
+  loop.value = setInterval(() => {
+    audio.play();
+  }, 100);
+};
+
+const stopTesting = () => {
+  isTesting.value = false;
+  clearInterval(loop.value);
+};
+
 onMounted(async () => {
   isLoading.value = true;
   try {
@@ -131,52 +154,12 @@ onMounted(async () => {
     if (!persistedStore.selectedSpeaker && store.speakers.length > 0) {
       persistedStore.selectedSpeaker = store.speakers[0].deviceId;
     }
-
-    selectedSpeaker.value = persistedStore.selectedSpeaker;
-
     setupVisualizer();
-
-    console.log(`Speaker initialized: ${selectedSpeaker.value}`);
   } catch (error) {
     errorMessage.value = "Please allow speaker access to continue";
     console.error(error);
   } finally {
     isLoading.value = false;
-  }
-});
-
-const handleSpeakerChange = async () => {
-  try {
-    if (selectedSpeaker.value) {
-      // Update the persisted store first
-      persistedStore.selectedSpeaker = selectedSpeaker.value;
-
-      // Update the output device in the audio pipeline
-      await store.updateOutputDevice(selectedSpeaker.value);
-
-      console.log(`Speaker updated to: ${selectedSpeaker.value}`);
-    }
-  } catch (error) {
-    errorMessage.value = `Failed to switch speaker: ${error.message}`;
-    // Revert selection on error
-    selectedSpeaker.value = persistedStore.selectedSpeaker;
-  }
-};
-
-// Cleanup
-
-onMounted(async () => {
-  try {
-    await store.initializeAudio();
-    await store.getDevices();
-
-    // Handle default speaker
-    if (!persistedStore.selectedSpeaker) {
-      await store.updateOutputDevice(""); // System default
-    }
-  } catch (error) {
-    errorMessage.value = "Error initializing audio output";
-    console.log(error);
   }
 });
 </script>
