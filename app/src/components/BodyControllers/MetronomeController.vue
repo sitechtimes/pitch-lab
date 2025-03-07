@@ -53,9 +53,13 @@ const availableSounds = ref(["quack", "tack"]); // Add more as needed
 
 const loadSound = () => {
   isLoading.value = true;
-  audio = new Audio(`/${selectedSound.value}.mp3`);
-  audio.setSinkId(persistedStore.selectedSpeaker);
-  audio.volume = persistedStore.outputVolume;
+const soundFile =
+  selectedSound.value === "quack"
+    ? "quack.mp3"
+    : `${selectedSound.value}.mp3`;
+audio: new Audio(`${soundFile}`),
+audio.setSinkId(persistedStore.selectedSpeaker);
+audio.volume = persistedStore.outputVolume;
   audio.load();
   isLoading.value = false;
 };
