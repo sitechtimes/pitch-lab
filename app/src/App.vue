@@ -1,12 +1,23 @@
 <template>
   <div class="w-screen bg-entire-bg text-white min-h-screen">
+    <!-- Loading or Initialization State -->
     <div
-      v-if="isPortrait"
+      v-if="!isInitialized"
+      class="fixed inset-0 flex items-center justify-center text-3xl text-white bg-gray-800 z-50"
+    >
+      Initializing app... Please wait.
+    </div>
+
+    <!-- Orientation Warning (only shown if initialized) -->
+    <div
+      v-if="isInitialized && isPortrait"
       class="fixed inset-0 px-10 flex items-center justify-center text-5xl py-5 text-white bg-gray-800"
     >
       Please rotate your device horizontally to use this app.
     </div>
-    <div v-else>
+
+    <!-- Main App Content (only shown if initialized and in landscape) -->
+    <div v-if="isInitialized && !isPortrait">
       <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
         <HeaderTitle />
         <div class="flex items-center gap-4">
@@ -32,7 +43,7 @@
 </template>
 
 <script setup>
-import { settingsStore } from "./stores/settings.js";
+import { settingsStore } from "./stores/initialize.js";
 import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
 import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";

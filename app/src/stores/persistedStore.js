@@ -14,6 +14,7 @@ export const persistedSettings = defineStore(
     const selectedSpeaker = ref(null);
     const inputVolume = ref(0.5);
     const outputVolume = ref(1.0);
+    const fftSize = ref(2048);
     return {
       selectedMicrophone,
       selectedSpeaker,

@@ -68,10 +68,10 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { settingsStore } from "../../../../stores/settings";
+import { initialize } from "../../../../stores/initialize";
 import { persistedSettings } from "../../../../stores/persistedStore";
 
-const store = settingsStore();
+const store = initialize();
 const persistedStore = persistedSettings();
 const visualizerCanvas = ref(null);
 const isLoading = ref(true);

@@ -1,6 +1,6 @@
 <template>
   <div class="bg-controllers-bg rounded-3xl p-6">
-    <div class="flex flex-row text-center w-full text-3xl font-semibold mb-2 ">
+    <div class="flex flex-row text-center w-full text-3xl font-semibold mb-2">
       <h1 class="w-[40%]">Recorder</h1>
       <h1 class="w-[30%]">Metronome</h1>
       <h1 class="w-[30%]">Tuner</h1>
@@ -42,7 +42,7 @@ import MetronomeController from "../components/BodyControllers/MetronomeControll
 import HistoryModal from "../components/AudioComponents/HistoryModal.vue";
 import TunerSection from "../components/TunerComponents/TunerSection.vue";
 import { audioFiles } from "../stores/audioFiles";
-import { settingsStore } from "../stores/settings.js";
+import { settingsStore } from "../stores/initialize.js";
 
 const audioStore = audioFiles();
 const settings = settingsStore();

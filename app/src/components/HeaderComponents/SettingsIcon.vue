@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { settingsStore } from "../../stores/settings.js";
+import { settingsStore } from "../../stores/initialize.js";
 
 const settings = settingsStore();
 </script>

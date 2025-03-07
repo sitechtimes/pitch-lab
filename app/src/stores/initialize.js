@@ -2,16 +2,16 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import { persistedSettings } from "./persistedStore";
 
-export const settingsStore = defineStore(
-  "settings",
+export const initialize = defineStore(
+  "initialize",
   () => {
+
     const persistedStore = persistedSettings();
 
     const microphones = ref([]);
     const speakers = ref([]);
 
     const showSettingsModal = ref(false);
-    const selectedNote = ref(persistedStore.defaultNote);
 
     const audioContext = ref(null);
     const inputGainNode = ref(null);
@@ -178,7 +178,6 @@ export const settingsStore = defineStore(
       stream,
       initializeAudio,
       showSettingsModal,
-      selectedNote,
       updateInputDevice,
       setInputVolume,
       cleanupAudio,
