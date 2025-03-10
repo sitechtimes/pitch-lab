@@ -2,16 +2,19 @@
   <div class="metronome-container">
     <h1>Metronome</h1>
     <div class="controls">
-      <select v-model="timeSignature" @change="updateTempo">
+      <select v-model="persistedStore.timeSignature" @change="updateTempo">
         <option value="3">3</option>
         <option value="4">4</option>
       </select>
       /
-      <select v-model="timeSignatureDenominator" @change="updateTempo">
+      <select
+        v-model="persistedStore.timeSignatureDenominator"
+        @change="updateTempo"
+      >
         <option value="4">4</option>
       </select>
 
-      <select v-model="selectedSound" @change="loadSound">
+      <select v-model="persistedStore.selectedSound" @change="loadSound">
         <option value="duck">Select Options</option>
         <option v-for="sound in availableSounds" :key="sound" :value="sound">
           {{ sound }}
@@ -23,9 +26,13 @@
       </button>
 
       <div class="bpm-controls">
-        <button @click="decreaseBPM" :disabled="bpm <= 40">-</button>
-        <span>{{ bpm }} BPM</span>
-        <button @click="increaseBPM" :disabled="bpm >= 240">+</button>
+        <button @click="decreaseBPM" :disabled="persistedStore.bpm <= 40">
+          -
+        </button>
+        <span>{{ persistedStore.bpm }} BPM</span>
+        <button @click="increaseBPM" :disabled="persistedStore.bpm >= 240">
+          +
+        </button>
       </div>
 
       <div class="beat-circle" :class="{ beat: isBeating }"></div>
@@ -39,10 +46,6 @@ import { ref, onMounted, watch } from "vue";
 const persistedStore = persistedSettings();
 
 // State
-const timeSignature = ref("4"); // Default to 4/4
-const timeSignatureDenominator = ref("4"); // Default denominator
-const selectedSound = ref("quack"); // Default sound
-const bpm = ref(120);
 const isPlaying = ref(false);
 const isBeating = ref(false);
 const isLoading = ref(false);
@@ -53,7 +56,7 @@ const availableSounds = ref(["quack", "tack"]); // Add more as needed
 
 const loadSound = () => {
   isLoading.value = true;
-  audio = new Audio(`/${selectedSound.value}.mp3`);
+  audio = new Audio(`/${persistedStore.selectedSound}.mp3`);
   audio.setSinkId(persistedStore.selectedSpeaker);
   audio.volume = persistedStore.outputVolume;
   audio.load();
@@ -71,11 +74,11 @@ const toggleMetronome = () => {
 const startMetronome = () => {
   if (!audio) loadSound();
   isPlaying.value = true;
-  const beatDuration = 60000 / bpm.value; // milliseconds per beat
+  const beatDuration = 60000 / persistedStore.bpm; // milliseconds per beat
   let beatCount = 0;
 
   intervalId = setInterval(() => {
-    beatCount = (beatCount + 1) % parseInt(timeSignature.value);
+    beatCount = (beatCount + 1) % parseInt(persistedStore.timeSignature);
     isBeating.value = true;
     audio.currentTime = 0; // Reset audio to start
     audio.play().catch((error) => console.error("Audio play error:", error));
@@ -97,12 +100,12 @@ const stopMetronome = () => {
 };
 
 const updateTempo = () => {
-  const signature = parseInt(timeSignature.value);
-  const denominator = parseInt(timeSignatureDenominator.value);
+  const signature = parseInt(persistedStore.timeSignature);
+  const denominator = parseInt(persistedStore.timeSignatureDenominator);
   if (denominator === 4) {
-    bpm.value = Math.max(
+    persistedStore.bpm = Math.max(
       40,
-      Math.min(240, bpm.value + (signature === 3 ? -10 : 10)),
+      Math.min(240, persistedStore.bpm + (signature === 3 ? -10 : 10)),
     );
   }
   if (isPlaying.value) {
@@ -112,8 +115,8 @@ const updateTempo = () => {
 };
 
 const increaseBPM = () => {
-  if (bpm.value < 240) {
-    bpm.value += 1;
+  if (persistedStore.bpm < 240) {
+    persistedStore.bpm += 1;
     if (isPlaying.value) {
       stopMetronome();
       startMetronome();
@@ -122,8 +125,8 @@ const increaseBPM = () => {
 };
 
 const decreaseBPM = () => {
-  if (bpm.value > 40) {
-    bpm.value -= 1;
+  if (persistedStore.bpm > 40) {
+    persistedStore.bpm -= 1;
     if (isPlaying.value) {
       stopMetronome();
       startMetronome();
@@ -135,7 +138,7 @@ onMounted(() => {
   loadSound();
 });
 
-watch([bpm, selectedSound], () => {
+watch([persistedStore.bpm, persistedStore.selectedSound], () => {
   if (isPlaying.value) {
     stopMetronome();
     startMetronome();
