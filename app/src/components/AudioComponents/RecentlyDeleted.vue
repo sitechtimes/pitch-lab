@@ -1,6 +1,5 @@
 <template>
   <div>
-        <label for="note-selection" class="text-gray-400 mr-4">Recently Deleted</label>
         <div>
           <select
             class="bg-gray-700 text-black rounded"

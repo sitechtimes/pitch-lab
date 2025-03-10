@@ -1,7 +1,6 @@
 <template>
   <div>
     <div>
-      <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
       <select
         class="bg-gray-700 text-black rounded w-[90%]"
         v-model="audioStore.currentAudio"
@@ -22,9 +21,9 @@
         type="text"
         class="text-black w-1/2 mt-3"
         v-model="audioStore.fileName"
+        :disabled="!isEditing"
       />
-
-      <button @click="saveAudio">Rename File</button>
+      <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
       <button @click="deleteAudio">Delete</button>
     </div>
 
@@ -43,6 +42,14 @@ import { ref } from "vue";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 const saving = ref(null);
+const isEditing = ref(false);
+
+const handleSave = () => {
+  if (isEditing.value) {
+    saveAudio();
+  }
+  isEditing.value = !isEditing.value;
+};
 
 const checkName = () => {
   if (audioStore.fileName !== null) {

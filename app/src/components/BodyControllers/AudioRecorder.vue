@@ -30,8 +30,8 @@ Saved Recordings
     </div>
 
     <!-- Display recorded audio playback and download link -->
-    <div v-if="audioStore.currentAudio && !isRecording" class="w-full">
-      <div class="flex flex-row justify-between">
+    <div v-if="audioStore.currentAudio && !isRecording" class="w-full flex items-center justify-center">
+      <div class="flex flex-row justify-between w-[85%]">
       <div :key="audioStore.currentAudio.id" class="flex flex-col items-center">
       <audio
         ref="audioElement"
