@@ -1,19 +1,18 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { persistedSettings } from "./persistedStore";
-import { getDevices, devices } from "./devices";
+import { devices } from "./devices";
 export const initialize = defineStore(
   "initialize",
   () => {
-    const devices = devices();
-    const persistedStore = persistedSettings();
-
+    const devicesStore = devices();
     const audioContext = ref(null);
+    const analyser = ref(null);
+    const persistedStore = persistedSettings();
     const inputGainNode = ref(null);
     const outputGainNode = ref(null);
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
-    const analyser = ref(null);
     const isInitialized = ref(false)
 
     const initializeAudio = async () => {
@@ -95,41 +94,9 @@ export const initialize = defineStore(
       console.log("Audio resources cleaned");
     };
 
-    const updateInputDevice = async () => {
-      try {
-        if (audioContext.value) {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: persistedStore.selectedMicrophone },
-          });
 
-          // Disconnect the old source if it exists
-          if (inputGainNode.value) {
-            inputGainNode.value.disconnect();
-          }
 
-          // Create a new source and connect it to the gain node
-          const mediaStreamSource =
-            audioContext.value.createMediaStreamSource(stream);
-          mediaStreamSource.connect(inputGainNode.value);
 
-          console.log(
-            `Input device updated to: ${persistedStore.selectedMicrophone}`,
-          );
-        }
-      } catch (error) {
-        console.error("Error setting input device:", error);
-        throw error;
-      }
-    };
-
-    const setInputVolume = (volume) => {
-      console.log(volume);
-      if (inputGainNode.value) {
-        inputGainNode.value.gain.value = volume;
-      } else {
-        console.warn("Input gain node is not initialized.");
-      }
-    };
 
 
 
@@ -138,13 +105,10 @@ export const initialize = defineStore(
       inputGainNode,
       outputGainNode,
       mediaStreamDestination,
-
       stream,
       initializeAudio,
-      updateInputDevice,
-      setInputVolume,
-      cleanupAudio,
 
+      cleanupAudio,
       analyser,
     };
   },
