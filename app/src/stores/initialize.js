@@ -2,36 +2,56 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import { persistedSettings } from "./persistedStore";
 import { devices } from "./devices";
+
 export const initialize = defineStore(
   "initialize",
   () => {
+    // Initialize the devices store
     const devicesStore = devices();
+    const persistedStore = persistedSettings();
+
+    // Reactive refs for audio-related state
     const audioContext = ref(null);
     const analyser = ref(null);
-    const persistedStore = persistedSettings();
     const inputGainNode = ref(null);
     const outputGainNode = ref(null);
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
-    const isInitialized = ref(false)
+    const isInitialized = ref(false);
 
     const initializeAudio = async () => {
       try {
-        cleanupAudio(); // Clean up any existing audio resources
-        getDevices()
-        audioContext.value = new (window.AudioContext ||
-          window.webkitAudioContext)();
+        // Clean up any existing audio resources
+        cleanupAudio();
+
+        // Ensure devices are fetched before proceeding
+        // This ensures `microphones` and `speakers` are populated
+        if (devicesStore.microphones.length === 0) {
+          await devicesStore.getDevices();
+        }
+
+        // Check if a selected microphone exists in persisted settings
+        let deviceId = persistedStore.selectedMicrophone;
+        if (!deviceId && devicesStore.microphones.length > 0) {
+          // Default to the first available microphone if none is selected
+          deviceId = devicesStore.microphones[0].deviceId;
+          persistedStore.selectedMicrophone = deviceId; // Persist the default selection
+        }
+
+        // Create audio context
+        audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
         console.log("AudioContext created");
 
         if (audioContext.value.state === "suspended") {
           await audioContext.value.resume();
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({
+        // Request audio stream with the selected device
+        stream.value = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
             autoGainControl: false,
-            deviceId: { ideal: persistedSettings().selectedMicrophone },
+            deviceId: deviceId ? { exact: deviceId } : undefined,
           },
         });
 
@@ -42,7 +62,7 @@ export const initialize = defineStore(
 
         // Create nodes
         analyser.value = audioContext.value.createAnalyser();
-        analyser.value.fftSize = 2048; // Reduced for better compatibility
+        analyser.value.fftSize = 2048;
 
         inputGainNode.value = audioContext.value.createGain();
         inputGainNode.value.gain.value = persistedStore.inputVolume || 0.5;
@@ -63,6 +83,11 @@ export const initialize = defineStore(
           context: audioContext.value.state,
         });
 
+        // Register audio context and input gain node in devices store
+        devicesStore.registerAudioContext(audioContext.value);
+        devicesStore.registerInputGainNode(inputGainNode.value);
+
+        isInitialized.value = true;
         return true;
       } catch (error) {
         console.error("Audio initialization failed:", error);
@@ -72,6 +97,11 @@ export const initialize = defineStore(
     };
 
     const cleanupAudio = () => {
+      if (stream.value) {
+        stream.value.getTracks().forEach((track) => track.stop());
+        stream.value = null;
+      }
+
       if (audioContext.value) {
         try {
           // Disconnect all nodes first
@@ -88,17 +118,14 @@ export const initialize = defineStore(
         }
         audioContext.value = null;
       }
+
       analyser.value = null;
       inputGainNode.value = null;
       outputGainNode.value = null;
+      mediaStreamDestination.value = null;
+      isInitialized.value = false;
       console.log("Audio resources cleaned");
     };
-
-
-
-
-
-
 
     return {
       audioContext,
@@ -106,13 +133,13 @@ export const initialize = defineStore(
       outputGainNode,
       mediaStreamDestination,
       stream,
-      initializeAudio,
-
-      cleanupAudio,
       analyser,
+      initializeAudio,
+      cleanupAudio,
+      isInitialized,
     };
   },
   {
     persist: false, // Don't persist this store
-  },
+  }
 );
