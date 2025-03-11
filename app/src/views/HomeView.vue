@@ -1,10 +1,5 @@
 <template>
   <div class="bg-controllers-bg rounded-3xl p-6">
-    <div class="flex flex-row text-center w-full text-3xl font-semibold mb-2">
-      <h1 class="w-[40%]">Recorder</h1>
-      <h1 class="w-[30%]">Metronome</h1>
-      <h1 class="w-[30%]">Tuner</h1>
-    </div>
     <div class="flex items-center justify-center ">
       <!-- Recorder -->
       <div class="flex w-[35%] flex-col relative">

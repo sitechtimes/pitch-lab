@@ -1,5 +1,6 @@
 <template>
-  <div class="metronome-container w-[70%] flex flex-row justify-between">
+  <div class="metronome-container text-center p-[1.25rem] w-[70%]">
+  <div class="flex flex-row justify-between">
       <div class="flex flex-col">
         <div class="mb-4">
       <select v-model="timeSignature" @change="updateTempo">
@@ -30,6 +31,7 @@
     </div>   
   
       <div class="beat-circle" :class="{ beat: isBeating }"></div>
+    </div>
     </div>
 </template>
 
@@ -145,12 +147,7 @@ watch([bpm, selectedSound], () => {
 </script>
 
 <style scoped>
-.metronome-container {
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-family: Arial, sans-serif;
-}
+
 
 select,
 button {
