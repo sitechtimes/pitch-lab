@@ -1,6 +1,6 @@
 <template>
   <div class="w-screen bg-entire-bg text-white min-h-screen">
-    <header class="flex items-center justify-between px-6 py-4 bg-entire-bg md:flex-col">
+    <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
       <HeaderTitle />
       <div class="flex items-center gap-4">
         <router-link to="/" class="text-xl hover:underline">Home</router-link>
