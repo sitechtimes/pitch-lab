@@ -8,7 +8,7 @@ export const persistedSettings = defineStore(
     const assignedID = ref(1);
     const pastAudio = ref([]);
     const recentlyDeleted = ref([]);
-    const defaultNote = ref({ name: "C", frequency: 261.63 });
+    const selectedNote = ref({ name: "C", frequency: 261.63 });
 
     const selectedMicrophone = ref(null);
     const selectedSpeaker = ref(null);
@@ -23,7 +23,8 @@ export const persistedSettings = defineStore(
       assignedID,
       pastAudio,
       recentlyDeleted,
-      defaultNote,
+      selectedNote,
+      fftSize
     };
   },
   {
@@ -40,7 +41,8 @@ export const persistedSettings = defineStore(
             "assignedID",
             "pastAudio",
             "recentlyDeleted",
-            "defaultNote",
+            "selectedNote",
+            "fftSize"
           ],
         },
       ],

@@ -1,4 +1,12 @@
+import { ref } from "vue";
+import { defineStore } from "pinia";
 
-const showSettingsModal = ref(false);
 
-showSettingsModal
+export const settingsUI = defineStore(
+    "settingsUI", () => {
+        const showSettingsModal = ref(false);
+        return {
+            showSettingsModal
+        }
+    }
+)

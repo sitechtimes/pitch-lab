@@ -102,5 +102,5 @@ export const devices = defineStore(
         }
     },
     {
-        persist: true,
+        persist: true, //but only persist input and output volume
     })
