@@ -65,7 +65,7 @@
 import { ref } from "vue";
 import AudioPlayback from "../AudioComponents/AudioPlayback.vue";
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedVars";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 

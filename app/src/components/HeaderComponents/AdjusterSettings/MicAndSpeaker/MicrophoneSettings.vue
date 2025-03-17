@@ -64,7 +64,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { settingsStore } from "../../../../stores/initialize";
-import { persistedSettings } from "../../../../stores/persistedStore";
+import { persistedSettings } from "../../../../stores/persistedVars";
 const store = settingsStore();
 const persistedStore = persistedSettings();
 const isLoading = ref(true);

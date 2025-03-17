@@ -10,7 +10,7 @@
 
 <script setup>
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedVars";
 
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();

@@ -1,8 +1,8 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const audioFiles = defineStore(
-  "audioFiles",
+export const audioFilesStore = defineStore(
+  "audioFilesStore",
   () => {
     const fileName = ref(null);
     const currentAudio = ref(null);

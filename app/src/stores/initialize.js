@@ -1,10 +1,10 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { persistedSettings } from "./persistedStore";
+import { persistedSettings } from "./persistedVars";
 import { devices } from "./devices";
 
-export const initialize = defineStore(
-  "initialize",
+export const initializeStore = defineStore(
+  "initializeStore",
   () => {
     // Initialize the devices store
     const devicesStore = devices();

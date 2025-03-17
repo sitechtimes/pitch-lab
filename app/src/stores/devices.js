@@ -1,12 +1,13 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { persistedSettings } from "./persistedStore";
+import { persistedSettings } from "./persistedVars";
+import { initializeStore } from "./initialize";
 
-export const devices = defineStore(
-    "devices",
+export const devicesStore = defineStore(
+    "devicesStore",
     () => {
         const persistedStore = persistedSettings();
-
+        const initialize = initializeStore()
         const microphones = ref([]);
         const speakers = ref([]);
         const inputVolume = ref(persistedStore.inputVolume || 0.5);
@@ -17,14 +18,8 @@ export const devices = defineStore(
             try {
                 // Only request mic permission if needed
                 if (!persistedStore.selectedMicrophone) {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        audio: {
-                            autoGainControl: false,
-                            noiseSuppression: false,
-                            echoCancellation: false,
-                        },
-                    });
-                    stream.getTracks().forEach((track) => track.stop());
+
+                    initialize.stream.getTracks().forEach((track) => track.stop());
                 }
 
                 const devices = await navigator.mediaDevices.enumerateDevices();

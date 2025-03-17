@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { persistedSettings } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedVars";
 import { ref, onMounted, watch } from "vue";
 const persistedStore = persistedSettings();
 

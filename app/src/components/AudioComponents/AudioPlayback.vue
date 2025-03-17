@@ -27,7 +27,7 @@
 <script setup>
 import { watch, onMounted, useTemplateRef } from "vue";
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedVars";
 const audioStore = audioFiles();
 const persistedStore = persistedSettings();
 const audio = useTemplateRef("audioElement");

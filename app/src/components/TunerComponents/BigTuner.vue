@@ -99,7 +99,7 @@
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
-import { persistedSettings } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedVars";
 
 const audioContext = ref(null);
 const analyser = ref(null);

@@ -53,7 +53,7 @@
 import { ref } from "vue";
 import WarningModal from "./WarningModal.vue";
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
+import { persistedSettings } from "@/stores/persistedVars";
 const persistedStore = persistedSettings();
 const audioStore = audioFiles();
 const saving = ref(null);

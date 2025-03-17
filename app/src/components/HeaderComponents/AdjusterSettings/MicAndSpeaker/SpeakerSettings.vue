@@ -69,7 +69,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { initialize } from "../../../../stores/initialize";
-import { persistedSettings } from "../../../../stores/persistedStore";
+import { persistedSettings } from "../../../../stores/persistedVars";
 
 const store = initialize();
 const persistedStore = persistedSettings();
