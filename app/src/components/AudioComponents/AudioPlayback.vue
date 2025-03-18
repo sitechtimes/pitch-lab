@@ -26,7 +26,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
 import { audioFiles } from "@/stores/audioFiles";
 // import WaveSurfer from 'wavesurfer.js';
 
