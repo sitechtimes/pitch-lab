@@ -4,11 +4,11 @@
       <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
       <select
         class="bg-gray-700 text-black rounded w-[90%]"
-        v-model="audioStore.currentAudio"
+        v-model="audioStore.currentRecording"
       >
         History:
         <option
-          v-for="file in persistedStore.pastAudio"
+          v-for="file in persistedStore.audioHistory"
           :key="file.id"
           :value="{ audio: file.audio, id: file.id }"
           @change="audioStore.fileName = file.name"
@@ -38,28 +38,27 @@
 
 <script setup>
 import { audioFilesStore } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedVars";
 import { ref } from "vue";
 const audioStore = audioFilesStore();
-const persistedStore = persistedSettings();
+
 const saving = ref(null);
 
 const checkName = () => {
   if (audioStore.fileName !== null) {
     return true;
   } else {
-    audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
+    audioStore.fileName = `Untitled Recording ${audioStore.assignedID}`;
   }
 };
 
 const saveAudio = () => {
-  let index = persistedStore.pastAudio.findIndex(
-    (file) => file.id === audioStore.currentAudio.id,
+  let index = audioStore.audioHistory.findIndex(
+    (file) => file.id === audioStore.currentRecording.id,
   );
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName === true) {
-      persistedStore.pastAudio[index].name = audioStore.fileName.trim();
+      audioStore.audioHistory[index].name = audioStore.fileName.trim();
     }
   } else {
     console.log(
@@ -67,13 +66,13 @@ const saveAudio = () => {
     );
     let date = new Date();
     checkName();
-    persistedStore.pastAudio.push({
-      id: persistedStore.assignedID,
+    audioStore.audioHistory.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName.trim(),
-      audio: audioStore.currentAudio.audio,
+      audio: audioStore.currentRecording.audio,
       date: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
   audioStore.fileName = null;
   saving.value = "save";
@@ -81,14 +80,14 @@ const saveAudio = () => {
 };
 
 const deleteAudio = () => {
-  let index = persistedStore.pastAudio.findIndex(
-    (file) => file.id === audioStore.currentAudio.id,
+  let index = audioStore.audioHistory.findIndex(
+    (file) => file.id === audioStore.currentRecording.id,
   );
   let date = new Date();
   if (index === Number || index === 0) {
     console.log("found it");
     let obj = Object.defineProperty(
-      persistedStore.pastAudio[index],
+      audioStore.audioHistory[index],
       "dateDeleted",
       {
         value: date.toLocaleDateString(),
@@ -97,23 +96,23 @@ const deleteAudio = () => {
         configurable: true,
       },
     );
-    persistedStore.recentlyDeleted.push(obj);
-    persistedStore.pastAudio.splice(index, 1);
+    audioStore.recentlyDeleted.push(obj);
+    audioStore.audioHistory.splice(index, 1);
   } else {
     console.log(
       "what the hell? how did you manage that? please report this issue. whatever. deleting smth new",
     );
     checkName();
-    persistedStore.recentlyDeleted.push({
-      id: persistedStore.assignedID,
+    audioStore.recentlyDeleted.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName,
-      audio: audioStore.currentAudio.audio,
+      audio: audioStore.currentRecording.audio,
       date: date.toLocaleDateString(),
       deletedDate: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
-  audioStore.currentAudio = null;
+  audioStore.currentRecording = null;
   audioStore.fileName = null;
   saving.value = "delete";
   autoDisappear();

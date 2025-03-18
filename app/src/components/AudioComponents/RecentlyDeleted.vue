@@ -6,11 +6,11 @@
       >
       <select
         class="bg-gray-700 text-black rounded"
-        v-model="audioStore.currentAudio"
+        v-model="audioStore.currentRecording"
       >
         History:
         <option
-          v-for="file in persistedStore.recentlyDeleted"
+          v-for="file in audioStore.recentlyDeleted"
           :key="file.id"
           :value="{ audio: file.audio, id: file.id }"
           @change="audioStore.fileName = file.name"
@@ -53,8 +53,6 @@
 import { ref } from "vue";
 import WarningModal from "./WarningModal.vue";
 import { audioFilesStore } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedVars";
-const persistedStore = persistedSettings();
 const audioStore = audioFilesStore();
 const saving = ref(null);
 
@@ -65,31 +63,31 @@ const autoDisappear = () => {
 };
 
 const restoreAudio = () => {
-  let index = persistedStore.recentlyDeleted.findIndex(
-    (file) => file.id === audioStore.currentAudio.id,
+  let index = audioStore.recentlyDeleted.findIndex(
+    (file) => file.id === audioStore.currentRecording.id,
   );
   let date = new Date();
   if (index === Number || index === 0) {
     console.log("found it");
-    let obj = persistedStore.recentlyDeleted[index];
+    let obj = audioStore.recentlyDeleted[index];
     delete obj.deletedDate;
-    persistedStore.pastAudio.push(obj);
-    persistedStore.recentlyDeleted.splice(index, 1);
+    audioStore.audioHistory.push(obj);
+    audioStore.recentlyDeleted.splice(index, 1);
   } else {
     console.log(
       "what the hell? how did you manage that? please report this issue. whatever. deleting smth new",
     );
     checkName();
-    persistedStore.pastAudio.push({
-      id: persistedStore.assignedID,
+    audioStore.audioHistory.push({
+      id: audioStore.assignedID,
       name: audioStore.fileName,
-      audio: audioStore.currentAudio.audio,
+      audio: audioStore.currentRecording.audio,
       date: date.toLocaleDateString(),
       deletedDate: date.toLocaleDateString(),
     });
-    persistedStore.assignedID++;
+    audioStore.assignedID++;
   }
-  audioStore.currentAudio = null;
+  audioStore.currentRecording = null;
   audioStore.fileName = null;
   saving.value = "save";
   autoDisappear();
@@ -99,7 +97,7 @@ const checkName = () => {
   if (audioStore.fileName !== null) {
     return true;
   } else {
-    audioStore.fileName = `Untitled Recording ${persistedStore.assignedID}`;
+    audioStore.fileName = `Untitled Recording ${audioStore.assignedID}`;
   }
 };
 </script>

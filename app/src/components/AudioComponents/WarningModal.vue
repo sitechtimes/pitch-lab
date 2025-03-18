@@ -10,28 +10,26 @@
 
 <script setup>
 import { audioFilesStore } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedVars";
 
 const audioStore = audioFilesStore();
-const persistedStore = persistedSettings();
 
 const killIt = () => {
   if (audioStore.deleteFunc === "single") {
     deleteRecent();
   } else {
-    persistedStore.recentlyDeleted = [];
-    audioStore.currentAudio = null;
+    audioStore.recentlyDeleted = [];
+    audioStore.currentRecording = null;
     audioStore.warning = false;
   }
 };
 
 const deleteRecent = () => {
-  let index = persistedStore.recentlyDeleted.findIndex(
-    (file) => file.id === audioStore.currentAudio.id,
+  let index = audioStore.recentlyDeleted.findIndex(
+    (file) => file.id === audioStore.currentRecording.id,
   );
   console.log("found it", index);
-  persistedStore.recentlyDeleted.splice(index, 1);
-  audioStore.currentAudio = null;
+  audioStore.recentlyDeleted.splice(index, 1);
+  audioStore.currentRecording = null;
   audioStore.warning = false;
 };
 </script>

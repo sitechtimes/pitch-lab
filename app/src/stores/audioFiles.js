@@ -8,7 +8,7 @@ export const audioFilesStore = defineStore(
     const currentRecording = ref(null);
 
     const showHistoryModal = ref(false);
-    const showDeletedDeletedModal = ref(false);
+    const showDeletedModal = ref(false);
 
     const warning = ref(false);
     const deleteFunc = ref(null);
@@ -21,7 +21,7 @@ export const audioFilesStore = defineStore(
       fileName,
       currentRecording,
       showHistoryModal,
-      showDeletedDeletedModal,
+      showDeletedModal,
       warning,
       assignedID,
       audioHistory,
