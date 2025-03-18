@@ -1,5 +1,5 @@
 <template>
-  <button class="mr-24 text-white" @click="settings.showSettingsModal = true">
+  <button class="mr-24 text-white" @click="settingsUI.showSettingsModal = true">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -19,7 +19,6 @@
 </template>
 
 <script setup>
-import { settingsStore } from "../../stores/initialize.js";
-
-const settings = settingsStore();
+import { settingsUIStore } from "@/stores/settingsUI";
+const settingsUI = settingsUIStore();
 </script>

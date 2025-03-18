@@ -18,6 +18,7 @@ export const initializeStore = defineStore(
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
     const isInitialized = ref(false);
+    const fftSize = ref(2048);
 
     const initializeAudio = async () => {
       try {
@@ -137,9 +138,20 @@ export const initializeStore = defineStore(
       initializeAudio,
       cleanupAudio,
       isInitialized,
+      fftSize
     };
   },
   {
-    persist: false, // Don't persist this store
+    persist: {
+      enabled: true,
+      strategies: [
+        {
+          storage: localStorage,
+          paths: [
+            "fftSize",
+          ],
+        },
+      ],
+    },
   }
 );

@@ -14,7 +14,7 @@
       <div class="space-x-4">
         <button
           class="btn btn-outline btn-error"
-          @click="store.showSettingsModal = false"
+          @click="settingsUI.showSettingsModal = false"
         >
           Exit
         </button>
@@ -26,9 +26,9 @@
 <script setup>
 import SpeakerSettings from "./MicAndSpeaker/SpeakerSettings.vue";
 import MicrophoneSettings from "./MicAndSpeaker/MicrophoneSettings.vue";
+import { settingsUIStore } from "@/stores/settingsUI";
 
-import { settingsStore } from "../../../stores/initialize.js";
-const store = settingsStore();
+const settingsUI = settingsUIStore(0);
 </script>
 
 <style scoped></style>
