@@ -5,24 +5,37 @@
     <div
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
     >
-      <h1 class="text-3xl font-semibold mb-2">History</h1>
+      <div class="w-full flex flex-row justify-between mb-[1%]">
+        <h1
+          class="text-3xl font-semibold mb-2"
+          v-if="!audioStore.showDeletedModal"
+        >
+          History
+        </h1>
+        <h1
+          class="text-3xl font-semibold mb-2"
+          v-if="audioStore.showDeletedModal"
+        >
+          Recently Deleted
+        </h1>
+        <button
+          v-if="!audioStore.showDeletedModal"
+          @click="audioStore.showDeletedModal = true"
+          class="text-xl bg-purple rounded-full p-1 mb-2"
+        >
+          Go to recently deleted
+        </button>
+        <button
+          v-if="audioStore.showDeletedModal"
+          @click="audioStore.showDeletedModal = false"
+          class="text-xl bg-purple rounded-full p-1 mb-2"
+        >
+          Go back to history
+        </button>
+      </div>
       <div class="flex flex-row justify-center">
-        <div>
-          <Button
-            v-if="!audioStore.showDeletedModal"
-            @click="audioStore.showDeletedModal = true"
-            class="text-xl bg-purple rounded-full p-1 mb-2"
-          >
-            Go to recently deleted
-          </Button>
-          <Button
-            v-if="audioStore.showDeletedModal"
-            @click="audioStore.showDeletedModal = false"
-            class="text-xl bg-purple rounded-full p-1 mb-2"
-          >
-            Go back to history
-          </Button>
-          <PastAudio v-if="!audioStore.showDeletedModal" />
+        <div class="flex items-center h-full">
+          <PastAudio v-if="!audioStore.showHistoryModal" />
           <RecentlyDeleted v-if="audioStore.showDeletedModal" />
         </div>
         <div v-if="audioStore.currentRecording">
@@ -32,7 +45,8 @@
       <button
         @click="
           (audioStore.showHistoryModal = false),
-            (audioStore.currentRecording = null)
+            (audioStore.currentAudio = null),
+            (audioStore.showDeletedModal = false)
         "
         class="text-xl"
       >

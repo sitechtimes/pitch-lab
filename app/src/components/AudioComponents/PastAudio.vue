@@ -1,7 +1,6 @@
 <template>
   <div>
     <div>
-      <!-- <label for="note-selection" class="text-gray-400 mr-4">History</label> -->
       <select
         class="bg-gray-700 text-black rounded w-[90%]"
         v-model="audioStore.currentRecording"
@@ -22,17 +21,19 @@
         type="text"
         class="text-black w-1/2 mt-3"
         v-model="audioStore.fileName"
+        :disabled="!isEditing"
       />
-
-      <button @click="saveAudio">Rename File</button>
+      <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
       <button @click="deleteAudio">Delete</button>
     </div>
 
-    <div v-if="saving">
-      <button @click="saving = null">x</button>
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+    <div v-if="saving" class="flex">
+      <div class="fixed inset-0 h-[5%] w-[60%] flex items-center justify-center bg-green bg-opacity-50 z-50">
+      <!-- <button @click="saving = null">x</button> -->
+      <p v-if="saving === 'delete'" class="">Successfully Deleted!</p>
       <p v-if="saving === 'save'">Successfully Saved!</p>
     </div>
+  </div>
   </div>
 </template>
 
@@ -42,6 +43,14 @@ import { ref } from "vue";
 const audioStore = audioFilesStore();
 
 const saving = ref(null);
+const isEditing = ref(false);
+
+const handleSave = () => {
+  if (isEditing.value) {
+    saveAudio();
+  }
+  isEditing.value = !isEditing.value;
+};
 
 const checkName = () => {
   if (audioStore.fileName !== null) {
@@ -118,9 +127,9 @@ const deleteAudio = () => {
   autoDisappear();
 };
 
-const autoDisappear = () => {
-  setTimeout(() => {
-    saving.value = null;
-  }, 3000);
-};
+// const autoDisappear = () => {
+//   setTimeout(() => {
+//     saving.value = null;
+//   }, 1000);
+// };
 </script>

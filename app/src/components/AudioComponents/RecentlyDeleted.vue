@@ -1,14 +1,13 @@
 <template>
   <div>
     <div>
-      <label for="note-selection" class="text-gray-400 mr-4"
-        >Recently Deleted</label
-      >
       <select
         class="bg-gray-700 text-black rounded"
         v-model="audioStore.currentRecording"
       >
-        History:
+        <option v-if="audioStore.recentlyDeleted.length === 0" disabled>
+          No recently deleted recordings
+        </option>
         <option
           v-for="file in audioStore.recentlyDeleted"
           :key="file.id"
@@ -20,33 +19,47 @@
       </select>
     </div>
     <!-- buttons to clear recently deleted -->
-    <div>
-      <button @click="restoreAudio">Restore to History</button>
+    <div class="flex flex-row justify-between w-[80%]">
+      <button
+        v-if="audioStore.currentRecording"
+        @click="restoreAudio"
+        :disabled="audioStore.recentlyDeleted.length === 0"
+      >
+        Restore to History
+      </button>
       <button
         @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
+        :disabled="audioStore.recentlyDeleted.length === 0"
       >
         Delete
       </button>
       <button
-        @click="(audioStore.warning = true), (audioStore.deleteFunc = 'all')"
+        @click="
+          (audioStore.warning = true),
+            (showAlert = true),
+            (audioStore.deleteFunc = 'all')
+        "
+        :disabled="audioStore.recentlyDeleted.length === 0"
       >
         Clear Recently Deleted
       </button>
     </div>
-
-    <div v-if="saving">
-      <button @click="saving = null">x</button>
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
-      <p v-if="saving === 'save'">Successfully Saved!</p>
-    </div>
-
-    <div>
-      <WarningModal
-        @died="(saving = 'delete'), autoDisappear"
-        v-if="audioStore.warning"
-      />
+    <!-- <div v-if="showAlert" class=" w-full"> -->
+    <div class="flex items-center justify-center">
+      <div v-if="saving">
+        <button @click="saving = null">Exit</button>
+        <p v-if="saving === 'delete'">Successfully Deleted!</p>
+        <p v-if="saving === 'save'">Successfully Saved!</p>
+      </div>
+      <div>
+        <WarningModal
+          @died="(saving = 'delete'), autoDisappear"
+          v-if="audioStore.warning"
+        />
+      </div>
     </div>
   </div>
+  <!-- </div> -->
 </template>
 
 <script setup>
@@ -55,6 +68,7 @@ import WarningModal from "./WarningModal.vue";
 import { audioFilesStore } from "@/stores/audioFiles";
 const audioStore = audioFilesStore();
 const saving = ref(null);
+const showAlert = ref(false);
 
 const autoDisappear = () => {
   setTimeout(() => {
@@ -101,3 +115,5 @@ const checkName = () => {
   }
 };
 </script>
+
+<style scoped></style>
