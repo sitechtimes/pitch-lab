@@ -5,25 +5,43 @@ export const audioFilesStore = defineStore(
   "audioFilesStore",
   () => {
     const fileName = ref(null);
-    const currentAudio = ref(null);
+    const currentRecording = ref(null);
 
-    const viewingHistory = ref(false);
-    const viewingDeleted = ref(false);
+    const showHistoryModal = ref(false);
+    const showDeletedDeletedModal = ref(false);
 
     const warning = ref(false);
     const deleteFunc = ref(null);
 
+    const assignedID = ref(1);
+    const audioHistory = ref([]);
+    const recentlyDeleted = ref([]);
     return {
       deleteFunc,
       fileName,
-      currentAudio,
-      viewingDeleted,
-      viewingHistory,
+      currentRecording,
+      showHistoryModal,
+      showDeletedDeletedModal,
       warning,
+      assignedID,
+      audioHistory,
+      recentlyDeleted,
     };
   },
 
   {
-    persist: false,
+    persist: {
+      enabled: true,
+      strategies: [
+        {
+          storage: localStorage,
+          paths: [
+            "assignedID",
+            "pastAudio",
+            "recentlyDeleted",
+          ],
+        },
+      ],
+    },
   },
 );

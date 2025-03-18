@@ -37,10 +37,10 @@
 </template>
 
 <script setup>
-import { audioFiles } from "@/stores/audioFiles";
+import { audioFilesStore } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedVars";
 import { ref } from "vue";
-const audioStore = audioFiles();
+const audioStore = audioFilesStore();
 const persistedStore = persistedSettings();
 const saving = ref(null);
 

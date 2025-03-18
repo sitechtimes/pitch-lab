@@ -52,10 +52,10 @@
 <script setup>
 import { ref } from "vue";
 import WarningModal from "./WarningModal.vue";
-import { audioFiles } from "@/stores/audioFiles";
+import { audioFilesStore } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedVars";
 const persistedStore = persistedSettings();
-const audioStore = audioFiles();
+const audioStore = audioFilesStore();
 const saving = ref(null);
 
 const autoDisappear = () => {

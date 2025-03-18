@@ -45,13 +45,6 @@
 import AudioPlayback from "./AudioPlayback.vue";
 import PastAudio from "./PastAudio.vue";
 import RecentlyDeleted from "./RecentlyDeleted.vue";
-import { audioFiles } from "@/stores/audioFiles";
-const audioStore = audioFiles();
+import { audioFilesStore } from "@/stores/audioFiles";
+const audioStore = audioFilesStore();
 </script>
-
-<style scoped>
-.download-icon {
-  @apply w-6 h-6; /* Use Tailwind's utility classes to set the width and height */
-  object-fit: contain; /* Ensure the image maintains its aspect ratio */
-}
-</style>

@@ -10,10 +10,13 @@ export const devicesStore = defineStore(
         const initialize = initializeStore()
         const microphones = ref([]);
         const speakers = ref([]);
-        const inputVolume = ref(persistedStore.inputVolume || 0.5);
-        const outputVolume = ref(persistedStore.outputVolume || 0.5);
+
         const audioContext = ref(null);
         const inputGainNode = ref(null);
+        const selectedMicrophone = ref(null);
+        const selectedSpeaker = ref(null);
+        const inputVolume = ref(0.5);
+        const outputVolume = ref(1.0);
         const getDevices = async () => {
             try {
                 // Only request mic permission if needed
@@ -94,8 +97,27 @@ export const devicesStore = defineStore(
             setOutputVolume,
             registerAudioContext,
             registerInputGainNode,
+            selectedMicrophone,
+            selectedSpeaker,
+            inputVolume,
+            outputVolume,
+
         }
     },
     {
-        persist: true, //but only persist input and output volume
+        persist: {
+            enabled: true,
+            strategies: [
+                {
+                    storage: localStorage,
+                    paths: [
+                        "selectedMicrophone",
+                        "selectedSpeaker",
+                        "inputVolume",
+                        "outputVolume",
+
+                    ],
+                },
+            ],
+        },
     })
