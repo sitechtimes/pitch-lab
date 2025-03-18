@@ -37,7 +37,7 @@ export const audioFilesStore = defineStore(
           storage: localStorage,
           paths: [
             "assignedID",
-            "pastAudio",
+            "audioHistory",
             "recentlyDeleted",
           ],
         },
