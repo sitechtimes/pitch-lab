@@ -1,30 +1,26 @@
 <template>
-  <div>
-    <div
-      v-if="!isInitialized"
-      class="fixed inset-0 flex items-center justify-center text-3xl text-white bg-gray-800 z-50"
-    >
-      Initializing app... Please wait.
-    </div>
-    <div v-else>
-      <slot></slot>
-      <!-- Render child components (e.g., your main app) -->
+  <div
+    class="fixed inset-0 flex items-center justify-center bg-gray-900 text-white z-50"
+  >
+    <div class="text-center">
+      <p class="text-2xl mb-4">Please initialize audio to continue</p>
+      <button
+        @click="initialize.initializeAudio"
+        class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700"
+        :disabled="initialize.isInitialized"
+      >
+        {{
+          initialize.isInitialized ? "Initializing..." : "Grant Audio Access"
+        }}
+      </button>
+      <p v-if="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed } from "vue";
-import { useSettingsStore } from "../stores/settingsStore";
-
-const store = useSettingsStore();
-const isInitialized = computed(() => store.isInitialized);
-
-onMounted(async () => {
-  await store.initialize(); // Initialize the app
-});
-
-onUnmounted(() => {
-  store.cleanup(); // Clean up resources when the app unmounts
-});
+import { ref } from "vue";
+import { initializeStore } from "@/stores/initialize";
+const initialize = initializeStore();
+const errorMessage = ref("");
 </script>
