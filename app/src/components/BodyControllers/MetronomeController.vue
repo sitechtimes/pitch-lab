@@ -1,7 +1,8 @@
 <template>
-  <div class="metronome-container">
-    <h1>Metronome</h1>
-    <div class="controls">
+  <div class="metronome-container text-center p-[1.25rem] w-[70%]">
+  <div class="flex flex-row justify-between">
+      <div class="flex flex-col">
+        <div class="mb-4">
       <select v-model="timeSignature" @change="updateTempo">
         <option value="3">3</option>
         <option value="4">4</option>
@@ -10,27 +11,28 @@
       <select v-model="timeSignatureDenominator" @change="updateTempo">
         <option value="4">4</option>
       </select>
-
+        </div>
       <select v-model="selectedSound" @change="loadSound">
         <option value="duck">Select Options</option>
         <option v-for="sound in availableSounds" :key="sound" :value="sound">
           {{ sound }}
         </option>
       </select>
-
-      <button @click="toggleMetronome" :disabled="isLoading">
-        {{ isPlaying ? "Stop" : "Start" }}
-      </button>
-
-      <div class="bpm-controls">
+      </div>
+      <div>
+      <div class="bpm-controls mb-4">
         <button @click="decreaseBPM" :disabled="bpm <= 40">-</button>
         <span>{{ bpm }} BPM</span>
         <button @click="increaseBPM" :disabled="bpm >= 240">+</button>
-      </div>
-
+      </div>   
+      <button @click="toggleMetronome" :disabled="isLoading">
+        {{ isPlaying ? "Stop" : "Start" }}
+      </button>
+    </div>   
+  
       <div class="beat-circle" :class="{ beat: isBeating }"></div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script setup>
@@ -165,20 +167,7 @@ watch(
 </script>
 
 <style scoped>
-.metronome-container {
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-family: Arial, sans-serif;
-}
 
-.controls {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
 
 select,
 button {
@@ -211,9 +200,8 @@ button:disabled {
   height: 50px;
   background-color: #8a2be2;
   border-radius: 50%;
-  margin: 0 auto;
   transition: transform 0.1s ease-in-out;
-}
+} 
 
 .beat-circle.beat {
   transform: scale(1.5); /* Enlarge the circle when beating */

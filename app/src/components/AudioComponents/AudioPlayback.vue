@@ -1,19 +1,12 @@
 <template>
   <div>
-    <div>
-      <h3>Recorded Audio:</h3>
-    </div>
-
-    <div :key="audioStore.currentAudio.id">
+    <div :key="audioStore.currentAudio.id" class="flex flex-col items-center">
       <audio
         ref="audioElement"
         id="audio"
         controls
         :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       ></audio>
-    </div>
-
-    <div>
       <a
         :href="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
         download="recorded-audio.mp4"
@@ -21,43 +14,58 @@
         Download
       </a>
     </div>
+
+    <!-- <div>
+      <button @click="toggleWaveform">Toggle Waveform</button>
+    </div>
+
+    <div v-if="showWaveform">
+      <canvas ref="waveformCanvas"></canvas>
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import { watch, onMounted, useTemplateRef } from "vue";
+import { ref, onMounted } from "vue";
 import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
+// import WaveSurfer from 'wavesurfer.js';
+
 const audioStore = audioFiles();
-const persistedStore = persistedSettings();
-const audio = useTemplateRef("audioElement");
+// const showWaveform = ref(false);
+// const waveformCanvas = ref(null);
+// const audioElement = ref(null);
 
-onMounted(() => {
-  console.log(audio);
-  audio.value.volume = persistedStore.outputVolume;
-  audio.value.setSinkId(persistedStore.selectedSpeaker);
-});
+// const toggleWaveform = () => {
+//   showWaveform.value = !showWaveform.value;
+//   if (showWaveform.value) {
+//     createWaveform();
+//   }
+// };
 
-watch(
-  () => persistedStore.selectedSpeaker,
-  (newSpeaker) => {
-    audio.value.setSinkId(newSpeaker);
-    audio.value.volume = persistedStore.outputVolume;
-  },
-);
+// const createWaveform = () => {
+//   const wavesurfer = WaveSurfer.create({
+//     container: waveformCanvas.value,
+//     waveColor: 'violet',
+//     progressColor: 'purple'
+//   });
+//   wavesurfer.load(audioElement.value);
+// };
 
-watch(
-  () => persistedStore.outputVolume,
-  (newVolume) => {
-    audio.value.volume = newVolume;
-  },
-);
+// onMounted(() => {
+//   if (showWaveform.value) {
+//     createWaveform();
+//   }
+// });
 </script>
 
 <style scoped>
-audio {
+/* audio {
   display: block;
   width: 100%;
   margin-bottom: 10px;
 }
+canvas {
+  width: 100%;
+  height: 100px;
+} */
 </style>
