@@ -21,15 +21,15 @@ export const initializeStore = defineStore(
         cleanupAudio();
 
         // This ensures `microphones` and `speakers` are populated
-        if (devicesStore.microphones.length === 0) {
-          await devicesStore.getDevices();
+        if (devices.microphones.length === 0) {
+          await devices.getDevices();
         }
 
         // Check if a selected microphone exists in persisted settings
         let deviceId = devices.selectedMicrophone;
-        if (!deviceId && devicesStore.microphones.length > 0) {
+        if (!deviceId && devices.microphones.length > 0) {
           // Default to the first available microphone if none is selected
-          deviceId = devicesStore.microphones[0].deviceId;
+          deviceId = devices.microphones[0].deviceId;
           devices.selectedMicrophone = deviceId; // Persist the default selection
         }
 
@@ -79,8 +79,8 @@ export const initializeStore = defineStore(
         });
 
         // Register audio context and input gain node in devices store
-        devicesStore.registerAudioContext(audioContext.value);
-        devicesStore.registerInputGainNode(inputGainNode.value);
+        devices.registerAudioContext(audioContext.value);
+        devices.registerInputGainNode(inputGainNode.value);
 
         isInitialized.value = true;
         return true;

@@ -17,7 +17,6 @@ export const devicesStore = defineStore(
         const outputVolume = ref(1.0);
         const getDevices = async () => {
             try {
-                // Only request mic permission if needed
                 if (!selectedMicrophone.value) {
 
                     initialize.stream.getTracks().forEach((track) => track.stop());

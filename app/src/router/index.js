@@ -11,11 +11,13 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
+      meta: { requiresInit: true }
     },
     {
       path: "/tuner",
       name: "tuner",
       component: TunerView,
+      meta: { requiresInit: true }
     },
     {
       path: "/landing",
@@ -30,7 +32,6 @@ const router = createRouter({
   ],
 });
 
-// Navigation Guard
 router.beforeEach((to, from, next) => {
   const initialize = initializeStore()
   if (to.meta.requiresInit && !initialize.isInitialized) {
