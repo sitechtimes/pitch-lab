@@ -7,7 +7,7 @@
       <button
         @click="initialize.initializeAudio"
         class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700"
-        :disabled="initialize.isInitialized"
+        :disabled="isInitializing"
       >
         {{
           initialize.isInitialized ? "Initializing..." : "Grant Audio Access"
@@ -21,6 +21,7 @@
 <script setup>
 import { ref } from "vue";
 import { initializeStore } from "@/stores/initialize";
+
 const initialize = initializeStore();
 const errorMessage = ref("");
 </script>

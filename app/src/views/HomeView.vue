@@ -30,7 +30,7 @@
 
     <!-- Tuning Section -->
     <div class="mt-5 bg-entire-bg">
-      <TunerSection @toggle-fullscreen="settings.toggleTunerFullScreen" />
+      <TunerSection />
     </div>
   </div>
 </template>

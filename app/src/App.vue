@@ -1,13 +1,5 @@
 <template>
   <div class="w-screen bg-entire-bg text-white min-h-screen">
-    <!-- Loading or Initialization State -->
-    <div
-      v-if="!initialize.isInitialized"
-      class="fixed inset-0 flex items-center justify-center text-3xl text-white bg-gray-800 z-50"
-    >
-      Initializing app... Please wait.
-    </div>
-
     <!-- Orientation Warning (only shown if initialized) -->
     <div
       v-if="initialize.isInitialized && isPortrait"
@@ -17,7 +9,7 @@
     </div>
 
     <!-- Main App Content (only shown if initialized and in landscape) -->
-    <div v-if="initialize.isInitialized && !isPortrait">
+    <div v-if="!isPortrait">
       <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
         <HeaderTitle />
         <div class="flex items-center gap-4">
