@@ -7,22 +7,22 @@
       </label>
       <select
         id="microphone"
-        v-model="persistedStore.selectedMicrophone"
+        v-model="devices.selectedMicrophone"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
         :disabled="isLoading"
-        @change="store.updateInputDevice(persistedStore.selectedMicrophone)"
+        @change="devices.updateInputDevice(devices.selectedMicrophone)"
       >
         <option v-if="isLoading" value="" disabled>
           Loading microphones...
         </option>
         <option
-          v-for="device in store.microphones"
+          v-for="device in devices.microphones"
           :key="device.deviceId"
           :value="device.deviceId"
         >
           {{ device.label || `Microphone ${device.deviceId.slice(0, 5)}` }}
         </option>
-        <option v-if="store.microphones.length === 0" value="" disabled>
+        <option v-if="devices.microphones.length === 0" value="" disabled>
           No microphones found
         </option>
       </select>
@@ -43,7 +43,7 @@
     <div id="dynamic-bar" :style="barStyle"></div>
     <div class="audio-controls mb-6">
       <label for="input-volume" class="block text-white text-sm mb-2">
-        Input Volume: {{ persistedStore.inputVolume }}
+        Input Volume: {{ devices.inputVolume }}
       </label>
       <input
         id="input-volume"
@@ -51,7 +51,7 @@
         min="0"
         max="1"
         step="0.01"
-        v-model="persistedStore.inputVolume"
+        v-model="devices.inputVolume"
         class="w-full range range-purple"
       />
     </div>
@@ -63,10 +63,8 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { settingsStore } from "../../../../stores/initialize";
-import { persistedSettings } from "../../../../stores/persistedVars";
-const store = settingsStore();
-const persistedStore = persistedSettings();
+import { devicesStore } from "@/stores/devices";
+const devices = devicesStore();
 const isLoading = ref(true);
 const errorMessage = ref("");
 const isTesting = ref(false);
@@ -77,10 +75,9 @@ let loop = null;
 onMounted(async () => {
   isLoading.value = true;
   try {
-    await store.initializeAudio();
-    await store.getDevices();
-    if (!persistedStore.selectedMicrophone && store.microphones.length > 0) {
-      persistedStore.selectedMicrophone = store.microphones[0].deviceId;
+    await devices.getDevices();
+    if (!devices.selectedMicrophone && devices.microphones.length > 0) {
+      devices.selectedMicrophone = devices.microphones[0].deviceId;
     }
   } catch (error) {
     errorMessage.value = "Please allow microphone access to continue";
@@ -91,9 +88,9 @@ onMounted(async () => {
 });
 
 watch(
-  () => persistedStore.inputVolume,
+  () => devices.inputVolume,
   (newVolume) => {
-    store.setInputVolume(newVolume);
+    devices.setInputVolume(newVolume);
   },
 );
 
@@ -103,7 +100,7 @@ const testMic = async () => {
       noiseSuppression: false,
       echoCancellation: true,
       autoGainControl: false,
-      deviceId: persistedStore.selectedMicrophone,
+      deviceId: devices.selectedMicrophone,
     },
   });
   const analyser = store.audioContext.createAnalyser();

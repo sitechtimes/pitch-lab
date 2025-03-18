@@ -1,12 +1,10 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { persistedSettings } from "./persistedVars";
 import { initializeStore } from "./initialize";
 
 export const devicesStore = defineStore(
     "devicesStore",
     () => {
-        const persistedStore = persistedSettings();
         const initialize = initializeStore()
         const microphones = ref([]);
         const speakers = ref([]);
@@ -20,7 +18,7 @@ export const devicesStore = defineStore(
         const getDevices = async () => {
             try {
                 // Only request mic permission if needed
-                if (!persistedStore.selectedMicrophone) {
+                if (!selectedMicrophone.value) {
 
                     initialize.stream.getTracks().forEach((track) => track.stop());
                 }
@@ -52,7 +50,7 @@ export const devicesStore = defineStore(
                 if (!audioContext.value) return;
 
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { deviceId: persistedStore.selectedMicrophone },
+                    audio: { deviceId: selectedMicrophone.value },
                 });
 
                 if (inputGainNode.value) {
@@ -61,7 +59,7 @@ export const devicesStore = defineStore(
 
                 const source = audioContext.value.createMediaStreamSource(stream);
                 source.connect(inputGainNode.value);
-                console.log(`Input device updated to: ${persistedStore.selectedMicrophone}`);
+                console.log(`Input device updated to: ${selectedMicrophone.value}`);
             } catch (error) {
                 console.error("Error updating input device:", error);
             }
@@ -72,7 +70,7 @@ export const devicesStore = defineStore(
             if (inputGainNode.value) {
                 inputGainNode.value.gain.value = volume;
             }
-            persistedStore.inputVolume = volume;
+            inputVolume.value = volume;
         };
         const setOutputVolume = (volume) => {
             outputVolume.value = volume;
@@ -99,9 +97,6 @@ export const devicesStore = defineStore(
             registerInputGainNode,
             selectedMicrophone,
             selectedSpeaker,
-            inputVolume,
-            outputVolume,
-
         }
     },
     {
