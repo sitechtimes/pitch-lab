@@ -1,15 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { persistedSettings } from "./persistedVars";
-import { devices } from "./devices";
-
+import { devicesStore } from "./devices";
 export const initializeStore = defineStore(
   "initializeStore",
   () => {
     // Initialize the devices store
-    const devicesStore = devices();
-    const persistedStore = persistedSettings();
-
+    const devices = devicesStore()
     // Reactive refs for audio-related state
     const audioContext = ref(null);
     const analyser = ref(null);
@@ -22,21 +18,19 @@ export const initializeStore = defineStore(
 
     const initializeAudio = async () => {
       try {
-        // Clean up any existing audio resources
         cleanupAudio();
 
-        // Ensure devices are fetched before proceeding
         // This ensures `microphones` and `speakers` are populated
         if (devicesStore.microphones.length === 0) {
           await devicesStore.getDevices();
         }
 
         // Check if a selected microphone exists in persisted settings
-        let deviceId = persistedStore.selectedMicrophone;
+        let deviceId = devices.selectedMicrophone;
         if (!deviceId && devicesStore.microphones.length > 0) {
           // Default to the first available microphone if none is selected
           deviceId = devicesStore.microphones[0].deviceId;
-          persistedStore.selectedMicrophone = deviceId; // Persist the default selection
+          devices.selectedMicrophone = deviceId; // Persist the default selection
         }
 
         // Create audio context
@@ -66,7 +60,7 @@ export const initializeStore = defineStore(
         analyser.value.fftSize = 2048;
 
         inputGainNode.value = audioContext.value.createGain();
-        inputGainNode.value.gain.value = persistedStore.inputVolume || 0.5;
+        inputGainNode.value.gain.value = devices.inputVolume || 0.5;
 
         // Create processing chain
         const source = audioContext.value.createMediaStreamSource(stream.value);
