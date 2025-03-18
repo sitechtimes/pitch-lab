@@ -68,11 +68,10 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { initialize } from "../../../../stores/initialize";
-import { persistedSettings } from "../../../../stores/persistedVars";
-
-const store = initialize();
-const persistedStore = persistedSettings();
+import { initializeStore } from "../../../../stores/initialize";
+import { devicesStore } from "@/stores/devices";
+const devices = devicesStore();
+const initialize = initializeStore();
 const visualizerCanvas = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
@@ -86,15 +85,15 @@ let bufferLength = null;
 let dataArray = null;
 
 const setupVisualizer = () => {
-  if (!store.audioContext.value) return;
+  if (!initialize.audioContext.value) return;
 
-  analyser = store.audioContext.value.createAnalyser();
+  analyser = initialize.audioContext.value.createAnalyser();
   analyser.fftSize = 256;
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
 
   // Connect audio output to analyser
-  store.outputGainNode.value.connect(analyser);
+  initialize.outputGainNode.value.connect(analyser);
 
   drawVisualizer();
 };
@@ -129,11 +128,11 @@ const drawVisualizer = () => {
 const shortId = (id) => id.slice(0, 5);
 
 const testSpeaker = async () => {
-  if (!persistedStore.selectedSpeaker) return;
+  if (!devices.selectedSpeaker) return;
   isTesting.value = true;
   const audio = new Audio();
   audio.src = "/quack.mp3";
-  audio.setSinkId(persistedStore.selectedSpeaker);
+  audio.setSinkId(devices.selectedSpeaker);
   loop.value = setInterval(() => {
     audio.play();
   }, 100);
@@ -148,11 +147,11 @@ onMounted(async () => {
   isLoading.value = true;
   try {
     // First initialize audio to ensure permission
-    await store.initializeAudio();
-    await store.getDevices();
+    await initialize.initializeAudio();
+    await devices.getDevices();
 
-    if (!persistedStore.selectedSpeaker && store.speakers.length > 0) {
-      persistedStore.selectedSpeaker = store.speakers[0].deviceId;
+    if (!devices.selectedSpeaker && devices.speakers.length > 0) {
+      devices.selectedSpeaker = devices.speakers[0].deviceId;
     }
     setupVisualizer();
   } catch (error) {

@@ -10,7 +10,7 @@
       <div class="flex w-[35%] flex-col relative">
         <AudioRecorder />
         <div
-          v-if="audioStore.viewingHistory"
+          v-if="audioStore.showHistoryModal"
           class="absolute inset-0 bg-black/30 p-4"
         >
           <HistoryModal />
@@ -41,9 +41,7 @@ import TunerController from "../components/BodyControllers/TunerController.vue";
 import MetronomeController from "../components/BodyControllers/MetronomeController.vue";
 import HistoryModal from "../components/AudioComponents/HistoryModal.vue";
 import TunerSection from "../components/TunerComponents/TunerSection.vue";
-import { audioFiles } from "../stores/audioFiles";
-import { settingsStore } from "../stores/initialize.js";
+import { audioFilesStore } from "../stores/audioFiles";
 
-const audioStore = audioFiles();
-const settings = settingsStore();
+const audioStore = audioFilesStore();
 </script>

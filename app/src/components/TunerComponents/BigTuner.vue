@@ -99,8 +99,8 @@
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
-import { persistedSettings } from "@/stores/persistedVars";
-
+import { devicesStore } from "@/stores/devices";
+const devices = devicesStore();
 const audioContext = ref(null);
 const analyser = ref(null);
 const source = ref(null);
@@ -174,7 +174,7 @@ async function startTuning() {
       audio: {
         noiseSuppression: false,
         autoGainControl: false,
-        deviceId: { ideal: persistedSettings().selectedMicrophone },
+        deviceId: { ideal: devices.selectedMicrophone },
       },
     });
     source.value = audioContext.value.createMediaStreamSource(stream);

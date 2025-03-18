@@ -34,11 +34,9 @@
 </template>
 
 <script setup>
-import { persistedSettings } from "@/stores/persistedVars";
 import { ref, onMounted, watch } from "vue";
-const persistedStore = persistedSettings();
-
-// State
+import { devicesStore } from "@/stores/devices";
+const devices = devicesStore();
 const timeSignature = ref("4"); // Default to 4/4
 const timeSignatureDenominator = ref("4"); // Default denominator
 const selectedSound = ref("quack"); // Default sound
@@ -60,8 +58,8 @@ const loadSound = () => {
       : `${selectedSound.value}.mp3`;
 
   audio = new Audio(`/${soundFile}`);
-  audio.setSinkId(persistedStore.selectedSpeaker);
-  audio.volume = persistedStore.outputVolume;
+  audio.setSinkId(devices.selectedSpeaker);
+  audio.volume = devices.outputVolume;
   audio.load();
   isLoading.value = false;
 };
@@ -149,15 +147,15 @@ watch([bpm, selectedSound], () => {
 });
 
 watch(
-  () => persistedStore.selectedSpeaker,
+  () => devices.selectedSpeaker,
   (newSpeaker) => {
     audio.setSinkId(newSpeaker);
-    audio.volume = persistedStore.outputVolume;
+    audio.volume = devices.outputVolume;
   },
 );
 
 watch(
-  () => persistedStore.outputVolume,
+  () => devices.outputVolume,
   (newVolume) => {
     audio.volume = newVolume;
   },

@@ -30,7 +30,7 @@
       </header>
 
       <DeviceSelector
-        v-if="settings.showSettingsModal"
+        v-if="settingsUI.showSettingsModal"
         name="Settings"
         class="absolute inset-0 bg-black/30 p-4 z-10"
       />
@@ -48,7 +48,9 @@ import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { initializeStore } from "./stores/initialize";
+import { settingsUIStore } from "./stores/settingsUI";
 
+const settingsUI = settingsUIStore();
 const initialize = initializeStore();
 const isPortrait = ref(window.innerHeight > window.innerWidth);
 const checkOrientation = () => {
