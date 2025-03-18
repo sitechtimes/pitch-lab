@@ -27,11 +27,13 @@
       <button @click="deleteAudio">Delete</button>
     </div>
 
-    <div v-if="saving" class="fixed inset-0 h-[5%] w-[70%] flex items-center justify-center bg-green bg-opacity-50 z-50">
-      <button @click="saving = null">x</button>
+    <div v-if="saving" class="flex">
+      <div class="fixed inset-0 h-[5%] w-[60%] flex items-center justify-center bg-green bg-opacity-50 z-50">
+      <!-- <button @click="saving = null">x</button> -->
       <p v-if="saving === 'delete'" class="">Successfully Deleted!</p>
       <p v-if="saving === 'save'">Successfully Saved!</p>
     </div>
+  </div>
   </div>
 </template>
 
