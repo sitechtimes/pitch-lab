@@ -5,14 +5,12 @@
       <select
         class="bg-gray-700 text-black rounded w-[90%]"
         v-model="audioStore.currentAudio"
+        v-for="file in persistedStore.pastAudio"
+        :key="file.id"
+        @change="audioStore.fileName = file.name"
       >
         History:
-        <option
-          v-for="file in persistedStore.pastAudio"
-          :key="file.id"
-          :value="{ audio: file.audio, id: file.id }"
-          @change="audioStore.fileName = file.name"
-        >
+        <option :value="{ audio: file.audio, id: file.id }">
           {{ file.name }} recorded on {{ file.date }}
         </option>
       </select>
