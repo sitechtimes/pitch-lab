@@ -58,7 +58,7 @@ const saveAudio = () => {
   );
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
-    if (checkName === true) {
+    if (checkName() === true) {
       persistedStore.pastAudio[index].name = audioStore.fileName.trim();
     }
   } else {
