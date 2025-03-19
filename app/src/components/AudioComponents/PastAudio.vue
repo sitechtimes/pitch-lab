@@ -27,10 +27,10 @@
       <button @click="deleteAudio">Delete</button>
     </div>
 
-    <div v-if="saving" class="flex">
-      <div class="fixed inset-0 h-[5%] w-[60%] flex items-center justify-center bg-green bg-opacity-50 z-50">
+    <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
+      <div class="h-[5%] w-[60%] bg-green text-lg flex items-center justify-center bg-opacity-60 ">
       <!-- <button @click="saving = null">x</button> -->
-      <p v-if="saving === 'delete'" class="">Successfully Deleted!</p>
+      <p v-if="saving === 'delete'">Successfully Deleted!</p>
       <p v-if="saving === 'save'">Successfully Saved!</p>
     </div>
   </div>
@@ -131,6 +131,6 @@ const deleteAudio = () => {
 // const autoDisappear = () => {
 //   setTimeout(() => {
 //     saving.value = null;
-//   }, 1000);
+//   }, 1500);
 // };
 </script>
