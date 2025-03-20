@@ -23,20 +23,32 @@ const router = createRouter({
       path: "/landing",
       name: "landing",
       component: LandingView,
+      meta: { requiresInit: false }
+
     },
     {
       path: "/initialize",
       name: "initialize",
       component: InitializeApp,
+      meta: { requiresInit: false }
+
     },
   ],
 });
-
 router.beforeEach((to, from, next) => {
-  const initialize = initializeStore()
-  if (to.meta.requiresInit && !initialize.isInitialized) {
+  const initialize = initializeStore();
+  console.log("isInitialized:", initialize.isInitialized, "Route:", to.path);
+
+  if (to.name === "initialize" && initialize.isInitialized) {
+    console.log("Redirecting from /initialize to / because already initialized");
+    next({ name: "home" });
+  }
+  else if (to.meta.requiresInit && !initialize.isInitialized) {
+    console.log("Redirecting to /initialize because initialization is required");
     next({ name: "initialize" });
-  } else {
+  }
+  else {
+    console.log("Proceeding to:", to.path);
     next();
   }
 });

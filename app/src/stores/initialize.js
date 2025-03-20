@@ -4,9 +4,7 @@ import { devicesStore } from "./devices";
 export const initializeStore = defineStore(
   "initializeStore",
   () => {
-    // Initialize the devices store
     const devices = devicesStore()
-    // Reactive refs for audio-related state
     const audioContext = ref(null);
     const analyser = ref(null);
     const inputGainNode = ref(null);
@@ -14,26 +12,22 @@ export const initializeStore = defineStore(
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
     const isInitialized = ref(false);
-    const fftSize = ref(2048);
+    const fftSize = ref(4096);
 
     const initializeAudio = async () => {
       try {
         cleanupAudio();
 
-        // This ensures `microphones` and `speakers` are populated
         if (devices.microphones.length === 0) {
           await devices.getDevices();
         }
 
-        // Check if a selected microphone exists in persisted settings
         let deviceId = devices.selectedMicrophone;
         if (!deviceId && devices.microphones.length > 0) {
-          // Default to the first available microphone if none is selected
           deviceId = devices.microphones[0].deviceId;
-          devices.selectedMicrophone = deviceId; // Persist the default selection
+          devices.selectedMicrophone = deviceId;
         }
 
-        // Create audio context
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
         console.log("AudioContext created");
 
@@ -83,6 +77,7 @@ export const initializeStore = defineStore(
         devices.registerInputGainNode(inputGainNode.value);
 
         isInitialized.value = true;
+        console.log("Audio initialized successfully");
         return true;
       } catch (error) {
         console.error("Audio initialization failed:", error);
