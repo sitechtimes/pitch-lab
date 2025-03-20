@@ -28,9 +28,10 @@
     </div>
 
     <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
-      <div class="h-[5%] w-[60%] bg-green text-lg flex items-center justify-center bg-opacity-60 ">
+      <div  class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
+      :class="{'bg-red': saving === 'delete', 'bg-green': saving === 'save'}">
       <!-- <button @click="saving = null">x</button> -->
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
+      <p v-if="saving === 'delete' ">Successfully Deleted!</p>
       <p v-if="saving === 'save'">Successfully Saved!</p>
     </div>
   </div>
@@ -128,9 +129,9 @@ const deleteAudio = () => {
   autoDisappear();
 };
 
-// const autoDisappear = () => {
-//   setTimeout(() => {
-//     saving.value = null;
-//   }, 1500);
-// };
+const autoDisappear = () => {
+  setTimeout(() => {
+    saving.value = null;
+  }, 1500);
+};
 </script>

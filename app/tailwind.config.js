@@ -10,6 +10,7 @@ export default {
     colors: {
       black: "#000000",
       white: "#FFFFFF",
+      red:"#FF0000",
       "tuner-bg": "#120E1D",
       "entire-bg": "#2A283B",
       "controllers-bg": "#1A1725",
