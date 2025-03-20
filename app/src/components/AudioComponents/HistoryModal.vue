@@ -45,10 +45,10 @@
 </template>
 
 <script setup>
-import { audioFiles } from "@/stores/audioFiles";
 import AudioPlayback from "./AudioPlayback.vue";
 import PastAudio from "./PastAudio.vue";
 import RecentlyDeleted from "./RecentlyDeleted.vue";
+import { audioFiles } from "@/stores/audioFiles";
 const audioStore = audioFiles();
 </script>
 

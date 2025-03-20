@@ -3,6 +3,7 @@
     <div :key="audioStore.currentAudio.id" class="flex flex-col items-center">
       <audio
         ref="audioElement"
+        id="audio"
         controls
         :src="'data:audio/wav;base64,' + audioStore.currentAudio.audio"
       ></audio>
@@ -25,36 +26,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { watch, onMounted, useTemplateRef } from "vue";
 import { audioFiles } from "@/stores/audioFiles";
-// import WaveSurfer from 'wavesurfer.js';
-
+import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
-// const showWaveform = ref(false);
-// const waveformCanvas = ref(null);
-// const audioElement = ref(null);
+const persistedStore = persistedSettings();
+const audio = useTemplateRef("audioElement");
 
-// const toggleWaveform = () => {
-//   showWaveform.value = !showWaveform.value;
-//   if (showWaveform.value) {
-//     createWaveform();
-//   }
-// };
+onMounted(() => {
+  console.log(audio);
+  audio.value.volume = persistedStore.outputVolume;
+  audio.value.setSinkId(persistedStore.selectedSpeaker);
+});
 
-// const createWaveform = () => {
-//   const wavesurfer = WaveSurfer.create({
-//     container: waveformCanvas.value,
-//     waveColor: 'violet',
-//     progressColor: 'purple'
-//   });
-//   wavesurfer.load(audioElement.value);
-// };
+watch(
+  () => persistedStore.selectedSpeaker,
+  (newSpeaker) => {
+    audio.value.setSinkId(newSpeaker);
+    audio.value.volume = persistedStore.outputVolume;
+  },
+);
 
-// onMounted(() => {
-//   if (showWaveform.value) {
-//     createWaveform();
-//   }
-// });
+watch(
+  () => persistedStore.outputVolume,
+  (newVolume) => {
+    audio.value.volume = newVolume;
+  },
+);
 </script>
 
 <style scoped>
