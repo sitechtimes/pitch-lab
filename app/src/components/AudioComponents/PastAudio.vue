@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <div>
+  <div>      <div class="flex flex-row">
+
+    <div>    
+
       <select
         class="bg-gray-700 text-black rounded w-[90%]"
         v-model="audioStore.currentAudio"
@@ -16,7 +18,7 @@
         </option>
       </select>
     </div>
-    <div>
+    <div v-if="audioStore.currentAudio">
       <input
         type="text"
         class="text-black w-1/2 mt-3"
@@ -26,15 +28,17 @@
       <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
       <button @click="deleteAudio">Delete</button>
     </div>
-
-    <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
-      <div  class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
-      :class="{'bg-red': saving === 'delete', 'bg-green': saving === 'save'}">
-      <!-- <button @click="saving = null">x</button> -->
-      <p v-if="saving === 'delete' ">Successfully Deleted!</p>
-      <p v-if="saving === 'save'">Successfully Saved!</p>
+    <div v-else class="mt-3 text-center text-lg text-gray-500">
+      No recording selected. Please select a recording to see options.
     </div>
-  </div>
+</div>
+    <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
+      <div class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
+      :class="{'bg-red': saving === 'delete', 'bg-green': saving === 'save'}">
+        <p v-if="saving === 'delete'">Successfully Deleted!</p>
+        <p v-if="saving === 'save'">Successfully Saved!</p>
+      </div>
+    </div>
   </div>
 </template>
 

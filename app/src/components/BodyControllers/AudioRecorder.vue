@@ -63,8 +63,6 @@ Saved Recordings
     </div>
   </div>
 
-
-
     <!-- Placeholder message when there is no recording -->
     <div v-else class="w-full flex items-center justify-center">
       <div class="w-[70%]">
