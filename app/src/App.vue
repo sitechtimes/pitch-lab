@@ -13,8 +13,10 @@
       <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
         <HeaderTitle />
         <div class="flex items-center gap-4">
-          <router-link to="/" class="text-xl hover:underline">Home</router-link>
-          <router-link to="/tuner" class="text-xl hover:underline"
+          <router-link to="/" class="text-3xl hover:underline"
+            >Home</router-link
+          >
+          <router-link to="/tuner" class="text-3xl hover:underline"
             >Tuner</router-link
           >
           <SettingsIcon />
