@@ -5,7 +5,7 @@
     <button @click="initialize.initialize" class="text-center">
       <p class="text-4xl mb-4">Click To Start Tuning</p>
       <div
-        class="w-40 h-40 bg-gray-light rounded-full flex items-center justify-center mx-auto shadow-2xl transition-transform transform hover:scale-105"
+        class="w-40 h-40 bg-green rounded-full flex items-center justify-center mx-auto shadow-2xl transition-transform transform hover:scale-105"
       >
         <img src="@/assets/logo.webp" alt="Pitch Lab Logo" class="w-24 h-24" />
       </div>
