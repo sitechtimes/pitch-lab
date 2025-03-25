@@ -1,10 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { devicesStore } from "./devices";
+
 export const initializeStore = defineStore(
   "initializeStore",
   () => {
-    const devices = devicesStore()
+    const devices = devicesStore();
     const audioContext = ref(null);
     const analyser = ref(null);
     const inputGainNode = ref(null);
@@ -13,7 +14,7 @@ export const initializeStore = defineStore(
     const stream = ref(null);
     const isInitialized = ref(false);
     const fftSize = ref(4096);
-
+    const cannotInitailize = ref(false)
     const initializeAudio = async () => {
       try {
         cleanupAudio();
@@ -127,7 +128,8 @@ export const initializeStore = defineStore(
       initializeAudio,
       cleanupAudio,
       isInitialized,
-      fftSize
+      fftSize,
+      cannotInitailize
     };
   },
   {
