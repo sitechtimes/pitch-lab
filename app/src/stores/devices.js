@@ -1,7 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { initializeStore } from "./initialize";
-
 export const devicesStore = defineStore(
     "devicesStore",
     () => {
@@ -9,54 +8,35 @@ export const devicesStore = defineStore(
         const microphones = ref([]);
         const speakers = ref([]);
 
-        const audioContext = ref(null);
-        const inputGainNode = ref(null);
         const selectedMicrophone = ref(null);
         const selectedSpeaker = ref(null);
         const inputVolume = ref(0.5);
         const outputVolume = ref(1.0);
         const getDevices = async () => {
             try {
-                if (!selectedMicrophone.value) {
-
-                    initialize.stream.getTracks().forEach((track) => track.stop());
-                }
-
                 const devices = await navigator.mediaDevices.enumerateDevices();
-
-                // Firefox workaround for speaker labels
-                if (navigator.userAgent.includes("Firefox")) {
-                    microphones.value = devices.filter((d) => d.kind === "audioinput");
-                    speakers.value = [{ deviceId: "default", label: "Default Speaker" }];
-                } else {
-                    microphones.value = devices.filter((d) => d.kind === "audioinput");
-                    speakers.value = devices.filter((d) => d.kind === "audiooutput");
-                }
+                microphones.value = devices.filter((d) => d.kind === "audioinput");
+                speakers.value = navigator.userAgent.includes("Firefox")
+                    ? [{ deviceId: "default", label: "Default Speaker" }]
+                    : devices.filter((d) => d.kind === "audiooutput");
             } catch (error) {
                 console.error("Error getting devices:", error);
             }
         };
 
-        // Unnecessary getUserMedia Call:
-        // The getUserMedia call is only needed to prompt for microphone permission if enumerateDevices() requires it(e.g., in some browsers like Chrome).However:
-        // Modern browsers(Chrome 71 +, Firefox 63 +) allow enumerateDevices() without prior permission if no device IDs are requested.
-
-        // The check if (!persistedStore.selectedMicrophone) assumes initialization hasn’t occurred, but if persistedStore is pre - populated, this might be redundant.
-
-        //             Improvement: Remove the getUserMedia call unless you confirm it’s necessary for your target browsers.Test without it to see if enumerateDevices() works standalone.
         const updateInputDevice = async () => {
             try {
-                if (!audioContext.value) return;
+                if (!initialize.audioContext.value) return;
 
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: { deviceId: selectedMicrophone.value },
                 });
 
-                if (inputGainNode.value) {
+                if (initialize.inputGainNode.value) {
                     inputGainNode.value.disconnect();
                 }
 
-                const source = audioContext.value.createMediaStreamSource(stream);
+                const source = initialize.audioContext.value.createMediaStreamSource(stream);
                 source.connect(inputGainNode.value);
                 console.log(`Input device updated to: ${selectedMicrophone.value}`);
             } catch (error) {
@@ -65,24 +45,18 @@ export const devicesStore = defineStore(
         };
 
         const setInputVolume = (volume) => {
-            inputVolume.value = volume;
+            inputVolume.value = Math.max(0, Math.min(1, volume));
             if (inputGainNode.value) {
-                inputGainNode.value.gain.value = volume;
+                inputGainNode.value.gain.value = inputVolume.value;
             }
-            inputVolume.value = volume;
         };
         const setOutputVolume = (volume) => {
-            outputVolume.value = volume;
-            // Add output volume logic here later
+            outputVolume.value = Math.max(0, Math.min(1, volume));
+            if (outputGainNode.value) {
+                outputGainNode.value.gain.value = outputVolume.value;
+            }
         };
 
-        const registerAudioContext = (ctx) => {
-            audioContext.value = ctx;
-        };
-
-        const registerInputGainNode = (node) => {
-            inputGainNode.value = node;
-        };
         return {
             microphones,
             speakers,
@@ -92,8 +66,6 @@ export const devicesStore = defineStore(
             updateInputDevice,
             setInputVolume,
             setOutputVolume,
-            registerAudioContext,
-            registerInputGainNode,
             selectedMicrophone,
             selectedSpeaker,
         }

@@ -64,6 +64,9 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { devicesStore } from "@/stores/devices";
+import { initializeStore } from "../../../../stores/initialize";
+
+const initialize = initializeStore();
 const devices = devicesStore();
 const isLoading = ref(true);
 const errorMessage = ref("");
@@ -103,10 +106,10 @@ const testMic = async () => {
       deviceId: devices.selectedMicrophone,
     },
   });
-  const analyser = store.audioContext.createAnalyser();
+  const analyser = initialize.audioContext.createAnalyser();
   analyser.fftSize = 512;
 
-  source.value = store.audioContext.createMediaStreamSource(stream);
+  source.value = initialize.audioContext.createMediaStreamSource(stream);
   source.value.connect(analyser);
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);

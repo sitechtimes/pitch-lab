@@ -95,7 +95,6 @@ export const initializeStore = defineStore(
 
       if (audioContext.value) {
         try {
-          // Disconnect all nodes first
           inputGainNode.value?.disconnect();
           outputGainNode.value?.disconnect();
           analyser.value?.disconnect();
