@@ -8,17 +8,20 @@ export const initializeStore = defineStore(
     const devices = devicesStore();
     const audioContext = ref(null);
     const analyser = ref(null);
-    const inputGainNode = ref(null);
-    const outputGainNode = ref(null);
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
+
+    const inputGainNode = ref(null);
+    const outputGainNode = ref(null);
+
     const isInitialized = ref(false);
-    const fftSize = ref(4096);
     const cannotInitailize = ref(false)
+    const fftSize = ref(4096);
+
     const initializeAudio = async () => {
       try {
-        cleanupAudio();
-
+        devices.cleanupAudio();
+        //move this down
         if (devices.microphones.length === 0) {
           await devices.getDevices();
         }
@@ -30,18 +33,17 @@ export const initializeStore = defineStore(
         }
 
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
-        console.log("AudioContext created");
 
         if (audioContext.value.state === "suspended") {
           await audioContext.value.resume();
         }
 
-        // Request audio stream with the selected device
+        // Request audio stream with the selected device + update updateInputDevices in initialize device
         stream.value = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
             autoGainControl: false,
-            deviceId: deviceId ? { exact: deviceId } : undefined,
+            deviceId: devices.selectedMicrophone ? { exact: devices.selectedMicrophone } : undefined,
           },
         });
 
@@ -82,40 +84,12 @@ export const initializeStore = defineStore(
         return true;
       } catch (error) {
         console.error("Audio initialization failed:", error);
-        cleanupAudio();
+        devices.cleanupAudio();
         return false;
       }
     };
 
-    const cleanupAudio = () => {
-      if (stream.value) {
-        stream.value.getTracks().forEach((track) => track.stop());
-        stream.value = null;
-      }
 
-      if (audioContext.value) {
-        try {
-          inputGainNode.value?.disconnect();
-          outputGainNode.value?.disconnect();
-          analyser.value?.disconnect();
-
-          // Close context properly
-          if (typeof audioContext.value.close === "function") {
-            audioContext.value.close();
-          }
-        } catch (e) {
-          console.warn("Cleanup error:", e);
-        }
-        audioContext.value = null;
-      }
-
-      analyser.value = null;
-      inputGainNode.value = null;
-      outputGainNode.value = null;
-      mediaStreamDestination.value = null;
-      isInitialized.value = false;
-      console.log("Audio resources cleaned");
-    };
 
     return {
       audioContext,
@@ -125,7 +99,6 @@ export const initializeStore = defineStore(
       stream,
       analyser,
       initializeAudio,
-      cleanupAudio,
       isInitialized,
       fftSize,
       cannotInitailize
