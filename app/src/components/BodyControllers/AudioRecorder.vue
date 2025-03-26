@@ -3,26 +3,26 @@
     <div class="flex flex-col items-center w-[30%]">
       <!-- Timer display -->
       <button
-        class="bg-[#36C4E4] rounded p-2 w-full"
+        class="bg-[#36C4E4] rounded-full p-2 w-full"
         @click="startRecording"
         v-if="!isRecording"
       >
         Start Recording
       </button>
       <button
-        class="bg-[#A3D10A] rounded p-2 w-full"
+        class="bg-[#A3D10A] rounded-full p-2 w-full"
         @click="stopRecording"
         v-if="isRecording"
       >
         Stop Recording
       </button>
    
-      <div class="text-black bg-white text-center p-2 rounded w-full">
+      <div class="text-black bg-white text-center p-2 rounded-full w-full">
         Timer: {{ formatTime(timer) }}
       </div>
       <button
         type="button"
-        class="text-white text-center bg-gold font-medium rounded-lg text-sm bg-purple p-2 w-full"
+        class="text-white text-center bg-gold font-medium rounded-full text-sm bg-purple p-2 w-full"
         @click="(audioStore.viewingHistory = true), (saving = null), (audioStore.viewingDeleted = false)"
       >
 Saved Recordings      

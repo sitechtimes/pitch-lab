@@ -2,7 +2,6 @@
   <div class="flex justify-center">
     <div class="flex flex-col justify-between items-center w-[85%]">
       <div>
-      <div >
         <select
           class="bg-gray-700 text-black rounded w-[90%]"
           v-model="audioStore.currentAudio"
@@ -17,10 +16,6 @@
             {{ file.name }} recorded on {{ file.date }}
           </option>
         </select>
-        <div v-if="persistedStore.pastAudio.length === 0" class="mt-3 text-center text-lg text-gray-500">
-          There is no saved recording. Record an audio to select.
-        </div>
-      </div>
       </div>
       <div v-if="audioStore.currentAudio">
         <input
@@ -32,9 +27,7 @@
         <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
         <button @click="deleteAudio">Delete</button>
       </div>
-      <div v-else class="mt-3 text-center text-lg w-[50%] text-gray-500">
-        No recording selected. Please select a recording to see options.
-      </div>
+
     </div>
     <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
       <div class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
