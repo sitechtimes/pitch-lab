@@ -34,7 +34,6 @@
     </div>
     </div>
 </template>
-
 <script setup>
 import { ref, onMounted, watch } from "vue";
 
@@ -58,7 +57,10 @@ const loadSound = () => {
     selectedSound.value === "quack"
       ? "quack.mp3"
       : `${selectedSound.value}.mp3`;
-  audio = new Audio(`${basePath}${soundFile}`);
+
+  audio = new Audio(`/${soundFile}`);
+  audio.setSinkId(persistedStore.selectedSpeaker);
+  audio.volume = persistedStore.outputVolume;
   audio.load();
   isLoading.value = false;
 };
@@ -145,6 +147,7 @@ watch([bpm, selectedSound], () => {
   }
 });
 </script>
+
 
 <style scoped>
 
