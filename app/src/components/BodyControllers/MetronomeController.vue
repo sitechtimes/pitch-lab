@@ -35,12 +35,14 @@
     </div>
 </template>
 <script setup>
+import { persistedSettings } from "@/stores/persistedStore";
 import { ref, onMounted, watch } from "vue";
+const persistedStore = persistedSettings();
 
 // State
 const timeSignature = ref("4"); // Default to 4/4
 const timeSignatureDenominator = ref("4"); // Default denominator
-const selectedSound = ref("duck"); // Default sound
+const selectedSound = ref("quack"); // Default sound
 const bpm = ref(120);
 const isPlaying = ref(false);
 const isBeating = ref(false);
@@ -49,10 +51,10 @@ let intervalId = null;
 let audio = null;
 
 const availableSounds = ref(["quack", "tack"]); // Add more as needed
-const basePath = "/"; // Path to public folder
 
 const loadSound = () => {
   isLoading.value = true;
+
   const soundFile =
     selectedSound.value === "quack"
       ? "quack.mp3"
@@ -146,7 +148,23 @@ watch([bpm, selectedSound], () => {
     startMetronome();
   }
 });
+
+watch(
+  () => persistedStore.selectedSpeaker,
+  (newSpeaker) => {
+    audio.setSinkId(newSpeaker);
+    audio.volume = persistedStore.outputVolume;
+  },
+);
+
+watch(
+  () => persistedStore.outputVolume,
+  (newVolume) => {
+    audio.volume = newVolume;
+  },
+);
 </script>
+
 
 
 <style scoped>
