@@ -11,7 +11,7 @@
         <button
           v-if="!audioStore.viewingDeleted"
           @click="audioStore.viewingDeleted = true"
-          class="text-xl bg-purple rounded-full p-1 mb-2"
+          class="text-xl bg-purple rounded-full p-2 mb-2"
         >
           Go to recently deleted
         </button>
@@ -23,7 +23,8 @@
           Go back to history
         </button>
       </div>
-      <div class="flex flex-row justify-center">
+      <div class="w-[80%] flex justify-center">
+      <div class="flex flex-row justify-between ">
         <div class="flex items-center h-full">
           <PastAudio v-if="!audioStore.viewingDeleted" />
           <RecentlyDeleted v-if="audioStore.viewingDeleted" />
@@ -32,6 +33,7 @@
           <AudioPlayback />
         </div>
       </div>
+    </div>
       <button
         @click="
           (audioStore.viewingHistory = false), (audioStore.currentAudio = null), (audioStore.viewingDeleted = false)

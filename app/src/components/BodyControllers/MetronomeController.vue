@@ -34,7 +34,6 @@
     </div>
     </div>
 </template>
-
 <script setup>
 import { persistedSettings } from "@/stores/persistedStore";
 import { ref, onMounted, watch } from "vue";
@@ -165,6 +164,7 @@ watch(
   },
 );
 </script>
+
 
 <style scoped>
 

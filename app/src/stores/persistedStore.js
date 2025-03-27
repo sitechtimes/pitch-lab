@@ -8,12 +8,17 @@ export const persistedSettings = defineStore(
     const assignedID = ref(1);
     const pastAudio = ref([]);
     const recentlyDeleted = ref([]);
+    //setttings
     const defaultNote = ref({ name: "C", frequency: 261.63 });
-
     const selectedMicrophone = ref(null);
     const selectedSpeaker = ref(null);
     const inputVolume = ref(0.5);
     const outputVolume = ref(1.0);
+    //metronome
+    const timeSignature = ref("4");
+    const timeSignatureDenominator = ref("4");
+    const selectedSound = ref("quack");
+    const bpm = ref(120);
     return {
       selectedMicrophone,
       selectedSpeaker,
@@ -23,6 +28,10 @@ export const persistedSettings = defineStore(
       pastAudio,
       recentlyDeleted,
       defaultNote,
+      timeSignature,
+      timeSignatureDenominator,
+      selectedSound,
+      bpm,
     };
   },
   {
@@ -40,6 +49,10 @@ export const persistedSettings = defineStore(
             "pastAudio",
             "recentlyDeleted",
             "defaultNote",
+            "timeSignature",
+            "timeSignatureDenominator",
+            "selectedSound",
+            "bpm",
           ],
         },
       ],
