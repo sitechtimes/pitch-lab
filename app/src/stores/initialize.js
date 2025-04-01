@@ -16,6 +16,8 @@ export const initializeStore = defineStore(
 
     const isInitialized = ref(false);
     const cannotInitailize = ref(false)
+    const noMicrophones = ref(false);
+    const noSpeakers = ref(false);
     const fftSize = ref(4096);
     const initializeAudio = async () => {
       try {
@@ -87,6 +89,7 @@ export const initializeStore = defineStore(
         return true;
       } catch (error) {
         console.error("Audio initialization failed:", error);
+        cannotInitailize.value = true;
         devices.cleanupAudio();
         return false;
       }
@@ -102,7 +105,9 @@ export const initializeStore = defineStore(
       initializeAudio,
       isInitialized,
       fftSize,
-      cannotInitailize
+      cannotInitailize,
+      noMicrophones,
+      noSpeakers
     };
   },
   {
