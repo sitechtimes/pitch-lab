@@ -27,9 +27,7 @@
         <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
         <button @click="deleteAudio">Delete</button>
       </div>
-      <div class="mt-3 text-center text-lg w-[50%] text-gray-500" v-if="!audioStore.currentAudio">
-        No audio is being selected. Please select an audio file to see options.
-      </div>
+
     </div>
     <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
       <div class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
