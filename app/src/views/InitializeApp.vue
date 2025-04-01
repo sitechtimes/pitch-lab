@@ -42,8 +42,7 @@ watch(
 );
 onMounted(async () => {
   try {
-    await devices.getDevices(); // Assuming this populates devices.microphones and devices.speakers
-    console.log("Devices checked");
+    await devices.getDevices();
 
     // Check if microphones and speakers are available
     if (!devices.microphones || devices.microphones.length === 0) {

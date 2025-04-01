@@ -16,13 +16,18 @@ export const devicesStore = defineStore(
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 microphones.value = devices.filter((d) => d.kind === "audioinput");
-                speakers.value = navigator.userAgent.includes("Firefox")
-                    ? [{ deviceId: "default", label: "Default Speaker" }]
-                    : devices.filter((d) => d.kind === "audiooutput");
+                speakers.value = devices.filter((d) => d.kind === "audiooutput");
+                selectedMicrophone.value = microphones.value.find((d) => d.deviceId === "default") || microphones.value[0];
+                selectedSpeaker.value = speakers.value.find((d) => d.deviceId === "default") || speakers.value[0];
+
+                if (microphones.value.length === 0) selectedMicrophone.value = null;
+                if (speakers.value.length === 0) selectedSpeaker.value = null;
+
             } catch (error) {
                 console.error("Error getting devices:", error);
             }
         };
+
 
         const updateInputDevice = async () => {
             try {
@@ -68,7 +73,15 @@ export const devicesStore = defineStore(
             initialize.isInitialized = false;
             console.log("Audio resources cleaned");
         };
+        const registerAudioContext = (context) => {
+            console.log("Registering AudioContext", context);
+            initialize.audioContext = context;
+        };
 
+        const registerInputGainNode = (node) => {
+            console.log("Registering Input Gain Node", node);
+            initialize.inputGainNode = node;
+        };
         const setInputVolume = (volume) => {
             inputVolume.value = Math.max(0, Math.min(1, volume));
             if (initialize.inputGainNode) {
@@ -93,7 +106,9 @@ export const devicesStore = defineStore(
             setOutputVolume,
             selectedMicrophone,
             selectedSpeaker,
-            cleanupAudio
+            cleanupAudio,
+            registerAudioContext,
+            registerInputGainNode
         }
     },
     {

@@ -17,28 +17,29 @@ export const initializeStore = defineStore(
     const isInitialized = ref(false);
     const cannotInitailize = ref(false)
     const fftSize = ref(4096);
-
     const initializeAudio = async () => {
       try {
         devices.cleanupAudio();
-        //move this down
         if (devices.microphones.length === 0) {
           await devices.getDevices();
         }
 
-        let deviceId = devices.selectedMicrophone;
-        if (!deviceId && devices.microphones.length > 0) {
-          deviceId = devices.microphones[0].deviceId;
-          devices.selectedMicrophone = deviceId;
-        }
+        let deviceId = devices.selectedMicrophone?.deviceId || devices.microphones[0]?.deviceId;
+        devices.selectedMicrophone = deviceId;
 
+        // Initialize audio context
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
+
+        if (!audioContext.value) {
+          console.error("AudioContext creation failed.");
+          return false;
+        }
 
         if (audioContext.value.state === "suspended") {
           await audioContext.value.resume();
         }
 
-        // Request audio stream with the selected device + update updateInputDevices in initialize device
+        // Request audio stream with the selected device
         stream.value = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
@@ -47,6 +48,7 @@ export const initializeStore = defineStore(
           },
         });
 
+        // Check for audioContext initialization
         if (!audioContext.value) {
           console.error("AudioContext is not initialized.");
           return false;
@@ -54,7 +56,7 @@ export const initializeStore = defineStore(
 
         // Create nodes
         analyser.value = audioContext.value.createAnalyser();
-        analyser.value.fftSize = 2048;
+        analyser.value.fftSize = fftSize.value;
 
         inputGainNode.value = audioContext.value.createGain();
         inputGainNode.value.gain.value = devices.inputVolume || 0.5;
@@ -70,6 +72,7 @@ export const initializeStore = defineStore(
           .connect(highPassFilter)
           .connect(inputGainNode.value)
           .connect(analyser.value);
+
         console.log("Audio nodes initialized:", {
           analyser: !!analyser.value,
           context: audioContext.value.state,
@@ -88,8 +91,6 @@ export const initializeStore = defineStore(
         return false;
       }
     };
-
-
 
     return {
       audioContext,
