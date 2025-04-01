@@ -15,18 +15,30 @@ export const devicesStore = defineStore(
         const getDevices = async () => {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
-                microphones.value = devices.filter((d) => d.kind === "audioinput");
-                speakers.value = devices.filter((d) => d.kind === "audiooutput");
-                selectedMicrophone.value = microphones.value.find((d) => d.deviceId === "default") || microphones.value[0];
-                selectedSpeaker.value = speakers.value.find((d) => d.deviceId === "default") || speakers.value[0];
+                console.log("Devices:", devices);
 
+                // Filter microphones and speakers
+                microphones.value = devices.filter((d) => d.kind === "audioinput" && d.deviceId);
+                speakers.value = devices.filter((d) => d.kind === "audiooutput" && d.deviceId);
+
+                console.log("Microphones:", microphones.value);
+                console.log("Speakers:", speakers.value);
+
+                // Select the default microphone and speaker, or the first available device
+                selectedMicrophone.value = microphones.value.find((d) => d.deviceId === "default") || microphones.value[0] || null;
+                selectedSpeaker.value = speakers.value.find((d) => d.deviceId === "default") || speakers.value[0] || null;
+
+                // Handle case when no devices are found
                 if (microphones.value.length === 0) selectedMicrophone.value = null;
                 if (speakers.value.length === 0) selectedSpeaker.value = null;
 
+                console.log("Selected Microphone:", selectedMicrophone.value);
+                console.log("Selected Speaker:", selectedSpeaker.value);
             } catch (error) {
                 console.error("Error getting devices:", error);
             }
         };
+
 
 
         const updateInputDevice = async () => {
@@ -57,6 +69,8 @@ export const devicesStore = defineStore(
                     initialize.outputGainNode?.disconnect();
                     initialize.analyser?.disconnect();
 
+                    initialize.audioContext.destination.disconnect();
+
                     if (typeof initialize.audioContext.close === "function") {
                         initialize.audioContext.close();
                     }
@@ -70,9 +84,12 @@ export const devicesStore = defineStore(
             initialize.inputGainNode = null;
             initialize.outputGainNode = null;
             initialize.mediaStreamDestination = null;
+
             initialize.isInitialized = false;
             console.log("Audio resources cleaned");
         };
+
+
         const registerAudioContext = (context) => {
             console.log("Registering AudioContext", context);
             initialize.audioContext = context;
@@ -81,6 +98,10 @@ export const devicesStore = defineStore(
         const registerInputGainNode = (node) => {
             console.log("Registering Input Gain Node", node);
             initialize.inputGainNode = node;
+        };
+        const registerOutputGainNode = (node) => {
+            console.log("Registering Output Gain Node:", node);
+            initialize.outputGainNode = node;
         };
         const setInputVolume = (volume) => {
             inputVolume.value = Math.max(0, Math.min(1, volume));
@@ -108,7 +129,8 @@ export const devicesStore = defineStore(
             selectedSpeaker,
             cleanupAudio,
             registerAudioContext,
-            registerInputGainNode
+            registerInputGainNode,
+            registerOutputGainNode
         }
     },
     {

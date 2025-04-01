@@ -29,7 +29,6 @@ export const initializeStore = defineStore(
         let deviceId = devices.selectedMicrophone?.deviceId || devices.microphones[0]?.deviceId;
         devices.selectedMicrophone = deviceId;
 
-        // Initialize audio context
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
 
         if (!audioContext.value) {
@@ -41,7 +40,6 @@ export const initializeStore = defineStore(
           await audioContext.value.resume();
         }
 
-        // Request audio stream with the selected device
         stream.value = await navigator.mediaDevices.getUserMedia({
           audio: {
             noiseSuppression: false,
@@ -50,20 +48,20 @@ export const initializeStore = defineStore(
           },
         });
 
-        // Check for audioContext initialization
         if (!audioContext.value) {
           console.error("AudioContext is not initialized.");
           return false;
         }
 
-        // Create nodes
         analyser.value = audioContext.value.createAnalyser();
         analyser.value.fftSize = fftSize.value;
 
         inputGainNode.value = audioContext.value.createGain();
         inputGainNode.value.gain.value = devices.inputVolume || 0.5;
 
-        // Create processing chain
+        outputGainNode.value = audioContext.value.createGain();
+        outputGainNode.value.gain.value = devices.outputVolume || 1.0;
+
         const source = audioContext.value.createMediaStreamSource(stream.value);
         const highPassFilter = audioContext.value.createBiquadFilter();
         highPassFilter.type = "highpass";
@@ -73,7 +71,9 @@ export const initializeStore = defineStore(
         source
           .connect(highPassFilter)
           .connect(inputGainNode.value)
-          .connect(analyser.value);
+          .connect(analyser.value)
+          .connect(outputGainNode.value)
+          .connect(audioContext.value.destination);
 
         console.log("Audio nodes initialized:", {
           analyser: !!analyser.value,
@@ -83,6 +83,7 @@ export const initializeStore = defineStore(
         // Register audio context and input gain node in devices store
         devices.registerAudioContext(audioContext.value);
         devices.registerInputGainNode(inputGainNode.value);
+        devices.registerOutputGainNode(outputGainNode.value);
 
         isInitialized.value = true;
         console.log("Audio initialized successfully");

@@ -61,25 +61,23 @@ onMounted(async () => {
   try {
     await devices.getDevices();
 
-    // Check microphones
     if (!devices.microphones || devices.microphones.length === 0) {
       initialize.noMicrophones = true;
       console.warn("Cannot access microphone");
     }
 
-    // Check speakers
     if (!devices.speakers || devices.speakers.length === 0) {
       initialize.noSpeakers = true;
       console.warn("Cannot access speaker");
     }
 
-    // Set cannotInitialize based on either condition
     initialize.cannotInitialize =
       initialize.noMicrophones || initialize.noSpeakers;
 
     if (!initialize.cannotInitialize) {
       console.log("Both microphone and speaker detected");
     }
+    devices.cleanupAudio();
   } catch (error) {
     console.error("Error getting devices:", error);
 
