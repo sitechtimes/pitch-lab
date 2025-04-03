@@ -3,20 +3,23 @@
     <div class="flex flex-col items-center w-[30%]">
       <!-- Timer display -->
       <button
-        class="bg-[#36C4E4] rounded-full p-2 w-full"
+        class="bg-[#36C4E4] rounded-full p-2 w-full flex items-center justify-center"
         @click="startRecording"
         v-if="!isRecording"
       >
+        <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6 mr-2" />
         Start Recording
       </button>
       <button
-        class="bg-[#A3D10A] rounded-full p-2 w-full"
+        class="bg-[#A3D10A] rounded-full p-2 w-full flex items-center justify-center"
         @click="stopRecording"
         v-if="isRecording"
       >
+      <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
         Stop Recording
       </button>
    
+      
       <div class="text-black bg-white text-center p-2 rounded-full w-full">
         Timer: {{ formatTime(timer) }}
       </div>
@@ -66,7 +69,10 @@ Saved Recordings
   </div>
 
       <div class="flex  flex-col justify-between">
+      <div>
+        <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
         <button class="w-full" @click="saveAudio">Save To History</button>
+      </div>
         <button class="w-full" @click="deleteAudio">Delete</button>     
  
       </div>
@@ -92,7 +98,6 @@ Saved Recordings
 
 <script setup>
 import { ref } from "vue";
-import AudioPlayback from "../AudioComponents/AudioPlayback.vue";
 import { audioFiles } from "@/stores/audioFiles";
 import { persistedSettings } from "@/stores/persistedStore";
 const audioStore = audioFiles();
