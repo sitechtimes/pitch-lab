@@ -4,33 +4,52 @@ import { initializeStore } from "./initialize";
 export const devicesStore = defineStore(
     "devicesStore",
     () => {
-        const initialize = initializeStore()
+        const initialize = initializeStore();
         const microphones = ref([]);
         const speakers = ref([]);
+        const microphonesNoDeviceId = ref([]);
+        const speakersNoDeviceId = ref([]);
 
         const selectedMicrophone = ref(null);
         const selectedSpeaker = ref(null);
         const inputVolume = ref(0.5);
         const outputVolume = ref(1.0);
+
         const getDevices = async () => {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 console.log("Devices:", devices);
 
-                // Filter microphones and speakers
                 microphones.value = devices.filter((d) => d.kind === "audioinput" && d.deviceId);
                 speakers.value = devices.filter((d) => d.kind === "audiooutput" && d.deviceId);
 
-                console.log("Microphones:", microphones.value);
-                console.log("Speakers:", speakers.value);
+                microphonesNoDeviceId.value = devices.filter((d) => d.kind === "audioinput" && !d.deviceId);
+                speakersNoDeviceId.value = devices.filter((d) => d.kind === "audiooutput" && !d.deviceId);
 
-                // Select the default microphone and speaker, or the first available device
-                selectedMicrophone.value = microphones.value.find((d) => d.deviceId === "default") || microphones.value[0] || null;
-                selectedSpeaker.value = speakers.value.find((d) => d.deviceId === "default") || speakers.value[0] || null;
+                console.log("Microphones with deviceId:", microphones.value);
+                console.log("Speakers with deviceId:", speakers.value);
+                console.log("Microphones without deviceId:", microphonesNoDeviceId.value);
+                console.log("Speakers without deviceId:", speakersNoDeviceId.value);
 
-                // Handle case when no devices are found
-                if (microphones.value.length === 0) selectedMicrophone.value = null;
-                if (speakers.value.length === 0) selectedSpeaker.value = null;
+                if (microphones.value.length > 0) {
+                    selectedMicrophone.value = microphones.value.find((d) => d.deviceId === "default") || microphones.value[0];
+                } else {
+                    selectedMicrophone.value = null;
+                }
+
+                if (speakers.value.length > 0) {
+                    selectedSpeaker.value = speakers.value.find((d) => d.deviceId === "default") || speakers.value[0];
+                } else {
+                    selectedSpeaker.value = null;
+                }
+
+                if (microphonesNoDeviceId.value.length > 0) {
+                    selectedMicrophone.value = microphonesNoDeviceId.value[0] || selectedMicrophone.value;
+                }
+
+                if (speakersNoDeviceId.value.length > 0) {
+                    selectedSpeaker.value = speakersNoDeviceId.value[0] || selectedSpeaker.value;
+                }
 
                 console.log("Selected Microphone:", selectedMicrophone.value);
                 console.log("Selected Speaker:", selectedSpeaker.value);
@@ -38,8 +57,6 @@ export const devicesStore = defineStore(
                 console.error("Error getting devices:", error);
             }
         };
-
-
 
         const updateInputDevice = async () => {
             try {

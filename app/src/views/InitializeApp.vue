@@ -7,21 +7,23 @@
       :disabled="initialize.cannotInitialize"
       class="text-center"
     >
-      <p class="text-4xl mb-4">
-        <template v-if="initialize.cannotInitialize">
-          <template v-if="initialize.noMicrophones && initialize.noSpeakers">
-            Cannot access microphone and speaker
-          </template>
-          <template v-else-if="initialize.noMicrophones">
+      <div class="text-4xl mb-4">
+        <div v-if="initialize.cannotInitialize">
+          <div v-if="initialize.noMicrophones && initialize.noSpeakers">
+            Cannot access microphone and speaker.
+            <div class="p-3">
+              Try a different browser or check microphone and speaker
+              permissions.
+            </div>
+          </div>
+          <div v-else-if="initialize.noMicrophones">
             Cannot access microphone
-          </template>
-          <template v-else-if="initialize.noSpeakers">
-            Cannot access speaker
-          </template>
-          <template v-else> Cannot initialize audio </template>
-        </template>
-        <template v-else> Click To Start Tuning </template>
-      </p>
+          </div>
+          <div v-else-if="initialize.noSpeakers">Cannot access speaker</div>
+          <div v-else>Cannot initialize audio</div>
+        </div>
+        <div v-else>Click To Start Tuning</div>
+      </div>
 
       <div
         class="w-40 h-40 bg-white rounded-full flex items-center justify-center mx-auto shadow-2xl transition-transform transform hover:scale-105"
@@ -61,27 +63,31 @@ onMounted(async () => {
   try {
     await devices.getDevices();
 
-    if (!devices.microphones || devices.microphones.length === 0) {
+    if (devices.selectedMicrophone === !null) {
       initialize.noMicrophones = true;
+      initialize.cannotInitialize = true;
       console.warn("Cannot access microphone");
     }
-
-    if (!devices.speakers || devices.speakers.length === 0) {
+    if (devices.selectedSpeaker === !null) {
       initialize.noSpeakers = true;
       console.warn("Cannot access speaker");
     }
 
-    initialize.cannotInitialize =
-      initialize.noMicrophones || initialize.noSpeakers;
-
-    if (!initialize.cannotInitialize) {
+    if (!devices.selectedSpeaker.value) {
       console.log("Both microphone and speaker detected");
+    }
+    //some logs
+    if (initialize.noMicrophones && initialize.noSpeakers) {
+      console.log("No microphone and speaker detected");
+    } else if (initialize.noMicrophones) {
+      console.log("No microphone detected");
+    } else if (initialize.noSpeakers) {
+      console.log("No speaker detected");
     }
     devices.cleanupAudio();
   } catch (error) {
     console.error("Error getting devices:", error);
 
-    // Handle as a generic failure
     initialize.noMicrophones = true;
     initialize.noSpeakers = true;
     initialize.cannotInitialize = true;

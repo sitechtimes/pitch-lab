@@ -15,19 +15,18 @@ export const initializeStore = defineStore(
     const outputGainNode = ref(null);
 
     const isInitialized = ref(false);
-    const cannotInitailize = ref(false)
+    const cannotInitialize = ref(false)
     const noMicrophones = ref(false);
     const noSpeakers = ref(false);
     const fftSize = ref(4096);
     const initializeAudio = async () => {
       try {
         devices.cleanupAudio();
-        if (devices.microphones.length === 0) {
+
+        // Ensure we have device lists
+        if (devices.microphones.length === 0 && devices.microphonesNoDeviceId.length === 0) {
           await devices.getDevices();
         }
-
-        let deviceId = devices.selectedMicrophone?.deviceId || devices.microphones[0]?.deviceId;
-        devices.selectedMicrophone = deviceId;
 
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -40,12 +39,20 @@ export const initializeStore = defineStore(
           await audioContext.value.resume();
         }
 
+        if (!devices.selectedMicrophone) {
+          devices.selectedMicrophone =
+            devices.microphones[0]?.deviceId ||
+            devices.microphonesNoDeviceId[0] ||
+            null;
+        }
+
+        const audioConstraints =
+          typeof devices.selectedMicrophone === "string"
+            ? { deviceId: { exact: devices.selectedMicrophone }, noiseSuppression: false, autoGainControl: false }
+            : { noiseSuppression: false, autoGainControl: false };
+
         stream.value = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            noiseSuppression: false,
-            autoGainControl: false,
-            deviceId: devices.selectedMicrophone ? { exact: devices.selectedMicrophone } : undefined,
-          },
+          audio: audioConstraints,
         });
 
         if (!audioContext.value) {
@@ -53,6 +60,7 @@ export const initializeStore = defineStore(
           return false;
         }
 
+        // Set up nodes
         analyser.value = audioContext.value.createAnalyser();
         analyser.value.fftSize = fftSize.value;
 
@@ -67,7 +75,6 @@ export const initializeStore = defineStore(
         highPassFilter.type = "highpass";
         highPassFilter.frequency.value = 50;
 
-        // Connect nodes
         source
           .connect(highPassFilter)
           .connect(inputGainNode.value)
@@ -80,7 +87,7 @@ export const initializeStore = defineStore(
           context: audioContext.value.state,
         });
 
-        // Register audio context and input gain node in devices store
+        // Register components
         devices.registerAudioContext(audioContext.value);
         devices.registerInputGainNode(inputGainNode.value);
         devices.registerOutputGainNode(outputGainNode.value);
@@ -90,11 +97,12 @@ export const initializeStore = defineStore(
         return true;
       } catch (error) {
         console.error("Audio initialization failed:", error);
-        cannotInitailize.value = true;
+        cannotInitialize.value = true;
         devices.cleanupAudio();
         return false;
       }
     };
+
 
     return {
       audioContext,
@@ -106,7 +114,7 @@ export const initializeStore = defineStore(
       initializeAudio,
       isInitialized,
       fftSize,
-      cannotInitailize,
+      cannotInitialize,
       noMicrophones,
       noSpeakers
     };
