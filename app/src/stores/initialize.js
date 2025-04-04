@@ -22,14 +22,22 @@ export const initializeStore = defineStore(
     const initializeAudio = async () => {
       try {
         devices.cleanupAudio();
-        console.log("list of stuff" + devices.microphones, devices.microphonesNoDeviceId, devices.speakers, devices.speakersNoDeviceId);
 
-        if (!devices.microphones && !devices.microphonesNoDeviceId) {
+        if (
+          !devices.microphonesWithDeviceId &&
+          !devices.microphonesNoDeviceId
+        ) {
           await devices.getDevices();
         }
 
-        audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
+        if (!devices.selectedMicrophone) {
+          devices.selectedMicrophone =
+            devices.microphonesWithDeviceId[0] ||
+            devices.microphonesNoDeviceId[0] ||
+            null;
+        }
 
+        audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
         if (!audioContext.value) {
           console.error("AudioContext creation failed.");
           return false;
@@ -39,18 +47,19 @@ export const initializeStore = defineStore(
           await audioContext.value.resume();
         }
 
-        if (!devices.selectedMicrophone) {
-          devices.selectedMicrophone =
-            devices.microphones[0]?.deviceId ||
-            devices.microphonesNoDeviceId[0] ||
-            null;
-        }
-
         const audioConstraints =
-          typeof devices.selectedMicrophone === "string"
-            ? { deviceId: { exact: devices.selectedMicrophone }, noiseSuppression: false, autoGainControl: false }
-            : { noiseSuppression: false, autoGainControl: false };
+          devices.selectedMicrophone?.deviceId && devices.selectedMicrophone.deviceId !== ""
+            ? {
+              deviceId: { exact: devices.selectedMicrophone.deviceId },
+              noiseSuppression: false,
+              autoGainControl: false,
+            }
+            : {
+              noiseSuppression: false,
+              autoGainControl: false,
+            };
 
+        console.log("Audio constraints:", audioConstraints);
         stream.value = await navigator.mediaDevices.getUserMedia({
           audio: audioConstraints,
         });
@@ -60,7 +69,6 @@ export const initializeStore = defineStore(
           return false;
         }
 
-        // Set up nodes
         analyser.value = audioContext.value.createAnalyser();
         analyser.value.fftSize = fftSize.value;
 
@@ -87,7 +95,6 @@ export const initializeStore = defineStore(
           context: audioContext.value.state,
         });
 
-        // Register components
         devices.registerAudioContext(audioContext.value);
         devices.registerInputGainNode(inputGainNode.value);
         devices.registerOutputGainNode(outputGainNode.value);
@@ -102,7 +109,6 @@ export const initializeStore = defineStore(
         return false;
       }
     };
-
 
     return {
       audioContext,

@@ -15,13 +15,15 @@
         <option v-if="isLoading" value="" disabled>
           Loading microphones...
         </option>
+
         <option
           v-for="device in devices.microphones"
-          :key="device.deviceId"
-          :value="device.deviceId"
+          :key="device.deviceId || device.label"
+          :value="device"
         >
           {{ device.label || `Microphone ${device.deviceId.slice(0, 5)}` }}
         </option>
+
         <option v-if="devices.microphones.length === 0" value="" disabled>
           No microphones found
         </option>

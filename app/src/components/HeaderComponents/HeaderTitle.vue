@@ -16,11 +16,3 @@ const redirectToHome = () => {
   router.push("/");
 };
 </script>
-
-<style scoped>
-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-</style>
