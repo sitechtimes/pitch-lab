@@ -22,9 +22,9 @@ export const initializeStore = defineStore(
     const initializeAudio = async () => {
       try {
         devices.cleanupAudio();
+        console.log("list of stuff" + devices.microphones, devices.microphonesNoDeviceId, devices.speakers, devices.speakersNoDeviceId);
 
-        // Ensure we have device lists
-        if (devices.microphones.length === 0 && devices.microphonesNoDeviceId.length === 0) {
+        if (!devices.microphones && !devices.microphonesNoDeviceId) {
           await devices.getDevices();
         }
 

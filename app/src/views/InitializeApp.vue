@@ -63,12 +63,12 @@ onMounted(async () => {
   try {
     await devices.getDevices();
 
-    if (devices.selectedMicrophone === !null) {
+    if (!devices.selectedMicrophone) {
       initialize.noMicrophones = true;
       initialize.cannotInitialize = true;
       console.warn("Cannot access microphone");
     }
-    if (devices.selectedSpeaker === !null) {
+    if (!devices.selectedSpeaker) {
       initialize.noSpeakers = true;
       console.warn("Cannot access speaker");
     }

@@ -9,6 +9,8 @@ export const devicesStore = defineStore(
         const speakers = ref([]);
         const microphonesNoDeviceId = ref([]);
         const speakersNoDeviceId = ref([]);
+        const microphonesWithDeviceId = ref([]);
+        const speakersWithDeviceId = ref([]);
 
         const selectedMicrophone = ref(null);
         const selectedSpeaker = ref(null);
@@ -20,35 +22,44 @@ export const devicesStore = defineStore(
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 console.log("Devices:", devices);
 
-                microphones.value = devices.filter((d) => d.kind === "audioinput" && d.deviceId);
-                speakers.value = devices.filter((d) => d.kind === "audiooutput" && d.deviceId);
+                // Split by kind
+                microphones.value = devices.filter((d) => d.kind === "audioinput");
+                speakers.value = devices.filter((d) => d.kind === "audiooutput");
 
-                microphonesNoDeviceId.value = devices.filter((d) => d.kind === "audioinput" && !d.deviceId);
-                speakersNoDeviceId.value = devices.filter((d) => d.kind === "audiooutput" && !d.deviceId);
+                microphonesWithDeviceId.value = microphones.value.filter((d) => d.deviceId);
+                speakersWithDeviceId.value = speakers.value.filter((d) => d.deviceId);
 
-                console.log("Microphones with deviceId:", microphones.value);
-                console.log("Speakers with deviceId:", speakers.value);
+                microphonesNoDeviceId.value = microphones.value.filter((d) => !d.deviceId);
+                speakersNoDeviceId.value = speakers.value.filter((d) => !d.deviceId);
+
+                console.log("Microphones with deviceId:", microphonesWithDeviceId.value);
+                console.log("Speakers with deviceId:", speakersWithDeviceId.value);
                 console.log("Microphones without deviceId:", microphonesNoDeviceId.value);
                 console.log("Speakers without deviceId:", speakersNoDeviceId.value);
 
-                if (microphones.value.length > 0) {
-                    selectedMicrophone.value = microphones.value.find((d) => d.deviceId === "default") || microphones.value[0];
+                if (microphonesWithDeviceId.value.length > 0) {
+                    selectedMicrophone.value =
+                        microphonesWithDeviceId.value.find((d) => d.deviceId === "default") ||
+                        microphonesWithDeviceId.value[0];
                 } else {
                     selectedMicrophone.value = null;
                 }
 
-                if (speakers.value.length > 0) {
-                    selectedSpeaker.value = speakers.value.find((d) => d.deviceId === "default") || speakers.value[0];
+                if (speakersWithDeviceId.value.length > 0) {
+                    selectedSpeaker.value =
+                        speakersWithDeviceId.value.find((d) => d.deviceId === "default") ||
+                        speakersWithDeviceId.value[0];
                 } else {
                     selectedSpeaker.value = null;
                 }
 
-                if (microphonesNoDeviceId.value.length > 0) {
-                    selectedMicrophone.value = microphonesNoDeviceId.value[0] || selectedMicrophone.value;
+                // Fallback to no-deviceId mic/speaker if needed
+                if (!selectedMicrophone.value && microphonesNoDeviceId.value.length > 0) {
+                    selectedMicrophone.value = microphonesNoDeviceId.value[0];
                 }
 
-                if (speakersNoDeviceId.value.length > 0) {
-                    selectedSpeaker.value = speakersNoDeviceId.value[0] || selectedSpeaker.value;
+                if (!selectedSpeaker.value && speakersNoDeviceId.value.length > 0) {
+                    selectedSpeaker.value = speakersNoDeviceId.value[0];
                 }
 
                 console.log("Selected Microphone:", selectedMicrophone.value);
