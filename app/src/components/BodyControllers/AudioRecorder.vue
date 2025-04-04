@@ -69,12 +69,16 @@ Saved Recordings
   </div>
 
       <div class="flex  flex-col justify-between">
-      <div>
-        <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
-        <button class="w-full" @click="saveAudio">Save To History</button>
-      </div>
-        <button class="w-full" @click="deleteAudio">Delete</button>     
- 
+      <button
+        class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center" @click="saveAudio">
+        <img src="@/assets/buttons/save.webp" alt="Microphone" class="mr-1"/>
+          Save to history
+      </button>
+        <button
+        class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center " @click="deleteAudio">
+        <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3"/>
+          Delete
+      </button>
       </div>
     </div>
   </div>
