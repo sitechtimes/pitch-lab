@@ -19,7 +19,7 @@
           <router-link to="/tuner" class="text-3xl hover:underline"
             >Tuner</router-link
           >
-          <SettingsIcon />
+          <!-- <SettingsIcon /> -->
         </div>
       </header>
 
@@ -38,7 +38,7 @@
 
 <script setup>
 import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
-import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
+// import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
 import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { initializeStore } from "./stores/initialize";
