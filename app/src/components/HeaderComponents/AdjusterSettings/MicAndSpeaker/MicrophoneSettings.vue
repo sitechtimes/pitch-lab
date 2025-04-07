@@ -78,27 +78,41 @@ watch(
 );
 
 const testMic = async () => {
-  initialize.source.connect(initialize.analyser);
-  const bufferLength = initialize.analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  function calculateVolume() {
-    initialize.analyser.getByteFrequencyData(dataArray);
-    let sum = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      sum += dataArray[i];
-    }
-    averageVolume.value = sum / bufferLength;
+  if (!initialize.source?.value || !initialize.analyser?.value) {
+    errorMessage.value =
+      "Microphone not initialized. Please allow mic access or reselect your input.";
+    return;
   }
-  loop = setInterval(calculateVolume, 100);
 
-  watch(isTesting, () => {
-    if (isTesting.value === false) {
-      initialize.source.disconnect();
-      clearInterval(loop);
-      loop = null;
+  try {
+    initialize.source.value.connect(initialize.analyser.value);
+
+    const bufferLength = initialize.analyser.value.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function calculateVolume() {
+      initialize.analyser.value.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i];
+      }
+      averageVolume.value = sum / bufferLength;
     }
-  });
+
+    loop = setInterval(calculateVolume, 100);
+
+    watch(isTesting, () => {
+      if (!isTesting.value) {
+        initialize.source.value?.disconnect();
+        clearInterval(loop);
+        loop = null;
+      }
+    });
+  } catch (err) {
+    console.error("Mic test failed:", err);
+    errorMessage.value =
+      "Mic test failed. Try refreshing or switching microphones.";
+  }
 };
 
 const barStyle = computed(() => {

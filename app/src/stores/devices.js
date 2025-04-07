@@ -69,10 +69,10 @@ export const devicesStore = defineStore(
             }
         };
 
-        const updateInputDevice = async () => {
+        const updateDevice = async () => {
             cleanupAudio();
             await initialize.initializeAudio();
-            console.log("Input device updated:", selectedMicrophone.value);
+            console.log("Device updated:", selectedMicrophone.value);
         };
 
         const cleanupAudio = () => {
@@ -144,7 +144,7 @@ export const devicesStore = defineStore(
             inputVolume,
             outputVolume,
             getDevices,
-            updateInputDevice,
+            updateDevice,
             setInputVolume,
             setOutputVolume,
             selectedMicrophone,

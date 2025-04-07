@@ -22,6 +22,12 @@
       id="speaker"
       v-model="devices.selectedSpeaker"
       class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
+      @change="
+        () => {
+          stopTesting();
+          devices.updateDevice();
+        }
+      "
     >
       <!-- Speakers with deviceId -->
       <option
@@ -54,6 +60,10 @@
         No speakers found
       </option>
     </select>
+    <canvas
+      ref="visualizerCanvas"
+      class="w-full h-[100px] mt-4 border border-purple rounded"
+    ></canvas>
   </div>
 </template>
 
@@ -134,9 +144,12 @@ const testSpeaker = async () => {
       "Your browser doesn't support selecting output devices.";
   }
 
-  loop.value = setInterval(() => {
-    audio.play();
-  }, 100);
+  audio.onended = () => {
+    if (isTesting.value) {
+      audio.play();
+    }
+  };
+  audio.play();
 };
 
 const stopTesting = () => {

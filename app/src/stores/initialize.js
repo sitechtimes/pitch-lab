@@ -10,7 +10,7 @@ export const initializeStore = defineStore(
     const analyser = ref(null);
     const mediaStreamDestination = ref(null);
     const stream = ref(null);
-
+    const source = ref(null);
     const inputGainNode = ref(null);
     const outputGainNode = ref(null);
 
@@ -79,12 +79,12 @@ export const initializeStore = defineStore(
         outputGainNode.value = audioContext.value.createGain();
         outputGainNode.value.gain.value = devices.outputVolume || 1.0;
 
-        const source = audioContext.value.createMediaStreamSource(stream.value);
+        source.value = audioContext.value.createMediaStreamSource(stream.value);
         const highPassFilter = audioContext.value.createBiquadFilter();
         highPassFilter.type = "highpass";
         highPassFilter.frequency.value = 50;
 
-        source
+        source.value
           .connect(highPassFilter)
           .connect(inputGainNode.value)
           .connect(analyser.value)
@@ -117,6 +117,7 @@ export const initializeStore = defineStore(
       outputGainNode,
       mediaStreamDestination,
       stream,
+      source,
       analyser,
       initializeAudio,
       isInitialized,
