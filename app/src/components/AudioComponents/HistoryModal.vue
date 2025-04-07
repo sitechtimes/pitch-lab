@@ -23,8 +23,8 @@
           Go back to history
         </button>
       </div>
-      <div class="w-[80%] flex justify-center">
-      <div class="flex flex-row justify-between ">
+      <div class="w-full flex justify-center">
+
         <div class="flex items-center h-full">
           <PastAudio v-if="!audioStore.viewingDeleted" />
           <RecentlyDeleted v-if="audioStore.viewingDeleted" />
@@ -32,7 +32,7 @@
         <div v-if="audioStore.currentAudio">
           <AudioPlayback />
         </div>
-      </div>
+
     </div>
       <button
         @click="

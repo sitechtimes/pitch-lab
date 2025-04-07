@@ -1,9 +1,9 @@
 <template>
   <div class="flex justify-center">
-    <div class="flex flex-col justify-between items-center w-[85%]">
-      <div>
+    <div class="flex flex-col justify-between items-center w-[90%]">
+      <div class="w-full">
         <select
-          class="bg-gray-700 text-black rounded w-[90%]"
+          class="bg-gray-700 text-black rounded w-full"
           v-model="audioStore.currentAudio"
         >
           <option disabled value="">History:</option>
@@ -24,7 +24,7 @@
           v-model="audioStore.fileName"
           :disabled="!isEditing"
         />
-        <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
+        <button class="mx-1" @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
         <button @click="deleteAudio">Delete</button>
       </div>
 

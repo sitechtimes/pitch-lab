@@ -4,7 +4,7 @@
       <!-- Timer display -->
       <button
         class="bg-[#36C4E4] rounded-full p-2 w-full flex items-center justify-center"
-        @click="startRecording"
+          @click="startRecording"
         v-if="!isRecording"
       >
         <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6 mr-2" />
