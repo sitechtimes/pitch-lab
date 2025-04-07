@@ -99,11 +99,9 @@
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
-import { devicesStore } from "@/stores/devices";
-const devices = devicesStore();
-const audioContext = ref(null);
-const analyser = ref(null);
-const source = ref(null);
+import { initializeStore } from "../../stores/initialize";
+const initialize = initializeStore();
+
 const frequency = ref(null);
 const lastValidFrequency = ref(null);
 const isTuning = ref(false);
@@ -166,19 +164,11 @@ function updateTuning() {
 
 async function startTuning() {
   try {
-    audioContext.value = new (window.AudioContext ||
-      window.webkitAudioContext)();
-    analyser.value = audioContext.value.createAnalyser();
-    analyser.value.fftSize = 16384;
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        noiseSuppression: false,
-        autoGainControl: false,
-        deviceId: { ideal: devices.selectedMicrophone },
-      },
-    });
-    source.value = audioContext.value.createMediaStreamSource(stream);
-    source.value.connect(analyser.value);
+    if (!initialize.isInitialized) {
+      const success = await initialize.initializeAudio();
+      if (!success) throw new Error("Initialization failed");
+    }
+
     isTuning.value = true;
     trackFrequency();
   } catch (error) {
@@ -188,8 +178,6 @@ async function startTuning() {
 }
 
 function stopTuning() {
-  if (source.value) source.value.disconnect();
-  if (audioContext.value) audioContext.value.close();
   isTuning.value = false;
   frequency.value = null;
   closestNote.value = null;
@@ -201,15 +189,15 @@ function toggleTuning() {
 }
 
 function trackFrequency() {
-  const bufferLength = analyser.value.frequencyBinCount;
+  const bufferLength = initialize.analyser.frequencyBinCount;
   const dataArray = new Float32Array(bufferLength);
 
   function update() {
     if (!isTuning.value) return;
 
-    analyser.value.getFloatFrequencyData(dataArray);
+    initialize.analyser.getFloatFrequencyData(dataArray);
 
-    const paddedArray = new Float32Array(analyser.value.fftSize);
+    const paddedArray = new Float32Array(initialize.fftSize);
     paddedArray.set(dataArray);
     let maxIndex = 0;
     let maxAmplitude = -Infinity;
@@ -220,7 +208,7 @@ function trackFrequency() {
       }
     }
 
-    const sampleRate = audioContext.value.sampleRate;
+    const sampleRate = initialize.audioContext.sampleRate;
     const detectedFreq = parabolicInterpolation(
       paddedArray,
       maxIndex,
@@ -251,8 +239,6 @@ function trackFrequency() {
 }
 
 function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
-  const fftSize = analyser.value.fftSize;
-
   const leftIndex = Math.max(0, peakIndex - 1);
   const rightIndex = Math.min(spectrum.length - 1, peakIndex + 1);
 
@@ -263,12 +249,19 @@ function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
   const delta = (0.5 * (alpha - gamma)) / (alpha - 2 * beta + gamma);
   const interpolatedIndex = peakIndex + delta;
 
-  return (interpolatedIndex * sampleRate) / fftSize;
+  return (interpolatedIndex * sampleRate) / initialize.fftSize;
 }
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
-onMounted(() => window.addEventListener("resize", handleResize));
-onUnmounted(() => window.removeEventListener("resize", handleResize));
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  toggleTuning();
+  console.log("Tuning started");
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+  stopTuning();
+});
 </script>
