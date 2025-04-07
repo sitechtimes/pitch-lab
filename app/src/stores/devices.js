@@ -70,19 +70,9 @@ export const devicesStore = defineStore(
         };
 
         const updateInputDevice = async () => {
-            try {
-                if (!initialize.audioContext) {
-                    return;
-                } else if (initialize.inputGainNode) {
-                    initialize.inputGainNode.disconnect();
-                }
-
-                const source = initialize.audioContext.createMediaStreamSource(initialize.stream);
-                source.connect(initialize.inputGainNode);
-                console.log(`Input device updated to: ${selectedMicrophone.value}`);
-            } catch (error) {
-                console.error("Error updating input device:", error);
-            }
+            cleanupAudio();
+            await initialize.initializeAudio();
+            console.log("Input device updated:", selectedMicrophone.value);
         };
 
         const cleanupAudio = () => {
@@ -145,6 +135,10 @@ export const devicesStore = defineStore(
         };
 
         return {
+            microphonesNoDeviceId,
+            speakersNoDeviceId,
+            microphonesWithDeviceId,
+            speakersWithDeviceId,
             microphones,
             speakers,
             inputVolume,

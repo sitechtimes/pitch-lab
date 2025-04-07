@@ -9,13 +9,8 @@
         id="microphone"
         v-model="devices.selectedMicrophone"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
-        :disabled="isLoading"
-        @change="devices.updateInputDevice(devices.selectedMicrophone)"
+        @change="devices.updateInputDevice()"
       >
-        <option v-if="isLoading" value="" disabled>
-          Loading microphones...
-        </option>
-
         <option
           v-for="device in devices.microphones"
           :key="device.deviceId || device.label"
@@ -64,33 +59,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import { devicesStore } from "@/stores/devices";
 import { initializeStore } from "../../../../stores/initialize";
 
 const initialize = initializeStore();
 const devices = devicesStore();
-const isLoading = ref(true);
 const errorMessage = ref("");
 const isTesting = ref(false);
-const source = ref(null);
 const averageVolume = ref(0);
 let loop = null;
-
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    await devices.getDevices();
-    if (!devices.selectedMicrophone && devices.microphones.length > 0) {
-      devices.selectedMicrophone = devices.microphones[0].deviceId;
-    }
-  } catch (error) {
-    errorMessage.value = "Please allow microphone access to continue";
-    console.error(error);
-  } finally {
-    isLoading.value = false;
-  }
-});
 
 watch(
   () => devices.inputVolume,
@@ -100,24 +78,12 @@ watch(
 );
 
 const testMic = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      noiseSuppression: false,
-      echoCancellation: true,
-      autoGainControl: false,
-      deviceId: devices.selectedMicrophone,
-    },
-  });
-  const analyser = initialize.audioContext.createAnalyser();
-  analyser.fftSize = 512;
-
-  source.value = initialize.audioContext.createMediaStreamSource(stream);
-  source.value.connect(analyser);
-  const bufferLength = analyser.frequencyBinCount;
+  initialize.source.connect(initialize.analyser);
+  const bufferLength = initialize.analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
 
   function calculateVolume() {
-    analyser.getByteFrequencyData(dataArray);
+    initialize.analyser.getByteFrequencyData(dataArray);
     let sum = 0;
     for (let i = 0; i < bufferLength; i++) {
       sum += dataArray[i];
@@ -128,7 +94,7 @@ const testMic = async () => {
 
   watch(isTesting, () => {
     if (isTesting.value === false) {
-      source.value.disconnect();
+      initialize.source.disconnect();
       clearInterval(loop);
       loop = null;
     }

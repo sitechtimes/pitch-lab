@@ -27,6 +27,7 @@ export const initializeStore = defineStore(
           !devices.microphonesWithDeviceId &&
           !devices.microphonesNoDeviceId
         ) {
+          console.log("microphones" + devices.microphonesWithDeviceId, devices.microphonesNoDeviceId)
           await devices.getDevices();
         }
 

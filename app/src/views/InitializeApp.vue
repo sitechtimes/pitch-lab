@@ -76,7 +76,7 @@ onMounted(async () => {
     if (!devices.selectedSpeaker.value) {
       console.log("Both microphone and speaker detected");
     }
-    //some logs
+
     if (initialize.noMicrophones && initialize.noSpeakers) {
       console.log("No microphone and speaker detected");
     } else if (initialize.noMicrophones) {

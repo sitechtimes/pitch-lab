@@ -22,10 +22,7 @@
       id="speaker"
       v-model="devices.selectedSpeaker"
       class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
-      :disabled="isLoading"
     >
-      <option v-if="isLoading" value="" disabled>Loading speakers...</option>
-
       <!-- Speakers with deviceId -->
       <option
         v-for="device in devices.speakersWithDeviceId"
@@ -61,13 +58,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { initializeStore } from "@/stores/initialize";
 import { devicesStore } from "@/stores/devices";
 const devices = devicesStore();
 const initialize = initializeStore();
 const visualizerCanvas = ref(null);
-const isLoading = ref(true);
+
 const errorMessage = ref("");
 const animationFrameId = ref(null);
 const isTesting = ref(false);
@@ -146,19 +143,4 @@ const stopTesting = () => {
   isTesting.value = false;
   clearInterval(loop.value);
 };
-
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    if (!devices.selectedSpeaker && !devices.speakers > 0) {
-      devices.selectedSpeaker = devices.speakers[0].deviceId;
-    }
-    setupVisualizer();
-  } catch (error) {
-    errorMessage.value = "Please allow speaker access to continue";
-    console.error(error);
-  } finally {
-    isLoading.value = false;
-  }
-});
 </script>
