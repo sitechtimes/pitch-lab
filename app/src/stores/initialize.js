@@ -92,7 +92,7 @@ export const initializeStore = defineStore(
           .connect(audioContext.value.destination);
 
         console.log("Audio nodes initialized:", {
-          analyser: !!analyser.value,
+          analyser: analyser.value,
           context: audioContext.value.state,
         });
 
@@ -102,6 +102,14 @@ export const initializeStore = defineStore(
 
         isInitialized.value = true;
         console.log("Audio initialized successfully");
+        setTimeout(() => {
+          console.log("AFTER INIT:", {
+            context: audioContext.value,
+            analyser: analyser.value,
+            source: source.value,
+          });
+        }, 10000);
+
         return true;
       } catch (error) {
         console.error("Audio initialization failed:", error);
@@ -109,6 +117,7 @@ export const initializeStore = defineStore(
         devices.cleanupAudio();
         return false;
       }
+
     };
 
     return {

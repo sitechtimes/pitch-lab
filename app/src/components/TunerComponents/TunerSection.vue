@@ -172,14 +172,17 @@ function updateTuning() {
 }
 
 async function startTuning() {
+  if (initialize.audioContext.value.state === "suspended") {
+    await initialize.audioContext.value.resume();
+  }
   try {
     if (!initialize.isInitialized) {
       const success = await initialize.initializeAudio();
       if (!success) throw new Error("Initialization failed");
     }
-
+    console.log(initialize.audioContext);
     isTuning.value = true;
-
+    initialize.initializeAudio();
     trackFrequency();
   } catch (error) {
     console.error("Error starting tuning:", error);
@@ -200,7 +203,8 @@ function toggleTuning() {
 
 function trackFrequency() {
   const bufferLength = initialize.analyser.frequencyBinCount;
-  console.log("Buffer Length:", bufferLength);
+  console.log("aud:", initialize.audioContext);
+  console.log("analyser:", initialize.analyser);
   const dataArray = new Float32Array(bufferLength);
 
   function update() {

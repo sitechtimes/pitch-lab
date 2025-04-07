@@ -77,7 +77,7 @@ export const devicesStore = defineStore(
 
         const cleanupAudio = () => {
             if (initialize.stream) {
-                initialize.stream.getTracks().forEach((track) => track.stop());
+                initialize.stream.value?.getTracks().forEach((track) => track.stop());
                 initialize.stream = null;
             }
 
