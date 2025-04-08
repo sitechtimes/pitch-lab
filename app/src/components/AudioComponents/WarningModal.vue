@@ -14,7 +14,7 @@
         <p>Do you want to proceed?</p>            
           </div>    
           <div class="flex justify-center space-x-4 mt-4">
-             <button @click="killIt" class="bg-purple rounded-lg text-xl px-2">Yes</button>
+            <button @click="killIt" class="bg-purple rounded-lg text-xl px-2">Yes</button>
              <button class="text-xl" @click="
             (audioStore.warning = false);">Cancel</button>
             </div>
@@ -25,29 +25,27 @@
 </template>
 
 <script setup>
-import { audioFiles } from "@/stores/audioFiles";
-import { persistedSettings } from "@/stores/persistedStore";
+import { audioFilesStore } from "@/stores/audioFiles";
 
-const audioStore = audioFiles();
-const persistedStore = persistedSettings();
+const audioStore = audioFilesStore();
 
 const killIt = () => {
   if (audioStore.deleteFunc === "single") {
     deleteRecent();
   } else {
-    persistedStore.recentlyDeleted = [];
-    audioStore.currentAudio = null;
+    audioStore.recentlyDeleted = [];
+    audioStore.currentRecording = null;
     audioStore.warning = false;
   }
 };
 
 const deleteRecent = () => {
-  let index = persistedStore.recentlyDeleted.findIndex(
-    (file) => file.id === audioStore.currentAudio.id,
+  let index = audioStore.recentlyDeleted.findIndex(
+    (file) => file.id === audioStore.currentRecording.id,
   );
   console.log("found it", index);
-  persistedStore.recentlyDeleted.splice(index, 1);
-  audioStore.currentAudio = null;
+  audioStore.recentlyDeleted.splice(index, 1);
+  audioStore.currentRecording = null;
   audioStore.warning = false;
 };
 </script>
