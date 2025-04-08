@@ -6,18 +6,28 @@
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
     >
       <div class="w-full flex flex-row justify-between mb-[1%]">
-        <h1 class="text-3xl font-semibold mb-2" v-if="!audioStore.viewingDeleted">History</h1>
-        <h1 class="text-3xl font-semibold mb-2" v-if="audioStore.viewingDeleted">Recently Deleted</h1>
+        <h1
+          class="text-3xl font-semibold mb-2"
+          v-if="!audioStore.showDeletedModal"
+        >
+          History
+        </h1>
+        <h1
+          class="text-3xl font-semibold mb-2"
+          v-if="audioStore.showDeletedModal"
+        >
+          Recently Deleted
+        </h1>
         <button
-          v-if="!audioStore.viewingDeleted"
-          @click="audioStore.viewingDeleted = true"
-          class="text-xl bg-purple rounded-full p-2 mb-2"
+          v-if="!audioStore.showDeletedModal"
+          @click="audioStore.showDeletedModal = true"
+          class="text-xl bg-purple rounded-full p-1 mb-2"
         >
           Go to recently deleted
         </button>
         <button
-          v-if="audioStore.viewingDeleted"
-          @click="audioStore.viewingDeleted = false"
+          v-if="audioStore.showDeletedModal"
+          @click="audioStore.showDeletedModal = false"
           class="text-xl bg-purple rounded-full p-1 mb-2"
         >
           Go back to history
@@ -26,17 +36,19 @@
       <div class="w-[80%] flex justify-center">
       <div class="flex flex-row justify-between ">
         <div class="flex items-center h-full">
-          <PastAudio v-if="!audioStore.viewingDeleted" />
-          <RecentlyDeleted v-if="audioStore.viewingDeleted" />
+          <PastAudio v-if="!audioStore.showHistoryModal" />
+          <RecentlyDeleted v-if="audioStore.showDeletedModal" />
         </div>
-        <div v-if="audioStore.currentAudio">
+        <div v-if="audioStore.currentRecording">
           <AudioPlayback />
         </div>
       </div>
     </div>
       <button
         @click="
-          (audioStore.viewingHistory = false), (audioStore.currentAudio = null), (audioStore.viewingDeleted = false)
+          (audioStore.showHistoryModal = false),
+            (audioStore.currentAudio = null),
+            (audioStore.showDeletedModal = false)
         "
         class="text-xl"
       >
@@ -50,10 +62,6 @@
 import AudioPlayback from "./AudioPlayback.vue";
 import PastAudio from "./PastAudio.vue";
 import RecentlyDeleted from "./RecentlyDeleted.vue";
-import { audioFiles } from "@/stores/audioFiles";
-const audioStore = audioFiles();
+import { audioFilesStore } from "@/stores/audioFiles";
+const audioStore = audioFilesStore();
 </script>
-
-<style scoped>
-
-</style>

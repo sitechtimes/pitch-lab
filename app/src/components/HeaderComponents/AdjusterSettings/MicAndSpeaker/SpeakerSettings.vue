@@ -1,80 +1,80 @@
 <template>
-  <div>
-    <!-- Speaker Selection -->
-    <div class="mb-6">
-      <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
-      <button
-        v-if="!isTesting"
-        @click="testSpeaker"
-        class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4"
-      >
-        Test Speaker
-      </button>
-      <button
-        v-if="isTesting"
-        @click="stopTesting"
-        class="bg-[#A3D10A] text-black w-[20%] rounded-lg"
-      >
-        Stop Testing
-      </button>
+  <!-- Speaker Selection -->
+  <div class="mb-6">
+    <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
 
-      <select
-        id="speaker"
-        v-model="persistedStore.selectedSpeaker"
-        class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
-        :disabled="isLoading"
+    <button
+      v-if="!isTesting"
+      @click="testSpeaker"
+      class="bg-[#36C4E4] text-black w-[20%] rounded-lg mr-4"
+    >
+      Test Speaker
+    </button>
+    <button
+      v-if="isTesting"
+      @click="stopTesting"
+      class="bg-[#A3D10A] text-black w-[20%] rounded-lg"
+    >
+      Stop Testing
+    </button>
+
+    <select
+      id="speaker"
+      v-model="devices.selectedSpeaker"
+      class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
+      @change="
+        () => {
+          stopTesting();
+          devices.updateDevice();
+        }
+      "
+    >
+      <!-- Speakers with deviceId -->
+      <option
+        v-for="device in devices.speakersWithDeviceId"
+        :key="device.deviceId"
+        :value="device"
       >
-        <option v-if="isLoading" value="" disabled>Loading speakers...</option>
-        <option
-          v-for="device in store.speakers"
-          :key="device.deviceId"
-          :value="device.deviceId"
-        >
-          {{
-            device.label ||
-            (device.deviceId
-              ? `Speaker ${shortId(device.deviceId)}`
-              : "System Default")
-          }}
-        </option>
-        <option v-if="store.speakers.length === 0" value="" disabled>
-          No speakers found
-        </option>
-      </select>
-    </div>
+        {{
+          device.label ||
+          (device.deviceId
+            ? `Speaker ${shortId(device.deviceId)}`
+            : "System Default")
+        }}
+      </option>
 
-    <!-- Volume Control -->
-    <div class="audio-controls mb-6">
-      <label for="output-volume" class="block text-white text-sm mb-2">
-        Output Volume: {{ store.outputVolume }}
-      </label>
-      <input
-        id="output-volume"
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        v-model.number="store.outputVolume"
-        class="w-full range range-purple"
-      />
-    </div>
+      <!-- Speakers without deviceId -->
+      <option
+        v-for="device in devices.speakersNoDeviceId"
+        :key="device.kind + '-' + device.label"
+        :value="device"
+      >
+        {{ device.label || "Default Speaker (no ID)" }}
+      </option>
 
-    <!-- Error Message -->
-    <div v-if="errorMessage" class="text-red-500 text-sm">
-      {{ errorMessage }}
-    </div>
+      <option
+        v-if="!devices.speakersWithDeviceId && !devices.speakersNoDeviceId"
+        value=""
+        disabled
+      >
+        No speakers found
+      </option>
+    </select>
+    <canvas
+      ref="visualizerCanvas"
+      class="w-full h-[100px] mt-4 border border-purple rounded"
+    ></canvas>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { settingsStore } from "../../../../stores/settings";
-import { persistedSettings } from "../../../../stores/persistedStore";
-
-const store = settingsStore();
-const persistedStore = persistedSettings();
+import { ref } from "vue";
+import { initializeStore } from "@/stores/initialize";
+import { devicesStore } from "@/stores/devices";
+const devices = devicesStore();
+const initialize = initializeStore();
 const visualizerCanvas = ref(null);
-const isLoading = ref(true);
+
 const errorMessage = ref("");
 const animationFrameId = ref(null);
 const isTesting = ref(false);
@@ -86,15 +86,15 @@ let bufferLength = null;
 let dataArray = null;
 
 const setupVisualizer = () => {
-  if (!store.audioContext.value) return;
+  if (!initialize.audioContext.value) return;
 
-  analyser = store.audioContext.value.createAnalyser();
+  analyser = initialize.audioContext.value.createAnalyser();
   analyser.fftSize = 256;
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
 
   // Connect audio output to analyser
-  store.outputGainNode.value.connect(analyser);
+  initialize.outputGainNode.value.connect(analyser);
 
   drawVisualizer();
 };
@@ -129,37 +129,31 @@ const drawVisualizer = () => {
 const shortId = (id) => id.slice(0, 5);
 
 const testSpeaker = async () => {
-  if (!persistedStore.selectedSpeaker) return;
+  if (!devices.selectedSpeaker || !devices.selectedSpeaker.deviceId) return;
+
   isTesting.value = true;
   const audio = new Audio();
   audio.src = "/quack.mp3";
-  audio.setSinkId(persistedStore.selectedSpeaker);
-  loop.value = setInterval(() => {
-    audio.play();
-  }, 100);
+
+  try {
+    // Only works in Chrome-based browsers
+    await audio.setSinkId(devices.selectedSpeaker.deviceId);
+  } catch (err) {
+    console.warn("setSinkId not supported or failed:", err);
+    errorMessage.value =
+      "Your browser doesn't support selecting output devices.";
+  }
+
+  audio.onended = () => {
+    if (isTesting.value) {
+      audio.play();
+    }
+  };
+  audio.play();
 };
 
 const stopTesting = () => {
   isTesting.value = false;
   clearInterval(loop.value);
 };
-
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    // First initialize audio to ensure permission
-    await store.initializeAudio();
-    await store.getDevices();
-
-    if (!persistedStore.selectedSpeaker && store.speakers.length > 0) {
-      persistedStore.selectedSpeaker = store.speakers[0].deviceId;
-    }
-    setupVisualizer();
-  } catch (error) {
-    errorMessage.value = "Please allow speaker access to continue";
-    console.error(error);
-  } finally {
-    isLoading.value = false;
-  }
-});
 </script>

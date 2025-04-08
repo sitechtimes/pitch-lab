@@ -99,11 +99,16 @@
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
-import { persistedSettings } from "@/stores/persistedStore";
+import { devicesStore } from "@/stores/devices";
 
-const audioContext = ref(null);
-const analyser = ref(null);
-const source = ref(null);
+const devices = devicesStore();
+
+const localAudioContext = ref(null);
+const localStream = ref(null);
+const localSource = ref(null);
+const localGain = ref(null);
+const localAnalyser = ref(null);
+
 const frequency = ref(null);
 const lastValidFrequency = ref(null);
 const isTuning = ref(false);
@@ -117,10 +122,68 @@ const windowWidth = ref(window.innerWidth);
 const frequencyHistory = [];
 const maxHistorySize = 5;
 
+const fftSize = 4096;
 const MAX_FREQUENCY = 4186;
 const MIN_FREQUENCY = 27.5;
 
-// Indicator position for UI
+const createLocalAudioGraph = async () => {
+  try {
+    const audioConstraints =
+      devices.selectedMicrophone?.deviceId &&
+      devices.selectedMicrophone.deviceId !== ""
+        ? {
+            deviceId: { exact: devices.selectedMicrophone.deviceId },
+            noiseSuppression: false,
+            autoGainControl: false,
+          }
+        : {
+            noiseSuppression: false,
+            autoGainControl: false,
+          };
+
+    localStream.value = await navigator.mediaDevices.getUserMedia({
+      audio: audioConstraints,
+    });
+
+    localAudioContext.value = new (window.AudioContext ||
+      window.webkitAudioContext)();
+
+    const streamSource = localAudioContext.value.createMediaStreamSource(
+      localStream.value,
+    );
+    localSource.value = streamSource;
+
+    const gainNode = localAudioContext.value.createGain();
+    gainNode.gain.value = devices.inputVolume;
+    localGain.value = gainNode;
+
+    const analyserNode = localAudioContext.value.createAnalyser();
+    analyserNode.fftSize = fftSize;
+    localAnalyser.value = analyserNode;
+
+    streamSource.connect(gainNode).connect(analyserNode);
+    console.log("🔊 Local AudioContext initialized in view");
+  } catch (err) {
+    console.error("Failed to create local audio graph:", err);
+  }
+};
+
+const cleanupLocalAudio = () => {
+  localStream.value?.getTracks().forEach((track) => track.stop());
+  if (
+    localAudioContext.value &&
+    typeof localAudioContext.value.close === "function"
+  ) {
+    localAudioContext.value.close();
+  }
+  localAudioContext.value = null;
+  localStream.value = null;
+  localSource.value = null;
+  localGain.value = null;
+  localAnalyser.value = null;
+  console.log("🧼 Local audio cleaned up");
+};
+
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -128,7 +191,6 @@ const indicatorPosition = computed(() => {
   return `calc(50% + ${percentageOffset}%)`;
 });
 
-// Binary search to find the closest note
 function findClosestNote(freq) {
   let left = 0;
   let right = noteFrequencies.length - 1;
@@ -166,19 +228,12 @@ function updateTuning() {
 
 async function startTuning() {
   try {
-    audioContext.value = new (window.AudioContext ||
-      window.webkitAudioContext)();
-    analyser.value = audioContext.value.createAnalyser();
-    analyser.value.fftSize = 16384;
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        noiseSuppression: false,
-        autoGainControl: false,
-        deviceId: { ideal: persistedSettings().selectedMicrophone },
-      },
-    });
-    source.value = audioContext.value.createMediaStreamSource(stream);
-    source.value.connect(analyser.value);
+    if (!localAudioContext.value) await createLocalAudioGraph();
+
+    if (localAudioContext.value?.state === "suspended") {
+      await localAudioContext.value.resume();
+    }
+
     isTuning.value = true;
     trackFrequency();
   } catch (error) {
@@ -188,8 +243,6 @@ async function startTuning() {
 }
 
 function stopTuning() {
-  if (source.value) source.value.disconnect();
-  if (audioContext.value) audioContext.value.close();
   isTuning.value = false;
   frequency.value = null;
   closestNote.value = null;
@@ -201,15 +254,16 @@ function toggleTuning() {
 }
 
 function trackFrequency() {
-  const bufferLength = analyser.value.frequencyBinCount;
+  const analyser = localAnalyser.value;
+  const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Float32Array(bufferLength);
 
   function update() {
-    if (!isTuning.value) return;
+    if (!isTuning.value || !analyser) return;
 
-    analyser.value.getFloatFrequencyData(dataArray);
+    analyser.getFloatFrequencyData(dataArray);
 
-    const paddedArray = new Float32Array(analyser.value.fftSize);
+    const paddedArray = new Float32Array(fftSize);
     paddedArray.set(dataArray);
     let maxIndex = 0;
     let maxAmplitude = -Infinity;
@@ -220,7 +274,7 @@ function trackFrequency() {
       }
     }
 
-    const sampleRate = audioContext.value.sampleRate;
+    const sampleRate = localAudioContext.value.sampleRate;
     const detectedFreq = parabolicInterpolation(
       paddedArray,
       maxIndex,
@@ -251,8 +305,6 @@ function trackFrequency() {
 }
 
 function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
-  const fftSize = analyser.value.fftSize;
-
   const leftIndex = Math.max(0, peakIndex - 1);
   const rightIndex = Math.min(spectrum.length - 1, peakIndex + 1);
 
@@ -269,6 +321,13 @@ function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
 };
-onMounted(() => window.addEventListener("resize", handleResize));
-onUnmounted(() => window.removeEventListener("resize", handleResize));
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  toggleTuning();
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+  stopTuning();
+  cleanupLocalAudio();
+});
 </script>

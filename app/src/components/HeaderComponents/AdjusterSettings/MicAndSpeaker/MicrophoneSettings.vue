@@ -7,22 +7,19 @@
       </label>
       <select
         id="microphone"
-        v-model="persistedStore.selectedMicrophone"
+        v-model="devices.selectedMicrophone"
         class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
-        :disabled="isLoading"
-        @change="store.updateInputDevice(persistedStore.selectedMicrophone)"
+        @change="devices.updateInputDevice()"
       >
-        <option v-if="isLoading" value="" disabled>
-          Loading microphones...
-        </option>
         <option
-          v-for="device in store.microphones"
-          :key="device.deviceId"
-          :value="device.deviceId"
+          v-for="device in devices.microphones"
+          :key="device.deviceId || device.label"
+          :value="device"
         >
           {{ device.label || `Microphone ${device.deviceId.slice(0, 5)}` }}
         </option>
-        <option v-if="store.microphones.length === 0" value="" disabled>
+
+        <option v-if="devices.microphones.length === 0" value="" disabled>
           No microphones found
         </option>
       </select>
@@ -43,7 +40,7 @@
     <div id="dynamic-bar" :style="barStyle"></div>
     <div class="audio-controls mb-6">
       <label for="input-volume" class="block text-white text-sm mb-2">
-        Input Volume: {{ persistedStore.inputVolume }}
+        Input Volume: {{ devices.inputVolume }}
       </label>
       <input
         id="input-volume"
@@ -51,7 +48,7 @@
         min="0"
         max="1"
         step="0.01"
-        v-model="persistedStore.inputVolume"
+        v-model="devices.inputVolume"
         class="w-full range range-purple"
       />
     </div>
@@ -62,75 +59,60 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
-import { settingsStore } from "../../../../stores/settings";
-import { persistedSettings } from "../../../../stores/persistedStore";
-const store = settingsStore();
-const persistedStore = persistedSettings();
-const isLoading = ref(true);
+import { ref, watch, computed } from "vue";
+import { devicesStore } from "@/stores/devices";
+import { initializeStore } from "../../../../stores/initialize";
+
+const initialize = initializeStore();
+const devices = devicesStore();
 const errorMessage = ref("");
 const isTesting = ref(false);
-const source = ref(null);
 const averageVolume = ref(0);
 let loop = null;
 
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    await store.initializeAudio();
-    await store.getDevices();
-    if (!persistedStore.selectedMicrophone && store.microphones.length > 0) {
-      persistedStore.selectedMicrophone = store.microphones[0].deviceId;
-    }
-  } catch (error) {
-    errorMessage.value = "Please allow microphone access to continue";
-    console.error(error);
-  } finally {
-    isLoading.value = false;
-  }
-});
-
 watch(
-  () => persistedStore.inputVolume,
+  () => devices.inputVolume,
   (newVolume) => {
-    store.setInputVolume(newVolume);
+    devices.setInputVolume(newVolume);
   },
 );
 
 const testMic = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      noiseSuppression: false,
-      echoCancellation: true,
-      autoGainControl: false,
-      deviceId: persistedStore.selectedMicrophone,
-    },
-  });
-  const analyser = store.audioContext.createAnalyser();
-  analyser.fftSize = 512;
-
-  source.value = store.audioContext.createMediaStreamSource(stream);
-  source.value.connect(analyser);
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  function calculateVolume() {
-    analyser.getByteFrequencyData(dataArray);
-    let sum = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      sum += dataArray[i];
-    }
-    averageVolume.value = sum / bufferLength;
+  if (!initialize.source?.value || !initialize.analyser?.value) {
+    errorMessage.value =
+      "Microphone not initialized. Please allow mic access or reselect your input.";
+    return;
   }
-  loop = setInterval(calculateVolume, 100);
 
-  watch(isTesting, () => {
-    if (isTesting.value === false) {
-      source.value.disconnect();
-      clearInterval(loop);
-      loop = null;
+  try {
+    initialize.source.value.connect(initialize.analyser.value);
+
+    const bufferLength = initialize.analyser.value.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function calculateVolume() {
+      initialize.analyser.value.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i];
+      }
+      averageVolume.value = sum / bufferLength;
     }
-  });
+
+    loop = setInterval(calculateVolume, 100);
+
+    watch(isTesting, () => {
+      if (!isTesting.value) {
+        initialize.source.value?.disconnect();
+        clearInterval(loop);
+        loop = null;
+      }
+    });
+  } catch (err) {
+    console.error("Mic test failed:", err);
+    errorMessage.value =
+      "Mic test failed. Try refreshing or switching microphones.";
+  }
 };
 
 const barStyle = computed(() => {
