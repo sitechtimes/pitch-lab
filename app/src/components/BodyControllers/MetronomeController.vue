@@ -91,7 +91,8 @@ import { devicesStore } from "@/stores/devices";
 import quackSound from "@/assets/audio/quack.mp3";
 import tackSound from "@/assets/audio/tack.mp3";
 import mooSound from "@/assets/audio/moo.mp3";
-import croackSound from "@/assets/audio/croak.mp3";
+import croakSound from "@/assets/audio/croak.mp3";
+
 const devices = devicesStore();
 const timeSignature = ref("4");
 const timeSignatureDenominator = ref("4");
@@ -106,7 +107,7 @@ const soundMap = {
   quack: quackSound,
   tack: tackSound,
   moo: mooSound,
-  croack: croackSound,
+  croak: croakSound,
 };
 
 const availableSounds = ref(["quack", "tack", "moo", "croak"]);
@@ -121,10 +122,6 @@ const loadSound = () => {
 
   try {
     audio = new Audio(soundMap[selectedSound.value]);
-
-    audio.setSinkId?.(devices.selectedSpeaker).catch((err) => {
-      console.warn("setSinkId not supported:", err);
-    });
 
     audio.volume = devices.outputVolume;
     audio.load();
