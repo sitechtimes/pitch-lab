@@ -21,22 +21,24 @@
             }"
           ></div>
           <div
-            class="w-2 h-16 bg-yellow-500 absolute"
+            class="w-2 h-16 bg-yellow-500 absolute transition-all duration-200 ease-in-out"
             :style="{
               left: indicatorPosition,
               transform: 'translateX(-50%) translateY(-50%)',
               top: '50%',
               border: '4px solid yellow',
+              borderRadius: '4px',
             }"
           ></div>
           <div
             v-for="j in 11"
             :key="`label-${j}`"
-            class="absolute text-2xl text-white"
+            class="absolute text-2xl text-white font-mono"
             :style="{
               left: `${(2 * j - 2) * 5}%`,
-              bottom: '-30px',
+              bottom: '-40px',
               transform: 'translateX(-50%)',
+              textShadow: '0 0 6px rgba(255,255,255,0.4)',
             }"
           >
             {{ (j - 6) * 10 }}
@@ -87,7 +89,7 @@
 
       <div class="flex flex-col items-center py-9">
         <button
-          class="bg-tuner-bg text-white font-bold py-2 px-4 text-3xl rounded shadow"
+          class="bg-tuner-bg hover:bg-tuner-bg/80 active:scale-95 transition-all text-white font-bold py-2 px-4 text-3xl rounded shadow"
           @click="toggleTuning"
         >
           {{ isTuning ? "Stop Tuning" : "Start Tuning" }}
@@ -104,12 +106,18 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
-import { initializeStore } from "../../stores/initialize";
-const initialize = initializeStore();
+import { devicesStore } from "@/stores/devices";
+
+const devices = devicesStore();
+
+const localAudioContext = ref(null);
+const localStream = ref(null);
+const localSource = ref(null);
+const localGain = ref(null);
+const localAnalyser = ref(null);
 
 const frequency = ref(null);
 const lastValidFrequency = ref(null);
@@ -124,10 +132,68 @@ const windowWidth = ref(window.innerWidth);
 const frequencyHistory = [];
 const maxHistorySize = 5;
 
+const fftSize = 4096;
 const MAX_FREQUENCY = 4186;
 const MIN_FREQUENCY = 27.5;
 
-// Indicator position for UI
+const createLocalAudioGraph = async () => {
+  try {
+    const audioConstraints =
+      devices.selectedMicrophone?.deviceId &&
+      devices.selectedMicrophone.deviceId !== ""
+        ? {
+            deviceId: { exact: devices.selectedMicrophone.deviceId },
+            noiseSuppression: true,
+            autoGainControl: false,
+          }
+        : {
+            noiseSuppression: true,
+            autoGainControl: false,
+          };
+
+    localStream.value = await navigator.mediaDevices.getUserMedia({
+      audio: audioConstraints,
+    });
+
+    localAudioContext.value = new (window.AudioContext ||
+      window.webkitAudioContext)();
+
+    const streamSource = localAudioContext.value.createMediaStreamSource(
+      localStream.value,
+    );
+    localSource.value = streamSource;
+
+    const gainNode = localAudioContext.value.createGain();
+    gainNode.gain.value = devices.inputVolume;
+    localGain.value = gainNode;
+
+    const analyserNode = localAudioContext.value.createAnalyser();
+    analyserNode.fftSize = fftSize;
+    localAnalyser.value = analyserNode;
+
+    streamSource.connect(gainNode).connect(analyserNode);
+    console.log("🔊 Local AudioContext initialized in view");
+  } catch (err) {
+    console.error("Failed to create local audio graph:", err);
+  }
+};
+
+const cleanupLocalAudio = () => {
+  localStream.value?.getTracks().forEach((track) => track.stop());
+  if (
+    localAudioContext.value &&
+    typeof localAudioContext.value.close === "function"
+  ) {
+    localAudioContext.value.close();
+  }
+  localAudioContext.value = null;
+  localStream.value = null;
+  localSource.value = null;
+  localGain.value = null;
+  localAnalyser.value = null;
+  console.log("🧼 Local audio cleaned up");
+};
+
 const indicatorPosition = computed(() => {
   const maxRange = 50;
   let detune = Math.max(Math.min(detuneValue.value, maxRange), -maxRange);
@@ -135,7 +201,6 @@ const indicatorPosition = computed(() => {
   return `calc(50% + ${percentageOffset}%)`;
 });
 
-// Binary search to find the closest note
 function findClosestNote(freq) {
   let left = 0;
   let right = noteFrequencies.length - 1;
@@ -172,17 +237,14 @@ function updateTuning() {
 }
 
 async function startTuning() {
-  if (initialize.audioContext.value.state === "suspended") {
-    await initialize.audioContext.value.resume();
-  }
   try {
-    if (!initialize.isInitialized) {
-      const success = await initialize.initializeAudio();
-      if (!success) throw new Error("Initialization failed");
+    if (!localAudioContext.value) await createLocalAudioGraph();
+
+    if (localAudioContext.value?.state === "suspended") {
+      await localAudioContext.value.resume();
     }
-    console.log(initialize.audioContext);
+
     isTuning.value = true;
-    initialize.initializeAudio();
     trackFrequency();
   } catch (error) {
     console.error("Error starting tuning:", error);
@@ -202,17 +264,16 @@ function toggleTuning() {
 }
 
 function trackFrequency() {
-  const bufferLength = initialize.analyser.frequencyBinCount;
-  console.log("aud:", initialize.audioContext);
-  console.log("analyser:", initialize.analyser);
+  const analyser = localAnalyser.value;
+  const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Float32Array(bufferLength);
 
   function update() {
-    if (!isTuning.value) return;
+    if (!isTuning.value || !analyser) return;
 
-    initialize.analyser.value?.getFloatFrequencyData(dataArray);
+    analyser.getFloatFrequencyData(dataArray);
 
-    const paddedArray = new Float32Array(initialize.fftSize);
+    const paddedArray = new Float32Array(fftSize);
     paddedArray.set(dataArray);
     let maxIndex = 0;
     let maxAmplitude = -Infinity;
@@ -223,7 +284,7 @@ function trackFrequency() {
       }
     }
 
-    const sampleRate = initialize.audioContext.sampleRate;
+    const sampleRate = localAudioContext.value.sampleRate;
     const detectedFreq = parabolicInterpolation(
       paddedArray,
       maxIndex,
@@ -264,7 +325,7 @@ function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
   const delta = (0.5 * (alpha - gamma)) / (alpha - 2 * beta + gamma);
   const interpolatedIndex = peakIndex + delta;
 
-  return (interpolatedIndex * sampleRate) / initialize.fftSize;
+  return (interpolatedIndex * sampleRate) / fftSize;
 }
 
 const handleResize = () => {
@@ -273,10 +334,10 @@ const handleResize = () => {
 onMounted(() => {
   window.addEventListener("resize", handleResize);
   toggleTuning();
-  console.log("Tuning started");
 });
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   stopTuning();
+  cleanupLocalAudio();
 });
 </script>

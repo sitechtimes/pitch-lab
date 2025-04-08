@@ -2,11 +2,7 @@
   <div
     class="fixed inset-0 flex items-center justify-center bg-gray-900 text-white z-50"
   >
-    <button
-      @click="initialize.initializeAudio"
-      :disabled="initialize.cannotInitialize"
-      class="text-center"
-    >
+    <button @click="initialize.initializeAudio" class="text-center">
       <div class="text-4xl mb-4">
         <div v-if="initialize.cannotInitialize">
           <div v-if="initialize.noMicrophones && initialize.noSpeakers">

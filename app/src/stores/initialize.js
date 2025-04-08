@@ -6,9 +6,9 @@ export const initializeStore = defineStore(
   "initializeStore",
   () => {
     const devices = devicesStore();
+
     const audioContext = ref(null);
     const analyser = ref(null);
-    const mediaStreamDestination = ref(null);
     const stream = ref(null);
     const source = ref(null);
     const inputGainNode = ref(null);
@@ -60,10 +60,10 @@ export const initializeStore = defineStore(
               autoGainControl: false,
             };
 
-        console.log("Audio constraints:", audioConstraints);
         stream.value = await navigator.mediaDevices.getUserMedia({
           audio: audioConstraints,
         });
+        registerStream(stream.value);
 
         if (!audioContext.value) {
           console.error("AudioContext is not initialized.");
@@ -79,7 +79,9 @@ export const initializeStore = defineStore(
         outputGainNode.value = audioContext.value.createGain();
         outputGainNode.value.gain.value = devices.outputVolume || 1.0;
 
-        source.value = audioContext.value.createMediaStreamSource(stream.value);
+        const sourceNode = audioContext.value.createMediaStreamSource(stream.value);
+        registerSourceNode(sourceNode);
+
         const highPassFilter = audioContext.value.createBiquadFilter();
         highPassFilter.type = "highpass";
         highPassFilter.frequency.value = 50;
@@ -96,19 +98,13 @@ export const initializeStore = defineStore(
           context: audioContext.value.state,
         });
 
-        devices.registerAudioContext(audioContext.value);
-        devices.registerInputGainNode(inputGainNode.value);
-        devices.registerOutputGainNode(outputGainNode.value);
+        registerAudioContext(audioContext.value);
+        registerInputGainNode(inputGainNode.value);
+        registerOutputGainNode(outputGainNode.value);
 
         isInitialized.value = true;
         console.log("Audio initialized successfully");
-        setTimeout(() => {
-          console.log("AFTER INIT:", {
-            context: audioContext.value,
-            analyser: analyser.value,
-            source: source.value,
-          });
-        }, 10000);
+
 
         return true;
       } catch (error) {
@@ -120,11 +116,34 @@ export const initializeStore = defineStore(
 
     };
 
+    const registerAudioContext = (context) => {
+      console.log("Registering AudioContext", context);
+      audioContext.value = context;
+    };
+
+    const registerInputGainNode = (node) => {
+      console.log("Registering Input Gain Node", node);
+      inputGainNode.value = node;
+    };
+    const registerOutputGainNode = (node) => {
+      console.log("Registering Output Gain Node:", node);
+      outputGainNode.value = node;
+    };
+
+    const registerStream = (mediaStream) => {
+      console.log("Registering MediaStream:", mediaStream);
+      stream.value = mediaStream;
+    };
+
+    const registerSourceNode = (sourceNode) => {
+      console.log("Registering Source Node:", sourceNode);
+      source.value = sourceNode;
+    };
+
     return {
       audioContext,
       inputGainNode,
       outputGainNode,
-      mediaStreamDestination,
       stream,
       source,
       analyser,
@@ -133,7 +152,10 @@ export const initializeStore = defineStore(
       fftSize,
       cannotInitialize,
       noMicrophones,
-      noSpeakers
+      noSpeakers,
+      registerAudioContext,
+      registerInputGainNode,
+      registerOutputGainNode,
     };
   },
   {

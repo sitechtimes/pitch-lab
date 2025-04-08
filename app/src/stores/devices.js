@@ -108,19 +108,6 @@ export const devicesStore = defineStore(
         };
 
 
-        const registerAudioContext = (context) => {
-            console.log("Registering AudioContext", context);
-            initialize.audioContext = context;
-        };
-
-        const registerInputGainNode = (node) => {
-            console.log("Registering Input Gain Node", node);
-            initialize.inputGainNode = node;
-        };
-        const registerOutputGainNode = (node) => {
-            console.log("Registering Output Gain Node:", node);
-            initialize.outputGainNode = node;
-        };
         const setInputVolume = (volume) => {
             inputVolume.value = Math.max(0, Math.min(1, volume));
             if (initialize.inputGainNode) {
@@ -150,9 +137,6 @@ export const devicesStore = defineStore(
             selectedMicrophone,
             selectedSpeaker,
             cleanupAudio,
-            registerAudioContext,
-            registerInputGainNode,
-            registerOutputGainNode
         }
     },
     {
