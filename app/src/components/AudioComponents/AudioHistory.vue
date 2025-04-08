@@ -8,7 +8,7 @@
         >
           <option disabled value="">History:</option>
           <option
-            v-for="file in persistedStore.pastAudio"
+            v-for="file in audioStore.audioHistory"
             :key="file.id"
             :value="{ audio: file.audio, id: file.id }"
             @change="audioStore.fileName = file.name"
@@ -75,7 +75,7 @@ const saveAudio = () => {
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName() === true) {
-      audioStore.pastAudio[index].name = audioStore.fileName.trim();
+      audioStore.audioHistory[index].name = audioStore.fileName.trim();
     }
   } else {
     console.log(
@@ -138,6 +138,6 @@ const deleteAudio = () => {
 const autoDisappear = () => {
   setTimeout(() => {
     saving.value = null;
-  }, 2000);
+  }, 1500);
 };
 </script>

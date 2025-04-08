@@ -14,7 +14,7 @@
         <p>Do you want to proceed?</p>            
           </div>    
           <div class="flex justify-center space-x-4 mt-4">
-             <button @click="killIt" class="bg-purple rounded-lg text-xl px-2">Yes</button>
+            <button @click="killIt" class="bg-purple rounded-lg text-xl px-2">Yes</button>
              <button class="text-xl" @click="
             (audioStore.warning = false);">Cancel</button>
             </div>
