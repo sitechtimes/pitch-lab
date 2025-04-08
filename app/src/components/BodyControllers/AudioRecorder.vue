@@ -26,26 +26,30 @@
       <button
         type="button"
         class="text-white text-center bg-gold font-medium rounded-full text-sm bg-purple p-2 w-full"
-        @click="(audioStore.viewingHistory = true), (saving = null), (audioStore.viewingDeleted = false)"
+        @click="
+          (audioStore.showHistoryModal = true),
+            (saving = null),
+            (audioStore.showDeletedModal = false)
+        "
       >
 Saved Recordings      
 </button>
     </div>
 
     <!-- Display recorded audio playback and download link -->
-    <div v-if="audioStore.currentAudio && !isRecording" class="w-full flex items-center justify-center">
+    <div v-if="audioStore.currentRecording && !isRecording" class="w-full flex items-center justify-center">
       <div class="flex flex-row justify-between w-[85%]">
         <div>
     <div>
       <h3>Recorded Audio:</h3>
     </div>
 
-    <div :key="audioStore.currentAudio.id">
+    <div :key="audioStore.currentRecording.id">
       <audio
         ref="audioElement"
         id="audio"
         controls
-        :src="'data:audio/mp4;base64,' + audioStore.currentAudio.audio"
+        :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
         ></audio>
     </div>
     <div class="w-[90%] mt-2 flex flex-row justify-between">
@@ -59,7 +63,7 @@ Saved Recordings
         
     <div>
       <a
-      :href="'data:audio/mp4;base64,' + audioStore.currentAudio.audio"
+      :href="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
   :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
 >
         Download

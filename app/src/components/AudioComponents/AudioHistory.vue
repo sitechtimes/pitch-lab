@@ -1,14 +1,14 @@
 <template>
   <div class="flex justify-center">
-    <div class="flex flex-col justify-between items-center w-[90%]">
-      <div class="w-full">
+    <div class="flex flex-col justify-between items-center w-[85%]">
+      <div>
         <select
-          class="bg-gray-700 text-black rounded w-full"
+          class="bg-gray-700 text-black rounded w-[90%]"
           v-model="audioStore.currentAudio"
         >
           <option disabled value="">History:</option>
           <option
-            v-for="file in persistedStore.pastAudio"
+            v-for="file in audioStore.audioHistory"
             :key="file.id"
             :value="{ audio: file.audio, id: file.id }"
             @change="audioStore.fileName = file.name"
@@ -24,14 +24,20 @@
           v-model="audioStore.fileName"
           :disabled="!isEditing"
         />
-        <button class="mx-1" @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
+        <button @click="handleSave">
+          {{ isEditing ? "Save File" : "Rename File" }}
+        </button>
         <button @click="deleteAudio">Delete</button>
       </div>
-
     </div>
     <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
-      <div class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
-        :class="{'bg-red': saving === 'delete', 'bg-green': saving === 'save'}">
+      <div
+        class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
+        :class="{
+          'bg-red': saving === 'delete',
+          'bg-green': saving === 'save',
+        }"
+      >
         <p v-if="saving === 'delete'">Successfully Deleted!</p>
         <p v-if="saving === 'save'">Successfully Saved!</p>
       </div>
@@ -69,7 +75,7 @@ const saveAudio = () => {
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName() === true) {
-      audioStore.pastAudio[index].name = audioStore.fileName.trim();
+      audioStore.audioHistory[index].name = audioStore.fileName.trim();
     }
   } else {
     console.log(
