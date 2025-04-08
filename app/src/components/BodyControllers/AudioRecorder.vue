@@ -3,31 +3,27 @@
     <div class="flex flex-col items-center w-[30%]">
       <!-- Timer display -->
       <button
-        class="bg-[#36C4E4] rounded p-2 w-full"
+        class="bg-[#36C4E4] rounded-full p-2 w-full"
         @click="startRecording"
         v-if="!isRecording"
       >
         Start Recording
       </button>
       <button
-        class="bg-[#A3D10A] rounded p-2 w-full"
+        class="bg-[#A3D10A] rounded-full p-2 w-full"
         @click="stopRecording"
         v-if="isRecording"
       >
         Stop Recording
       </button>
-
-      <div class="text-black bg-white text-center p-2 rounded w-full">
+   
+      <div class="text-black bg-white text-center p-2 rounded-full w-full">
         Timer: {{ formatTime(timer) }}
       </div>
       <button
         type="button"
-        class="text-white text-center bg-gold font-medium rounded-lg text-sm bg-purple p-2 w-full"
-        @click="
-          (audioStore.showHistoryModal = true),
-            (saving = null),
-            (audioStore.showDeletedModal = false)
-        "
+        class="text-white text-center bg-gold font-medium rounded-full text-sm bg-purple p-2 w-full"
+        @click="(audioStore.viewingHistory = true), (saving = null), (audioStore.viewingDeleted = false)"
       >
         Saved Recordings
       </button>
@@ -39,33 +35,38 @@
       class="w-full flex items-center justify-center"
     >
       <div class="flex flex-row justify-between w-[85%]">
-        <div
-          :key="audioStore.currentRecording.id"
-          class="flex flex-col items-center"
-        >
-          <audio
-            ref="audioElement"
-            controls
-            :src="'data:audio/wav;base64,' + audioStore.currentRecording.audio"
-          ></audio>
-          <div class="w-[90%] mt-2 flex flex-row justify-between">
-            <input
-              id="name"
-              type="text"
-              class="text-black w-[full]"
-              v-model="audioStore.fileName"
-              placeholder="Name File"
-            />
-            <div
-              :href="
-                'data:audio/wav;base64,' + audioStore.currentRecording.audio
-              "
-              download="recorded-audio.mp4"
-            >
-              Download
-            </div>
-          </div>
-        </div>
+        <div>
+    <div>
+      <h3>Recorded Audio:</h3>
+    </div>
+
+    <div :key="audioStore.currentAudio.id">
+      <audio
+        ref="audioElement"
+        id="audio"
+        controls
+        :src="'data:audio/mp4;base64,' + audioStore.currentAudio.audio"
+        ></audio>
+    </div>
+    <div class="w-[90%] mt-2 flex flex-row justify-between">
+        <input
+        id="name"
+        type="text"
+        class="text-black w-[full]"
+        v-model="audioStore.fileName"
+        placeholder="Name File"
+        />        
+        
+    <div>
+      <a
+      :href="'data:audio/mp4;base64,' + audioStore.currentAudio.audio"
+  :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
+>
+        Download
+      </a>
+    </div>
+  </div>
+  </div>
 
         <div class="flex flex-col justify-between">
           <button class="w-full" @click="saveAudio">Save To History</button>
@@ -73,6 +74,7 @@
         </div>
       </div>
     </div>
+  </div>
 
     <!-- Placeholder message when there is no recording -->
     <div v-else class="w-full flex items-center justify-center">

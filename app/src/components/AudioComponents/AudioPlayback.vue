@@ -29,35 +29,33 @@
 </template>
 
 <script setup>
-import { audioFilesStore } from "@/stores/audioFiles";
-// import WaveSurfer from 'wavesurfer.js';
+import { watch, onMounted, useTemplateRef } from "vue";
+import { audioFiles } from "@/stores/audioFiles";
+import { persistedSettings } from "@/stores/persistedStore";
+const audioStore = audioFiles();
+const persistedStore = persistedSettings();
+const audio = useTemplateRef("audioElement");
 
-const audioStore = audioFilesStore();
-// const showWaveform = ref(false);
-// const waveformCanvas = ref(null);
-// const audioElement = ref(null);
+onMounted(() => {
+  console.log(audio);
+  audio.value.volume = persistedStore.outputVolume;
+  audio.value.setSinkId(persistedStore.selectedSpeaker);
+});
 
-// const toggleWaveform = () => {
-//   showWaveform.value = !showWaveform.value;
-//   if (showWaveform.value) {
-//     createWaveform();
-//   }
-// };
+watch(
+  () => persistedStore.selectedSpeaker,
+  (newSpeaker) => {
+    audio.value.setSinkId(newSpeaker);
+    audio.value.volume = persistedStore.outputVolume;
+  },
+);
 
-// const createWaveform = () => {
-//   const wavesurfer = WaveSurfer.create({
-//     container: waveformCanvas.value,
-//     waveColor: 'violet',
-//     progressColor: 'purple'
-//   });
-//   wavesurfer.load(audioElement.value);
-// };
-
-// onMounted(() => {
-//   if (showWaveform.value) {
-//     createWaveform();
-//   }
-// });
+watch(
+  () => persistedStore.outputVolume,
+  (newVolume) => {
+    audio.value.volume = newVolume;
+  },
+);
 </script>
 
 <style scoped>
