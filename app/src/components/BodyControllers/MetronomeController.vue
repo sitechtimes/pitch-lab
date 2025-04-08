@@ -33,7 +33,6 @@
           @change="loadSound"
           class="bg-purple text-white px-3 py-2 rounded-md text-base cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
-          <option disabled value="">Select Sound</option>
           <option v-for="sound in availableSounds" :key="sound" :value="sound">
             {{ sound }}
           </option>
@@ -96,7 +95,7 @@ import croackSound from "@/assets/audio/croak.mp3";
 const devices = devicesStore();
 const timeSignature = ref("4");
 const timeSignatureDenominator = ref("4");
-const selectedSound = ref("");
+const selectedSound = ref("tack");
 const bpm = ref(120);
 const isPlaying = ref(false);
 const isBeating = ref(false);

@@ -24,14 +24,20 @@
           v-model="audioStore.fileName"
           :disabled="!isEditing"
         />
-        <button @click="handleSave">{{ isEditing ? 'Save File' : 'Rename File' }}</button>
+        <button @click="handleSave">
+          {{ isEditing ? "Save File" : "Rename File" }}
+        </button>
         <button @click="deleteAudio">Delete</button>
       </div>
-
     </div>
     <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
-      <div class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
-        :class="{'bg-red': saving === 'delete', 'bg-green': saving === 'save'}">
+      <div
+        class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
+        :class="{
+          'bg-red': saving === 'delete',
+          'bg-green': saving === 'save',
+        }"
+      >
         <p v-if="saving === 'delete'">Successfully Deleted!</p>
         <p v-if="saving === 'save'">Successfully Saved!</p>
       </div>
@@ -69,7 +75,7 @@ const saveAudio = () => {
   if (index === Number || index === 0) {
     console.log("found dupe maybe");
     if (checkName() === true) {
-      persistedStore.pastAudio[index].name = audioStore.fileName.trim();
+      audioStore.pastAudio[index].name = audioStore.fileName.trim();
     }
   } else {
     console.log(
