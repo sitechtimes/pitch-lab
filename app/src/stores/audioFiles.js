@@ -1,32 +1,47 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const audioFiles = defineStore(
-  "audioFiles",
+export const audioFilesStore = defineStore(
+  "audioFilesStore",
   () => {
-    //how we select stuff to delete or view and renaming maybeeee
     const fileName = ref(null);
-    const currentAudio = ref(null);
+    const currentRecording = ref(null);
 
-    //toggles to show history / recently deleted menus/modals
-    const viewingHistory = ref(false);
-    const viewingDeleted = ref(false);
+    const showHistoryModal = ref(false);
+    const showDeletedModal = ref(false);
 
-    //warning modal and actually specifies how to delete stuff
     const warning = ref(false);
     const deleteFunc = ref(null);
 
+    const assignedID = ref(1);
+    const audioHistory = ref([]);
+    const recentlyDeleted = ref([]);
     return {
       deleteFunc,
       fileName,
-      currentAudio,
-      viewingDeleted,
-      viewingHistory,
+      currentRecording,
+      showHistoryModal,
+      showDeletedModal,
       warning,
+      assignedID,
+      audioHistory,
+      recentlyDeleted,
     };
   },
 
   {
-    persist: false, // Don't persist this store
+    persist: {
+      enabled: true,
+      strategies: [
+        {
+          storage: localStorage,
+          paths: [
+            "assignedID",
+            "audioHistory",
+            "recentlyDeleted",
+          ],
+        },
+      ],
+    },
   },
 );

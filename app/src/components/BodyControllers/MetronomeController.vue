@@ -1,69 +1,137 @@
 <template>
-  <div class="metronome-container text-center p-[1.25rem] w-[70%]">
-  <div class="flex flex-row justify-between">
-      <div class="flex flex-col">
-        <div class="mb-4">
-      <select v-model="timeSignature" @change="updateTempo">
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-      /
-      <select v-model="timeSignatureDenominator" @change="updateTempo">
-        <option value="4">4</option>
-      </select>
-        </div>
-      <select v-model="selectedSound" @change="loadSound">
-        <option value="duck">Select Options</option>
-        <option v-for="sound in availableSounds" :key="sound" :value="sound">
-          {{ sound }}
-        </option>
-      </select>
+  <div
+    class="w-full max-w-4xl mx-auto rounded-xl shadow-lg p-6 flex flex-wrap items-center justify-between gap-8"
+  >
+    <!-- Time Signature & Sound -->
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center gap-2">
+        <label class="text-gray-700 text-lg font-semibold"
+          >Time Signature:</label
+        >
+        <select
+          v-model="timeSignature"
+          @change="updateTempo"
+          class="bg-purple text-white px-3 py-2 rounded-md text-base cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+        >
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+        <span class="text-gray-500 text-lg">/</span>
+        <select
+          v-model="timeSignatureDenominator"
+          @change="updateTempo"
+          class="bg-purple text-white px-3 py-2 rounded-md text-base cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+        >
+          <option value="4">4</option>
+        </select>
       </div>
-      <div>
-      <div class="bpm-controls mb-4">
-        <button @click="decreaseBPM" :disabled="bpm <= 40">-</button>
-        <span>{{ bpm }} BPM</span>
-        <button @click="increaseBPM" :disabled="bpm >= 240">+</button>
-      </div>   
-      <button @click="toggleMetronome" :disabled="isLoading">
+
+      <div class="flex flex-col">
+        <label class="text-gray-700 font-semibold mb-1">Sound</label>
+        <select
+          v-model="selectedSound"
+          @change="loadSound"
+          class="bg-purple text-white px-3 py-2 rounded-md text-base cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+        >
+          <option v-for="sound in availableSounds" :key="sound" :value="sound">
+            {{ sound }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- BPM Controls -->
+    <div class="flex flex-col items-center gap-3">
+      <label class="text-gray-700 font-semibold">Tempo (BPM)</label>
+      <div class="flex items-center gap-3">
+        <button
+          @click="decreaseBPM"
+          :disabled="bpm <= 40"
+          class="w-10 h-10 bg-purple hover:bg-purple text-white font-bold rounded disabled:opacity-50"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          v-model.number="bpm"
+          min="40"
+          max="240"
+          class="w-20 border border-gray-300 rounded-md px-2 py-1 text-lg text-center text-black bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <button
+          @click="increaseBPM"
+          :disabled="bpm >= 240"
+          class="w-10 h-10 bg-purple text-white font-bold rounded disabled:opacity-50"
+        >
+          +
+        </button>
+      </div>
+      <p class="text-ml text-gray-500">Range: 40–240 BPM</p>
+    </div>
+
+    <!-- Play/Stop + Beat Circle -->
+    <div class="flex flex-col items-center gap-4">
+      <button
+        @click="toggleMetronome"
+        :disabled="isLoading"
+        class="bg-purple text-white font-bold py-2 px-5 rounded-lg shadow-md transition disabled:opacity-50"
+      >
         {{ isPlaying ? "Stop" : "Start" }}
       </button>
-    </div>   
-  
-      <div class="beat-circle" :class="{ beat: isBeating }"></div>
+      <div
+        class="w-12 h-12 bg-purple rounded-full transition-transform duration-100"
+        :class="{ 'scale-150': isBeating }"
+      ></div>
     </div>
-    </div>
+  </div>
 </template>
 <script setup>
-import { persistedSettings } from "@/stores/persistedStore";
 import { ref, onMounted, watch } from "vue";
-const persistedStore = persistedSettings();
-
-// State
-const timeSignature = ref("4"); // Default to 4/4
-const timeSignatureDenominator = ref("4"); // Default denominator
-const selectedSound = ref("quack"); // Default sound
+import { devicesStore } from "@/stores/devices";
+import quackSound from "@/assets/audio/quack.mp3";
+import tackSound from "@/assets/audio/tack.mp3";
+import mooSound from "@/assets/audio/moo.mp3";
+import croackSound from "@/assets/audio/croak.mp3";
+const devices = devicesStore();
+const timeSignature = ref("4");
+const timeSignatureDenominator = ref("4");
+const selectedSound = ref("tack");
 const bpm = ref(120);
 const isPlaying = ref(false);
 const isBeating = ref(false);
 const isLoading = ref(false);
 let intervalId = null;
 let audio = null;
+const soundMap = {
+  quack: quackSound,
+  tack: tackSound,
+  moo: mooSound,
+  croack: croackSound,
+};
 
-const availableSounds = ref(["quack", "tack"]); // Add more as needed
+const availableSounds = ref(["quack", "tack", "moo", "croak"]);
 
 const loadSound = () => {
+  if (!selectedSound.value || !soundMap[selectedSound.value]) {
+    console.warn("Invalid sound selected:", selectedSound.value);
+    return;
+  }
+
   isLoading.value = true;
 
-  const soundFile =
-    selectedSound.value === "quack"
-      ? "quack.mp3"
-      : `${selectedSound.value}.mp3`;
+  try {
+    audio = new Audio(soundMap[selectedSound.value]);
 
-  audio = new Audio(`/${soundFile}`);
-  audio.setSinkId(persistedStore.selectedSpeaker);
-  audio.volume = persistedStore.outputVolume;
-  audio.load();
+    audio.setSinkId?.(devices.selectedSpeaker).catch((err) => {
+      console.warn("setSinkId not supported:", err);
+    });
+
+    audio.volume = devices.outputVolume;
+    audio.load();
+  } catch (err) {
+    console.error("Audio load error:", err);
+  }
+
   isLoading.value = false;
 };
 
@@ -150,60 +218,17 @@ watch([bpm, selectedSound], () => {
 });
 
 watch(
-  () => persistedStore.selectedSpeaker,
+  () => devices.selectedSpeaker,
   (newSpeaker) => {
     audio.setSinkId(newSpeaker);
-    audio.volume = persistedStore.outputVolume;
+    audio.volume = devices.outputVolume;
   },
 );
 
 watch(
-  () => persistedStore.outputVolume,
+  () => devices.outputVolume,
   (newVolume) => {
     audio.volume = newVolume;
   },
 );
 </script>
-
-
-<style scoped>
-
-
-select,
-button {
-  padding: 5px 10px;
-  font-size: 16px;
-  background-color: #8a2be2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: not-allowed;
-}
-
-.bpm-controls {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.bpm-controls button {
-  width: 30px;
-  height: 30px;
-}
-
-.beat-circle {
-  width: 50px;
-  height: 50px;
-  background-color: #8a2be2;
-  border-radius: 50%;
-  transition: transform 0.1s ease-in-out;
-} 
-
-.beat-circle.beat {
-  transform: scale(1.5); /* Enlarge the circle when beating */
-}
-</style>
