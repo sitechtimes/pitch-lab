@@ -92,6 +92,7 @@ import quackSound from "@/assets/audio/quack.mp3";
 import tackSound from "@/assets/audio/tack.mp3";
 import mooSound from "@/assets/audio/moo.mp3";
 import croakSound from "@/assets/audio/croak.mp3";
+import neighSound from "@/assets/audio/neigh.mp3";
 
 const devices = devicesStore();
 const timeSignature = ref("4");
@@ -108,9 +109,10 @@ const soundMap = {
   tack: tackSound,
   moo: mooSound,
   croak: croakSound,
+  neigh: neighSound,
 };
 
-const availableSounds = ref(["quack", "tack", "moo", "croak"]);
+const availableSounds = ref(["tack", "quack", "moo", "croak", "neigh"]);
 
 const loadSound = () => {
   if (!selectedSound.value || !soundMap[selectedSound.value]) {
