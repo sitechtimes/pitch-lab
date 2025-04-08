@@ -25,27 +25,29 @@
 </template>
 
 <script setup>
-import { audioFilesStore } from "@/stores/audioFiles";
+import { audioFiles } from "@/stores/audioFiles";
+import { persistedSettings } from "@/stores/persistedStore";
 
-const audioStore = audioFilesStore();
+const audioStore = audioFiles();
+const persistedStore = persistedSettings();
 
 const killIt = () => {
   if (audioStore.deleteFunc === "single") {
     deleteRecent();
   } else {
-    audioStore.recentlyDeleted = [];
-    audioStore.currentRecording = null;
+    persistedStore.recentlyDeleted = [];
+    audioStore.currentAudio = null;
     audioStore.warning = false;
   }
 };
 
 const deleteRecent = () => {
-  let index = audioStore.recentlyDeleted.findIndex(
-    (file) => file.id === audioStore.currentRecording.id,
+  let index = persistedStore.recentlyDeleted.findIndex(
+    (file) => file.id === audioStore.currentAudio.id,
   );
   console.log("found it", index);
-  audioStore.recentlyDeleted.splice(index, 1);
-  audioStore.currentRecording = null;
+  persistedStore.recentlyDeleted.splice(index, 1);
+  audioStore.currentAudio = null;
   audioStore.warning = false;
 };
 </script>
