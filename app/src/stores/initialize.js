@@ -31,11 +31,16 @@ export const initializeStore = defineStore(
           await devices.getDevices();
         }
 
+
         if (!devices.selectedMicrophone) {
-          devices.selectedMicrophone =
-            devices.microphonesWithDeviceId[0] ||
-            devices.microphonesNoDeviceId[0] ||
-            null;
+          console.warn("No microphone available");
+          noMicrophones.value = true;
+          return false;
+        }
+
+        if (!devices.selectedSpeaker) {
+          console.warn("No speaker available");
+          noSpeakers.value = true;
         }
 
         audioContext.value = new (window.AudioContext || window.webkitAudioContext)();

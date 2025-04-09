@@ -69,10 +69,6 @@ onMounted(async () => {
       console.warn("Cannot access speaker");
     }
 
-    if (!devices.selectedSpeaker.value) {
-      console.log("Both microphone and speaker detected");
-    }
-
     if (initialize.noMicrophones && initialize.noSpeakers) {
       console.log("No microphone and speaker detected");
     } else if (initialize.noMicrophones) {
@@ -83,10 +79,6 @@ onMounted(async () => {
     devices.cleanupAudio();
   } catch (error) {
     console.error("Error getting devices:", error);
-
-    initialize.noMicrophones = true;
-    initialize.noSpeakers = true;
-    initialize.cannotInitialize = true;
 
     if (error.name === "NotAllowedError") {
       console.warn("Cannot access microphone or speaker: Permission denied");
