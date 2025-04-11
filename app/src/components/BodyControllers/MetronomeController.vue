@@ -1,11 +1,10 @@
-
 <template>
   <div
-    class="w-full max-w-4xl mx-auto rounded-xl shadow-lg p-6 flex flex-wrap items-center justify-between gap-8"
+    class="w-full max-w-4xl mx-auto rounded-xl shadow-lg p-6 flex flex-col lg:flex-row flex-wrap items-center justify-between gap-8"
   >
     <!-- Time Signature & Sound -->
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center gap-2">
+    <div class="flex flex-col gap-4 w-full sm:w-auto">
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
         <label class="text-gray-700 text-lg font-semibold"
           >Time Signature:</label
         >
@@ -42,7 +41,7 @@
     </div>
 
     <!-- BPM Controls -->
-    <div class="flex flex-col items-center gap-3">
+    <div class="flex flex-col items-center gap-3 w-full sm:w-auto">
       <label class="text-gray-700 font-semibold">Tempo (BPM)</label>
       <div class="flex items-center gap-3">
         <button
@@ -71,7 +70,7 @@
     </div>
 
     <!-- Play/Stop + Beat Circle -->
-    <div class="flex flex-col items-center gap-4">
+    <div class="flex flex-col items-center gap-4 w-full sm:w-auto">
       <button
         @click="toggleMetronome"
         :disabled="isLoading"
