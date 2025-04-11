@@ -19,15 +19,8 @@
           <router-link to="/tuner" class="text-3xl hover:underline"
             >Tuner</router-link
           >
-          <SettingsIcon />
         </div>
       </header>
-
-      <DeviceSelector
-        v-if="settingsUI.showSettingsModal"
-        name="Settings"
-        class="absolute inset-0 bg-black/30 p-4 z-10"
-      />
 
       <div class="mt-8">
         <router-view />
@@ -38,13 +31,9 @@
 
 <script setup>
 import HeaderTitle from "./components/HeaderComponents/HeaderTitle.vue";
-import SettingsIcon from "./components/HeaderComponents/SettingsIcon.vue";
-import DeviceSelector from "./components/HeaderComponents/AdjusterSettings/DeviceSelector.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { initializeStore } from "./stores/initialize";
-import { settingsUIStore } from "./stores/settingsUI";
 
-const settingsUI = settingsUIStore();
 const initialize = initializeStore();
 const isPortrait = ref(window.innerHeight > window.innerWidth);
 const checkOrientation = () => {

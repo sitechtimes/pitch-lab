@@ -61,7 +61,7 @@
 <script setup>
 import { ref, watch, computed } from "vue";
 import { devicesStore } from "@/stores/devices";
-import { initializeStore } from "../../../../stores/initialize";
+import { initializeStore } from "../../stores/initialize";
 
 const initialize = initializeStore();
 const devices = devicesStore();

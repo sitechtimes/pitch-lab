@@ -85,20 +85,6 @@ let analyser = null;
 let bufferLength = null;
 let dataArray = null;
 
-const setupVisualizer = () => {
-  if (!initialize.audioContext.value) return;
-
-  analyser = initialize.audioContext.value.createAnalyser();
-  analyser.fftSize = 256;
-  bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
-
-  // Connect audio output to analyser
-  initialize.outputGainNode.value.connect(analyser);
-
-  drawVisualizer();
-};
-
 const drawVisualizer = () => {
   if (!visualizerCanvas.value || !analyser) return;
 
