@@ -21,7 +21,7 @@
             }"
           ></div>
           <div
-            class="w-2 h-16 bg-yellow-500 absolute transition-all duration-200 ease-in-out"
+            class="w-4 h-24 bg-yellow-500 absolute"
             :style="{
               left: indicatorPosition,
               transform: 'translateX(-50%) translateY(-50%)',
@@ -45,13 +45,19 @@
           </div>
         </div>
       </div>
+
+      <!-- Cents Display -->
+      <div class="flex justify-center text-white text-3xl font-mono mb-6">
+        <span v-if="closestNote">{{ detuneValue.toFixed(1) }} cents</span>
+      </div>
+
       <div class="flex items-center justify-between w-1/3 mx-auto">
         <div
           :class="{
             'bg-tuner-bg': !isFlat,
             'bg-orange': isFlat,
-            'px-5': true,
-            'py-3': true,
+            'px-6': true,
+            'py-4': true,
             'text-3xl': true,
             'rounded-full': true,
             'text-white': true,
@@ -64,10 +70,11 @@
             'bg-tuner-bg': !isInTune,
             'bg-green': isInTune,
             'text-4xl': true,
-            'px-5': true,
-            'py-3': true,
-            'rounded-lg': true,
+            'px-6': true,
+            'py-4': true,
+            'rounded-2xl': true,
             'text-white': true,
+            'shadow-lg': true,
           }"
         >
           {{ closestNote ? closestNote.note : "" }}
@@ -76,8 +83,8 @@
           :class="{
             'bg-tuner-bg': !isSharp,
             'bg-orange': isSharp,
-            'px-5': true,
-            'py-3': true,
+            'px-6': true,
+            'py-4': true,
             'text-3xl': true,
             'rounded-full': true,
             'text-white': true,
@@ -89,12 +96,13 @@
 
       <div class="flex flex-col items-center py-9">
         <button
-          class="bg-tuner-bg hover:bg-tuner-bg/80 active:scale-95 transition-all text-white font-bold py-2 px-4 text-3xl rounded shadow"
+          class="bg-purple-700 hover:bg-purple-600 active:scale-95 transition-all text-white font-bold py-3 px-6 text-3xl rounded-xl shadow-lg"
           @click="toggleTuning"
         >
           {{ isTuning ? "Stop Tuning" : "Start Tuning" }}
         </button>
       </div>
+
       <div class="flex flex-col items-center py-9">
         <router-link
           to="/tuner"
@@ -106,6 +114,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, computed, onUnmounted, onMounted } from "vue";
 import { noteFrequencies } from "@/constants/NoteFrequencies";
@@ -143,10 +152,12 @@ const createLocalAudioGraph = async () => {
       devices.selectedMicrophone.deviceId !== ""
         ? {
             deviceId: { exact: devices.selectedMicrophone.deviceId },
+            channelCount: { ideal: 1 },
             noiseSuppression: true,
             autoGainControl: false,
           }
         : {
+            channelCount: { ideal: 1 },
             noiseSuppression: true,
             autoGainControl: false,
           };
@@ -163,6 +174,12 @@ const createLocalAudioGraph = async () => {
     );
     localSource.value = streamSource;
 
+    const splitter = localAudioContext.value.createChannelSplitter(2);
+    const merger = localAudioContext.value.createChannelMerger(1);
+    streamSource.connect(splitter);
+    splitter.connect(merger, 0, 0);
+    localSource.value = merger;
+
     const gainNode = localAudioContext.value.createGain();
     gainNode.gain.value = devices.inputVolume;
     localGain.value = gainNode;
@@ -171,7 +188,7 @@ const createLocalAudioGraph = async () => {
     analyserNode.fftSize = fftSize;
     localAnalyser.value = analyserNode;
 
-    streamSource.connect(gainNode).connect(analyserNode);
+    merger.connect(gainNode).connect(analyserNode);
     console.log("🔊 Local AudioContext initialized in view");
   } catch (err) {
     console.error("Failed to create local audio graph:", err);
@@ -265,33 +282,21 @@ function toggleTuning() {
 
 function trackFrequency() {
   const analyser = localAnalyser.value;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Float32Array(bufferLength);
+  const bufferLength = analyser.fftSize;
+  const timeData = new Float32Array(bufferLength);
 
   function update() {
     if (!isTuning.value || !analyser) return;
 
-    analyser.getFloatFrequencyData(dataArray);
-
-    const paddedArray = new Float32Array(fftSize);
-    paddedArray.set(dataArray);
-    let maxIndex = 0;
-    let maxAmplitude = -Infinity;
-    for (let i = 0; i < bufferLength; i++) {
-      if (paddedArray[i] > maxAmplitude) {
-        maxAmplitude = paddedArray[i];
-        maxIndex = i;
-      }
-    }
-
+    analyser.getFloatTimeDomainData(timeData);
     const sampleRate = localAudioContext.value.sampleRate;
-    const detectedFreq = parabolicInterpolation(
-      paddedArray,
-      maxIndex,
-      sampleRate,
-    );
+    const detectedFreq = yinDetector(timeData, sampleRate);
 
-    if (detectedFreq >= MIN_FREQUENCY && detectedFreq <= MAX_FREQUENCY) {
+    if (
+      detectedFreq !== -1 &&
+      detectedFreq >= MIN_FREQUENCY &&
+      detectedFreq <= MAX_FREQUENCY
+    ) {
       lastValidFrequency.value = detectedFreq;
 
       frequencyHistory.push(detectedFreq);
@@ -299,7 +304,7 @@ function trackFrequency() {
 
       frequency.value =
         frequencyHistory.reduce((sum, freq) => sum + freq, 0) /
-          frequencyHistory.length || 0;
+        frequencyHistory.length;
 
       const note = findClosestNote(frequency.value);
       closestNote.value = note;
@@ -308,24 +313,65 @@ function trackFrequency() {
     } else {
       frequency.value = lastValidFrequency.value || 0;
     }
+
     requestAnimationFrame(update);
   }
 
   update();
 }
 
-function parabolicInterpolation(spectrum, peakIndex, sampleRate) {
-  const leftIndex = Math.max(0, peakIndex - 1);
-  const rightIndex = Math.min(spectrum.length - 1, peakIndex + 1);
+function yinDetector(buffer, sampleRate) {
+  const threshold = 0.1;
+  const probabilityThreshold = 0.1;
+  const yinBufferLength = Math.floor(buffer.length / 2);
+  const yinBuffer = new Float32Array(yinBufferLength);
 
-  const alpha = spectrum[leftIndex];
-  const beta = spectrum[peakIndex];
-  const gamma = spectrum[rightIndex];
+  // Step 1: Difference function
+  for (let tau = 0; tau < yinBufferLength; tau++) {
+    let sum = 0;
+    for (let i = 0; i < yinBufferLength; i++) {
+      const delta = buffer[i] - buffer[i + tau];
+      sum += delta * delta;
+    }
+    yinBuffer[tau] = sum;
+  }
 
-  const delta = (0.5 * (alpha - gamma)) / (alpha - 2 * beta + gamma);
-  const interpolatedIndex = peakIndex + delta;
+  yinBuffer[0] = 1;
+  let runningSum = 0;
+  for (let tau = 1; tau < yinBufferLength; tau++) {
+    runningSum += yinBuffer[tau];
+    yinBuffer[tau] *= tau / runningSum;
+  }
 
-  return (interpolatedIndex * sampleRate) / fftSize;
+  let tauEstimate = -1;
+  for (let tau = 2; tau < yinBufferLength; tau++) {
+    if (yinBuffer[tau] < threshold) {
+      while (tau + 1 < yinBufferLength && yinBuffer[tau + 1] < yinBuffer[tau]) {
+        tau++;
+      }
+      tauEstimate = tau;
+      break;
+    }
+  }
+
+  if (tauEstimate === -1) return -1;
+
+  const betterTau =
+    tauEstimate > 0 && tauEstimate < yinBufferLength - 1
+      ? tauEstimate +
+        (yinBuffer[tauEstimate + 1] - yinBuffer[tauEstimate - 1]) /
+          (2 *
+            (2 * yinBuffer[tauEstimate] -
+              yinBuffer[tauEstimate - 1] -
+              yinBuffer[tauEstimate + 1]))
+      : tauEstimate;
+  const confidence = 1 - yinBuffer[tauEstimate];
+
+  if (confidence < probabilityThreshold) {
+    return -1;
+  }
+
+  return sampleRate / betterTau;
 }
 
 const handleResize = () => {
