@@ -21,12 +21,13 @@
             }"
           ></div>
           <div
-            class="w-4 h-24 bg-yellow-500 absolute"
+            class="absolute w-1 h-48 rounded-sm shadow-lg"
             :style="{
+              background: 'linear-gradient(to bottom, #facc15, #f59e0b)',
+              boxShadow: '0 0 8px rgba(255, 213, 0, 0.6)',
               left: indicatorPosition,
               transform: 'translateX(-50%) translateY(-50%)',
               top: '50%',
-              border: '6px solid yellow',
             }"
           ></div>
           <div
@@ -43,6 +44,7 @@
           </div>
         </div>
       </div>
+
       <div class="flex items-center justify-between w-1/2 mx-auto gap-8">
         <div
           :class="{
@@ -83,6 +85,9 @@
         >
           #
         </div>
+      </div>
+      <div class="flex justify-center text-white mt-8 text-3xl font-mono">
+        <span v-if="closestNote">{{ detuneValue.toFixed(1) }} cents</span>
       </div>
       <div class="flex flex-col items-center py-12">
         <button
