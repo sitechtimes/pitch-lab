@@ -314,7 +314,6 @@ function yinDetector(buffer, sampleRate) {
   const yinBufferLength = Math.floor(buffer.length / 2);
   const yinBuffer = new Float32Array(yinBufferLength);
 
-  // Step 1: Difference function
   for (let tau = 0; tau < yinBufferLength; tau++) {
     let sum = 0;
     for (let i = 0; i < yinBufferLength; i++) {
