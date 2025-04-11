@@ -1,7 +1,7 @@
 <template>
   <!-- Speaker Selection -->
   <div class="mb-6">
-    <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
+    <!-- <h1 for="speaker" class="block text-white text-3xl mb-2">Speaker:</h1>
 
     <button
       v-if="!isTesting"
@@ -29,7 +29,7 @@
         }
       "
     >
-      <!-- Speakers with deviceId -->
+
       <option
         v-for="device in devices.speakersWithDeviceId"
         :key="device.deviceId"
@@ -43,7 +43,7 @@
         }}
       </option>
 
-      <!-- Speakers without deviceId -->
+
       <option
         v-for="device in devices.speakersNoDeviceId"
         :key="device.kind + '-' + device.label"
@@ -63,10 +63,10 @@
     <canvas
       ref="visualizerCanvas"
       class="w-full h-[100px] mt-4 border border-purple rounded"
-    ></canvas>
+    ></canvas> -->
   </div>
 </template>
-
+<!-- 
 <script setup>
 import { ref } from "vue";
 import { initializeStore } from "@/stores/initialize";
@@ -142,4 +142,4 @@ const stopTesting = () => {
   isTesting.value = false;
   clearInterval(loop.value);
 };
-</script>
+</script> -->
