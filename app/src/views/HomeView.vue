@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-controllers-bg rounded-3xl p-6">
+  <div class="bg-controllers-bg rounded-3xl">
     <div class="flex items-center justify-center">
       <!-- Recorder -->
       <div class="flex w-[35%] flex-col relative">

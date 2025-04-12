@@ -1,0 +1,16 @@
+{
+  "productName": "Pitch Lab",
+  "directories": {
+    "output": "release/"
+  },
+  "files": ["dist/", "electron-main.js", "preload.js"],
+  "mac": {
+    "target": "dmg"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "linux": {
+    "target": "AppImage"
+  }
+}

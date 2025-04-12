@@ -1,6 +1,5 @@
 <template>
   <div class="w-screen bg-entire-bg text-white min-h-screen">
-    <!-- Orientation Warning (only shown if initialized) -->
     <div
       v-if="initialize.isInitialized && isPortrait"
       class="fixed inset-0 px-10 flex items-center justify-center text-5xl py-5 text-white bg-gray-800"
@@ -8,16 +7,21 @@
       Please rotate your device horizontally to use this app.
     </div>
 
-    <!-- Main App Content (only shown if initialized and in landscape) -->
     <div v-if="!isPortrait">
       <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
         <HeaderTitle />
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 mr-8">
           <router-link to="/" class="text-3xl hover:underline"
             >Home</router-link
           >
+          <router-link to="/app" class="text-3xl hover:underline"
+            >App</router-link
+          >
           <router-link to="/tuner" class="text-3xl hover:underline"
             >Tuner</router-link
+          >
+          <router-link to="/download" class="text-3xl hover:underline"
+            >Download</router-link
           >
         </div>
       </header>
