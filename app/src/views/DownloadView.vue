@@ -1,40 +1,57 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-b from-black to-purple-900 text-white flex flex-col items-center justify-center px-6 py-12"
+    class="flex flex-col items-center justify-center min-h-screen bg-entire-bg text-white p-8"
   >
-    <h1 class="text-4xl font-bold mb-4">Download PitchLab</h1>
-    <p class="text-purple-300 text-lg text-center max-w-xl mb-10">
-      Get the best tuning experience offline. Available on multiple platforms
-      for musicians on the move.
+    <h1 class="text-4xl font-bold mb-4">Download Pitch Lab</h1>
+    <p class="text-lg text-center max-w-xl mb-8">
+      Get the latest version of Pitch Lab: a free, all-in-one tuner, metronome,
+      and recorder app for musicians.
     </p>
 
-    <!-- Download Buttons -->
-    <div class="flex flex-col sm:flex-row gap-6">
-      <a href="/downloads/pitchlab-setup.exe">⬇️ Download for Windows</a>
+    <div
+      class="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg text-center"
+    >
+      <h2 class="text-2xl font-semibold mb-2">Latest Version: {{ version }}</h2>
+      <p class="mb-4 text-sm text-gray-300">Built on {{ releaseDate }}</p>
 
       <a
-        href="#"
-        class="bg-white text-black px-6 py-3 rounded-lg text-lg font-semibold shadow hover:bg-gray-200 transition"
+        :href="downloadUrl"
+        @click="trackDownload"
+        download
+        class="bg-purple-600 hover:bg-purple-700 transition px-6 py-3 rounded-lg text-xl font-semibold"
       >
-        🍎 Download for macOS
+        Download for Windows (.exe)
       </a>
-      <a
-        href="#"
-        class="bg-white text-black px-6 py-3 rounded-lg text-lg font-semibold shadow hover:bg-gray-200 transition"
-      >
-        📱 Add to Home Screen
-      </a>
+
+      <p class="text-xs text-gray-400 mt-4">File size: ~40MB</p>
     </div>
 
-    <p class="text-sm text-purple-400 mt-8 text-center max-w-md">
-      You can also use PitchLab as a PWA. Visit this site in your mobile browser
-      and choose “Add to Home Screen.”
+    <p class="text-sm text-gray-400 mt-10">
+      Having trouble?
+      <a href="mailto:support@pitchlab.app" class="underline"
+        >Contact support</a
+      >
     </p>
   </div>
 </template>
 
 <script setup>
-// Static download page
+const version = "1.0.0";
+const releaseDate = "April 11, 2025";
+const downloadUrl = "/PitchLab Setup 0.0.0.exe";
+
+function trackDownload() {
+  if (typeof gtag !== "undefined") {
+    gtag("event", "download", {
+      event_category: "Download",
+      event_label: `pitchlab.exe v${version}`,
+    });
+  }
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+body {
+  font-family: "Jaini Purva", sans-serif;
+}
+</style>

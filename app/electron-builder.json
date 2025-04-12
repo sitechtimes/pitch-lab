@@ -3,7 +3,7 @@
   "directories": {
     "output": "release/"
   },
-  "files": ["dist/", "electron-main.js", "preload.js"],
+  "files": ["dist/", "electron-main.mjs", "preload.js"],
   "mac": {
     "target": "dmg"
   },
