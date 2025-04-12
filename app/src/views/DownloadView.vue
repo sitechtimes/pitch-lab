@@ -23,7 +23,7 @@
         Download for Windows (.exe)
       </a>
 
-      <p class="text-xs text-gray-400 mt-4">File size: ~40MB</p>
+      <p class="text-xs text-gray-400 mt-4">File size: ~632MB</p>
     </div>
 
     <p class="text-sm text-gray-400 mt-10">

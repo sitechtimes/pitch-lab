@@ -1,9 +1,10 @@
 {
   "productName": "Pitch Lab",
   "directories": {
-    "output": "release/"
+    "output": "release"
   },
-  "files": ["dist/", "electron-main.mjs", "preload.js"],
+  "files": ["dist/**/*", "electron-main.mjs", "preload.js"],
+  "main": "electron-main.mjs",
   "mac": {
     "target": "dmg"
   },
