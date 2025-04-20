@@ -1,10 +1,23 @@
 <template>
   <div class="flex flex-row">
     <div class="flex flex-col items-center w-[30%]">
+      <!-- Channel Selection -->
+      <div class="mb-4">
+        <label for="channel" class="block text-white text-sm mb-2">Channel:</label>
+        <select
+          id="channel"
+          v-model="selectedChannel"
+          class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
+        >
+          <option value="1">Mono</option>
+          <option value="2">Stereo</option>
+        </select>
+      </div>
+
       <!-- Timer display -->
       <button
         class="bg-[#36C4E4] rounded-full p-2 w-full flex items-center justify-center"
-          @click="startRecording"
+        @click="startRecording"
         v-if="!isRecording"
       >
         <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6 mr-2" />
@@ -15,11 +28,10 @@
         @click="stopRecording"
         v-if="isRecording"
       >
-      <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
+        <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
         Stop Recording
       </button>
-   
-      
+
       <div class="text-black bg-white text-center p-2 rounded-full w-full">
         Timer: {{ formatTime(timer) }}
       </div>
@@ -32,60 +44,64 @@
             (audioStore.showDeletedModal = false)
         "
       >
-Saved Recordings      
-</button>
+        Saved Recordings
+      </button>
     </div>
 
     <!-- Display recorded audio playback and download link -->
     <div v-if="audioStore.currentRecording && !isRecording" class="w-full flex items-center justify-center">
       <div class="flex flex-row justify-between w-[85%]">
         <div>
-    <div>
-      <h3>Recorded Audio:</h3>
-    </div>
+          <div>
+            <h3>Recorded Audio:</h3>
+          </div>
 
-    <div :key="audioStore.currentRecording.id">
-      <audio
-        ref="audioElement"
-        id="audio"
-        controls
-        :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
-        ></audio>
-    </div>
-    <div class="w-[90%] mt-2 flex flex-row justify-between">
-        <input
-        id="name"
-        type="text"
-        class="text-black w-[full]"
-        v-model="audioStore.fileName"
-        placeholder="Name File"
-        />        
-        
-    <div>
-      <a
-      :href="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
-  :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
->
-        Download
-      </a>
-    </div>
-  </div>
-  </div>
+          <div :key="audioStore.currentRecording.id">
+            <audio
+              ref="audioElement"
+              id="audio"
+              controls
+              :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
+            ></audio>
+          </div>
+          <div class="w-[90%] mt-2 flex flex-row justify-between">
+            <input
+              id="name"
+              type="text"
+              class="text-black w-[full]"
+              v-model="audioStore.fileName"
+              placeholder="Name File"
+            />
 
-      <div class="flex  flex-col justify-between">
-      <button
-        class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center" @click="saveAudio">
-        <img src="@/assets/buttons/save.webp" alt="Microphone" class="mr-1"/>
-          Save to history
-      </button>
-        <button
-        class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center " @click="deleteAudio">
-        <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3"/>
-          Delete
-      </button>
+            <div>
+              <a
+                :href="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
+                :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
+              >
+                Download
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col justify-between">
+          <button
+            class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
+            @click="saveAudio"
+          >
+            <img src="@/assets/buttons/save.webp" alt="Microphone" class="mr-1" />
+            Save to history
+          </button>
+          <button
+            class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
+            @click="deleteAudio"
+          >
+            <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" />
+            Delete
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
     <!-- Placeholder message when there is no recording -->
     <div v-else class="w-full flex items-center justify-center">
@@ -114,6 +130,7 @@ const devices = devicesStore();
 const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
+const selectedChannel = ref(1); // Default to mono
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
@@ -123,7 +140,10 @@ const startRecording = async () => {
   try {
     // Get access to the microphone
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: { deviceID: devices.selectedMicrophone },
+      audio: {
+        deviceID: devices.selectedMicrophone,
+        channelCount: selectedChannel.value, // Use selected channel count
+      },
     });
 
     mediaRecorder = new MediaRecorder(stream);
