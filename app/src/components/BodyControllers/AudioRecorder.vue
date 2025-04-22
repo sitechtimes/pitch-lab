@@ -16,24 +16,29 @@
 
       <!-- Timer display -->
       <button
-        class="bg-[#36C4E4] rounded-full p-2 w-full flex items-center justify-center"
+      class="bg-skyblue :bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+
         @click="startRecording"
         v-if="!isRecording"
       >
-        <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6 mr-2" />
-        Start Recording
+      <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6" />
+  <span
+    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity"
+  >
+    Start Recording
+  </span>
       </button>
       <button
-        class="bg-[#A3D10A] rounded-full p-2 w-full flex items-center justify-center"
-        @click="stopRecording"
+      class="bg-green hover:bg-#4CAF50] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+      @click="stopRecording"
         v-if="isRecording"
       >
         <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
         Stop Recording
       </button>
 
-      <div class="text-black bg-white text-center p-2 rounded-full w-full">
-        Timer: {{ formatTime(timer) }}
+      <div class="text-white bg-[#424242] text-center py-2 px-4 rounded-lg text-lg font-mono">
+  Timer: {{ formatTime(timer) }}
       </div>
       <button
         type="button"
