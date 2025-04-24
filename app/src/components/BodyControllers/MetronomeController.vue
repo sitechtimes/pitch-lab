@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full max-w-4xl mx-auto rounded-xl shadow-lg p-6 flex flex-col lg:flex-row flex-wrap items-center justify-between gap-8"
+    class="w-full max-w-4xl mx-auto rounded-xl shadow-lg p-6 flex flex-row  items-center justify-between gap-8"
   >
     <!-- Time Signature & Sound -->
     <div class="flex flex-col gap-4 w-full sm:w-auto">
