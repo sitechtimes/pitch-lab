@@ -15,6 +15,7 @@
       </div>
 
       <!-- Timer display -->
+    <div class="">
       <button
       class="bg-skyblue :bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
 
@@ -40,6 +41,7 @@
       <div class="text-white bg-[#424242] text-center py-2 px-4 rounded-lg text-lg font-mono">
   Timer: {{ formatTime(timer) }}
       </div>
+    </div>
       <button
         type="button"
         class="text-white text-center bg-gold font-medium rounded-full text-sm bg-purple p-2 w-full"

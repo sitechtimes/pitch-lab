@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-controllers-bg rounded-3xl p-6">
-    <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-4">
+  <div class="bg-controllers-bg rounded-3xl py-6">
+    <div class=" flex flex-col w-[90%] sm:flex-row items-center justify-between">
   <!-- Recorder Section -->
-  <div class="w-full sm:w-1/3">
+  <div class="w-full justify-between sm:w-1/3">
     <AudioRecorder />
     <div
           v-if="audioStore.showHistoryModal"
@@ -16,16 +16,17 @@
     <MetronomeController />
   </div>
   <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>  <!-- Tuner Section -->
-  <div class="w-full sm:w-1/3">
+  <div >
     <TunerController />
   </div>
 </div>
 
     <!-- Tuning Section -->
-    <div class="mt-5 bg-entire-bg">
+    
+  </div>
+  <div class="mt-5 bg-entire-bg">
       <TunerSection />
     </div>
-  </div>
 </template>
 
 <script setup>
