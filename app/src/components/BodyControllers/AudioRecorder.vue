@@ -1,147 +1,148 @@
-<template>
-  <div class="flex flex-row">
-    <div class="flex flex-col items-center w-[30%]">
-      <!-- Channel Selection -->
-      <div class="mb-4">
-        <label for="channel" class="block text-white text-sm mb-2">Channel:</label>
-        <select
-          id="channel"
-          v-model="selectedChannel"
-          class="select select-bordered w-full bg-tuner-bg text-white border-purple focus:ring-purple"
-        >
-          <option value="1">Mono</option>
-          <option value="2">Stereo</option>
-        </select>
-      </div>
-
-      <!-- Timer display -->
-    <div class="">
-      <button
-      class="bg-skyblue :bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
-
-        @click="startRecording"
-        v-if="!isRecording"
-      >
-      <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6" />
-  <span
-    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity"
+<template>     
+  <!-- Channel Selection -->
+  <div
+    class="relative group rounded-lg w-64 bg-[#616161] overflow-hidden before:absolute before:w-12 before:h-12 before:content[''] before:right-0 before:bg-[#9c27b0] before:rounded-full before:blur-lg before:[box-shadow:-60px_20px_10px_10px_#F9B0B9]"
   >
-    Start Recording
-  </span>
-      </button>
-      <button
-      class="bg-green hover:bg-#4CAF50] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
-      @click="stopRecording"
-        v-if="isRecording"
-      >
-        <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
-        Stop Recording
-      </button>
-
-      <div class="text-white bg-[#424242] text-center py-2 px-4 rounded-lg text-lg font-mono">
-  Timer: {{ formatTime(timer) }}
-      </div>
-    </div>
-      <button
-        type="button"
-        class="text-white text-center bg-gold font-medium rounded-full text-sm bg-purple p-2 w-full"
-        @click="
-          (audioStore.showHistoryModal = true),
-            (saving = null),
-            (audioStore.showDeletedModal = false)
-        "
-      >
-        Saved Recordings
-      </button>
-    </div>
-
-    <!-- Display recorded audio playback and download link -->
-    <div v-if="audioStore.currentRecording && !isRecording" class="w-full flex items-center justify-center">
-      <div class="flex flex-row justify-between w-[85%]">
-        <div>
-          <div>
-            <h3>Recorded Audio:</h3>
-          </div>
-
-          <div :key="audioStore.currentRecording.id">
-            <audio
-              ref="audioElement"
-              id="audio"
-              controls
-              :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
-            ></audio>
-          </div>
-          <div class="w-[90%] mt-2 flex flex-row justify-between">
-            <input
-              id="name"
-              type="text"
-              class="text-black w-[full]"
-              v-model="audioStore.fileName"
-              placeholder="Name File"
-            />
-
-            <div>
-              <a
-                :href="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
-                :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
-              >
-                Download
-              </a>
-            </div>
-            <!-- <button
-  type="submit"
-  class="flex justify-center gap-2 items-center mx-auto shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-emerald-500 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 rounded-full group"
->
-  Explore
-  <svg
-    class="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45"
-    viewBox="0 0 16 19"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
-      class="fill-gray-800 group-hover:fill-gray-800"
-    ></path>
-  </svg>
-</button> -->
-          </div>
-        </div>
-
-        <div class="flex flex-col justify-between">
-          <button
-            class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
-            @click="saveAudio"
-          >
-            <img src="@/assets/buttons/save.webp" alt="Microphone" class="mr-1" />
-            Save to history
-          </button>
-          <button
-            class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
-            @click="deleteAudio"
-          >
-            <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" />
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Placeholder message when there is no recording -->
-    <div v-else class="w-full flex items-center justify-center">
-      <div class="w-[70%]">
-        <p class="text-xl text-center w-full">
-          No recorded audio available. Please start recording to see playback and
-          download options.
-        </p>
-      </div>
-    </div>
-    <div v-if="saving" class="w-full">
-      <button @click="saving = null">x</button>
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
-      <p v-if="saving === 'save'">Successfully Saved!</p>
-    </div>
+    <svg
+      y="0"
+      xmlns="http://www.w3.org/2000/svg"
+      x="0"
+      width="100"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
+      height="100"
+      class="w-8 h-8 absolute right-0 -rotate-45 stroke-[#F06292] top-1.5 group-hover:rotate-0 duration-300"
+    >
+      <path
+        stroke-width="4"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+        fill="none"
+        d="M60.7,53.6,50,64.3m0,0L39.3,53.6M50,64.3V35.7m0,46.4A32.1,32.1,0,1,1,82.1,50,32.1,32.1,0,0,1,50,82.1Z"
+        class="svg-stroke-primary"
+      ></path>
+    </svg>
+    <select
+      id="channel"
+      v-model="selectedChannel"
+      class="appearance-none hover:placeholder-shown:bg-[#50C878] relative text-[#FF69B4] bg-transparent ring-0 outline-none border border-[#808080]  placeholder-[#EE82EE] text-sm font-bold rounded-lg focus:ring-[#EE82EE] focus:border-[#EE82EE] block w-full p-2.5"
+    >
+      <option value="1">Mono</option>
+      <option value="2">Stereo</option>
+    </select>
   </div>
-</template>
+    <div class="flex flex-row">
+      <div class="flex flex-col items-center w-[30%]">
+   
+  
+        <!-- Timer display -->
+      <div class="">
+        <button
+        class="bg-skyblue hover:bg-[#6A0DAD] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+  
+          @click="startRecording"
+          v-if="!isRecording"
+        >
+        <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6" />
+    <span
+      class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-[#000000] rounded opacity-0 group-hover:opacity-100 transition-opacity"
+    >
+      Start Recording
+    </span>
+        </button>
+        <button
+        class="bg-[#008000] hover:bg-[#4CAF50] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+        @click="stopRecording"
+          v-if="isRecording"
+        >
+          <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
+          Stop Recording
+        </button>
+  
+        <div class="text-white bg-[#424242] text-center py-2 px-4 rounded-lg text-lg font-mono">
+    Timer: {{ formatTime(timer) }}
+        </div>
+      </div>
+        <button
+          type="button"
+          class="text-white text-center font-medium rounded-full text-sm bg-[#7210E3] p-2 w-full"
+          @click="
+            (audioStore.showHistoryModal = true),
+              (saving = null),
+              (audioStore.showDeletedModal = false)
+          "
+        >
+          Saved Recordings
+        </button>
+      </div>
+  
+      <!-- Display recorded audio playback and download link -->
+      <div v-if="audioStore.currentRecording && !isRecording" class="w-full flex items-center justify-center">
+        <div class="flex flex-row justify-between w-[85%]">
+          <div>
+            <div :key="audioStore.currentRecording.id">
+              <audio
+                ref="audioElement"
+                id="audio"
+                controls
+                :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
+              ></audio>
+            </div>
+            <div class="w-[90%] mt-2 flex flex-row justify-between">
+              <input
+                id="name"
+                type="text"
+                class="text-[#000000] w-[full]"
+                v-model="audioStore.fileName"
+                placeholder="Name File"
+              />
+  
+              <div>
+                <a
+                  :href="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
+                  :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
+                >
+                  Download
+                </a>
+              </div>
+  
+            </div>
+          </div>
+          <div class="flex flex-col justify-between">
+            <button
+              class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
+              @click="saveAudio"
+            >
+              <img src="@/assets/buttons/save.webp" alt="Microphone" class="mr-1" />
+              Save to history
+            </button>
+            <button
+              class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
+              @click="deleteAudio"
+            >
+              <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" />
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Placeholder message when there is no recording -->
+      <div v-else class="w-full flex items-center justify-center">
+        <div class="w-[70%]">
+          <p class="text-xl text-center w-full">
+            No recorded audio available. Please start recording to see playback and
+            download options.
+          </p>
+        </div>
+      </div>
+      <div v-if="saving" class="w-full">
+        <button @click="saving = null">x</button>
+        <p v-if="saving === 'delete'">Successfully Deleted!</p>
+        <p v-if="saving === 'save'">Successfully Saved!</p>
+      </div>
+    </div>
+  </template>
 
 <script setup>
 import { ref } from "vue";
@@ -153,7 +154,7 @@ const devices = devicesStore();
 const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
-const selectedChannel = ref(1); // Default to mono
+const selectedChannel = ref(2); // Default to stereo
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
