@@ -13,6 +13,7 @@ export const devicesStore = defineStore(
         const speakersWithDeviceId = ref([]);
 
         const selectedMicrophone = ref(null);
+        const channelCount = ref(1); // Default to stereo
         const selectedSpeaker = ref(null);
         const inputVolume = ref(0.5);
         const outputVolume = ref(1.0);
@@ -137,6 +138,7 @@ export const devicesStore = defineStore(
             selectedMicrophone,
             selectedSpeaker,
             cleanupAudio,
+            channelCount
         }
     },
     {
@@ -147,6 +149,7 @@ export const devicesStore = defineStore(
                     storage: localStorage,
                     paths: [
                         "selectedMicrophone",
+                        "channelCount",
                         "selectedSpeaker",
                         "inputVolume",
                         "outputVolume",

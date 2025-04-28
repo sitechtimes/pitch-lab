@@ -1,34 +1,15 @@
 <template>     
   <!-- Channel Selection -->
   <div
-    class="relative group rounded-lg w-64 bg-[#616161] overflow-hidden before:absolute before:w-12 before:h-12 before:content[''] before:right-0 before:bg-[#9c27b0] before:rounded-full before:blur-lg before:[box-shadow:-60px_20px_10px_10px_#F9B0B9]"
+    class="relative group rounded-lg w-[20%]"
   >
-    <svg
-      y="0"
-      xmlns="http://www.w3.org/2000/svg"
-      x="0"
-      width="100"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid meet"
-      height="100"
-      class="w-8 h-8 absolute right-0 -rotate-45 stroke-[#F06292] top-1.5 group-hover:rotate-0 duration-300"
-    >
-      <path
-        stroke-width="4"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-        fill="none"
-        d="M60.7,53.6,50,64.3m0,0L39.3,53.6M50,64.3V35.7m0,46.4A32.1,32.1,0,1,1,82.1,50,32.1,32.1,0,0,1,50,82.1Z"
-        class="svg-stroke-primary"
-      ></path>
-    </svg>
     <select
       id="channel"
       v-model="selectedChannel"
-      class="appearance-none hover:placeholder-shown:bg-[#50C878] relative text-[#FF69B4] bg-transparent ring-0 outline-none border border-[#808080]  placeholder-[#EE82EE] text-sm font-bold rounded-lg focus:ring-[#EE82EE] focus:border-[#EE82EE] block w-full p-2.5"
-    >
-      <option value="1">Mono</option>
-      <option value="2">Stereo</option>
+      class="appearance-none hover:placeholder-shown:bg-[#50C878] relative text-[#FF69B4] bg-transparent ring-0 outline-none border border-[#808080] placeholder-[#EE82EE] text-sm font-bold rounded-lg focus:ring-[#EE82EE] focus:border-[#EE82EE] block w-full p-2.5">
+      placeholder="Select Channel"
+      <option value="1">Stereo</option>
+      <option value="2">Mono</option>
     </select>
   </div>
     <div class="flex flex-row">
@@ -108,7 +89,7 @@
   
             </div>
           </div>
-          <div class="flex flex-col justify-between">
+          <!-- <div class="flex flex-col justify-between">
             <button
               class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
               @click="saveAudio"
@@ -123,7 +104,22 @@
               <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" />
               Delete
             </button>
-          </div>
+          </div> -->
+          <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1">
+  <a
+    class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
+    @click="saveAudio"
+    >Download
+  </a>
+  <a
+    class="bg-[#5350c6] hover:bg-secondary-600 hover:scale-[1.065] hover:translate-y-[7px] hover:rounded-[23px] hover:rounded-tl-none hover:rounded-tr-none px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg transition-all text-center text-[#d8e5f9] hover:text-[#b3aaee] font-medium cursor-pointer"
+    @click="deleteAudio"
+  >
+  <!-- <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" /> -->
+
+   Delete
+  </a>
+</div>
         </div>
       </div>
   
@@ -154,7 +150,7 @@ const devices = devicesStore();
 const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
-const selectedChannel = ref(2); // Default to stereo
+const selectedChannel = ref(1); // Default to stereo
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
@@ -166,7 +162,9 @@ const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         deviceID: devices.selectedMicrophone,
-        channelCount: selectedChannel.value, // Use selected channel count
+        channelCount: selectedChannel.value, // Use stereo channel by default
+        noiseSuppression: true,
+        echoCancellation: true,
       },
     });
 
@@ -180,13 +178,13 @@ const startRecording = async () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64Audio = reader.result.split(",")[1]; // Extract base64 part
+        const base64Audio = reader.result.split(",")[1];
         audioStore.currentRecording = {
           audio: base64Audio,
           id: audioStore.assignedID,
-        }; // Store base64 string with id
+        };
       };
-      reader.readAsDataURL(audioBlob); // Convert Blob to Base64
+      reader.readAsDataURL(audioBlob);
     };
 
     // Start recording
