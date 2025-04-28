@@ -57,12 +57,12 @@ export const initializeStore = defineStore(
           devices.selectedMicrophone?.deviceId && devices.selectedMicrophone.deviceId !== ""
             ? {
               deviceId: { exact: devices.selectedMicrophone.deviceId },
-              noiseSuppression: false,
-              autoGainControl: false,
+              noiseSuppression: true,
+              autoGainControl: true,
             }
             : {
-              noiseSuppression: false,
-              autoGainControl: false,
+              noiseSuppression: true,
+              autoGainControl: true,
             };
 
         stream.value = await navigator.mediaDevices.getUserMedia({
