@@ -16,7 +16,7 @@
       <div class="flex flex-col items-center w-[30%]">
    
   
-        <!-- Timer display -->
+     
       <div class="">
         <button
         class="bg-skyblue hover:bg-[#6A0DAD] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
@@ -39,8 +39,8 @@
           <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
           Stop Recording
         </button>
-  
-        <div class="text-white bg-[#424242] text-center py-2 px-4 rounded-lg text-lg font-mono">
+        <!-- Timer Display -->
+        <div class="text-white bg-[#424242] text-center py-2 px-4 my-2 rounded-lg text-lg font-mono">
     Timer: {{ formatTime(timer) }}
         </div>
       </div>
@@ -89,22 +89,6 @@
   
             </div>
           </div>
-          <!-- <div class="flex flex-col justify-between">
-            <button
-              class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
-              @click="saveAudio"
-            >
-              <img src="@/assets/buttons/save.webp" alt="Microphone" class="mr-1" />
-              Save to history
-            </button>
-            <button
-              class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
-              @click="deleteAudio"
-            >
-              <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" />
-              Delete
-            </button>
-          </div> -->
           <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1">
   <a
     class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
@@ -132,11 +116,18 @@
           </p>
         </div>
       </div>
-      <div v-if="saving" class="w-full">
-        <button @click="saving = null">x</button>
+      <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
+      <div
+        class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
+        :class="{
+          'bg-red': saving === 'delete',
+          'bg-green': saving === 'save',
+        }"
+      >
         <p v-if="saving === 'delete'">Successfully Deleted!</p>
         <p v-if="saving === 'save'">Successfully Saved!</p>
       </div>
+    </div>
     </div>
   </template>
 
@@ -168,7 +159,29 @@ const startRecording = async () => {
       },
     });
 
-    mediaRecorder = new MediaRecorder(stream);
+     // Create an audio context for processing
+     const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+
+    // Create a stereo panner for spatial effects
+    const stereoPanner = audioContext.createStereoPanner();
+
+       // Simulate immersive sound by panning between left and right channels
+       let panValue = -1; // Start panning from the left
+    setInterval(() => {
+      panValue = panValue === -1 ? 1 : -1; // Alternate between left and right
+      stereoPanner.pan.value = panValue;
+    }, 1000); // Adjust panning every second
+
+    // Connect the source to the panner
+    source.connect(stereoPanner);
+
+    // Connect the panner to the destination
+    const destination = audioContext.createMediaStreamDestination();
+    stereoPanner.connect(destination);
+
+    // Use the processed stream for recording
+    mediaRecorder = new MediaRecorder(destination.stream);
 
     mediaRecorder.ondataavailable = (event) => {
       audioChunks.push(event.data);
@@ -266,16 +279,12 @@ const deleteAudio = () => {
 const autoDisappear = () => {
   setTimeout(() => {
     saving.value = null;
-  }, 3000);
+  }, 1500);
 };
 </script>
 
 <style scoped>
-button {
-  margin: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
+
 
 audio {
   margin-top: 10px;
