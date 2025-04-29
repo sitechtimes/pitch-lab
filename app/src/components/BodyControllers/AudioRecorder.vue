@@ -1,17 +1,4 @@
 <template>     
-  <!-- Channel Selection -->
-  <div
-    class="relative group rounded-lg w-[20%]"
-  >
-    <select
-      id="channel"
-      v-model="selectedChannel"
-      class="appearance-none hover:placeholder-shown:bg-[#50C878] relative text-[#FF69B4] bg-transparent ring-0 outline-none border border-[#808080] placeholder-[#EE82EE] text-sm font-bold rounded-lg focus:ring-[#EE82EE] focus:border-[#EE82EE] block w-full p-2.5">
-      placeholder="Select Channel"
-      <option value="1">Stereo</option>
-      <option value="2">Mono</option>
-    </select>
-  </div>
     <div class="flex flex-row">
       <div class="flex flex-col items-center w-[30%]">
    
@@ -152,8 +139,8 @@ const startRecording = async () => {
     // Get access to the microphone
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
-        deviceID: devices.selectedMicrophone,
-        channelCount: selectedChannel.value, // Use stereo channel by default
+        deviceId: devices.selectedMicrophone?.deviceId,
+        channelCount: 2, // Uses Stereo on default
         noiseSuppression: true,
         echoCancellation: true,
       },
@@ -182,7 +169,6 @@ const startRecording = async () => {
 
     // Use the processed stream for recording
     mediaRecorder = new MediaRecorder(destination.stream);
-
     mediaRecorder.ondataavailable = (event) => {
       audioChunks.push(event.data);
     };
