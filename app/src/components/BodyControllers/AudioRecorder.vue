@@ -155,10 +155,10 @@ const startRecording = async () => {
 
        // Simulate immersive sound by panning between left and right channels
        let panValue = -1; // Start panning from the left
-    setInterval(() => {
+      setInterval(() => {
       panValue = panValue === -1 ? 1 : -1; // Alternate between left and right
       stereoPanner.pan.value = panValue;
-    }, 500); // Adjust panning every half a second
+    }, 1000); // Adjust panning every second
 
     // Connect the source to the panner
     source.connect(stereoPanner);
