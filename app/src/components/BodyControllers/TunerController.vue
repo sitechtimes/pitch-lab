@@ -1,38 +1,81 @@
-<template>
-  <div class="flex flex-col">
-    <div
-      class="flex items-center justify-between p-4 bg-gray-900 rounded-md text-white max-w-sm"
-    >
-      <!-- Label -->
-      <div class="flex flex-col">
-        <label for="fft-size" class="text-lg font-semibold mb-2 text-gray-300">
-          FFT Size
-        </label>
-        <!-- FFT Size Dropdown -->
-        <div class="relative text-black">
-          <select
-            v-model="selectedFFTSize"
-            @change="updateFFTSize"
-            class="bg-gray-800 text-gray-300 border border-gray-600 rounded px-4 py-1 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option v-for="size in fftSizes" :key="size" :value="size">
-              {{ size }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { droneStore } from "@/stores/droneStore";
+import { noteFrequencies } from "@/constants/NoteFrequencies";
 
-const selectedFFTSize = ref(2048);
-const fftSizes = [256, 512, 1024, 2048, 4096, 8192, 16384];
+const drone = droneStore();
+const selectedNote = ref("A4");
 
-// Update FFT size
-const updateFFTSize = () => {
-  console.log(`FFT size updated to ${selectedFFTSize.value}`);
+const noteIndex = computed(() =>
+  noteFrequencies.findIndex((n) => n.note === selectedNote.value),
+);
+
+const setAndPlayNote = async (index) => {
+  if (index >= 0 && index < noteFrequencies.length) {
+    selectedNote.value = noteFrequencies[index].note;
+    await drone.stopDrone();
+    await drone.playDrone(selectedNote.value);
+  }
+};
+
+const nextNote = async () => {
+  if (noteIndex.value < noteFrequencies.length - 1) {
+    await setAndPlayNote(noteIndex.value + 1);
+  }
+};
+
+const prevNote = async () => {
+  if (noteIndex.value > 0) {
+    await setAndPlayNote(noteIndex.value - 1);
+  }
+};
+
+const toggleDrone = async () => {
+  if (drone.isPlaying && drone.currentNote === selectedNote.value) {
+    drone.stopDrone();
+  } else {
+    await drone.playDrone(selectedNote.value);
+  }
 };
 </script>
+
+<template>
+  <div class="p-4 max-w-md mx-auto">
+    <div class="flex gap-2 items-center mb-4">
+      <button
+        @click="prevNote"
+        :disabled="noteIndex <= 0"
+        class="p-2 px-4 text-white bg-purple rounded disabled:opacity-40"
+      >
+        −
+      </button>
+
+      <select
+        v-model="selectedNote"
+        class="flex-1 p-2 text-white bg-purple rounded shadow"
+      >
+        <option v-for="n in noteFrequencies" :key="n.note" :value="n.note">
+          {{ n.note }} ({{ n.frequency.toFixed(2) }} Hz)
+        </option>
+      </select>
+
+      <button
+        @click="nextNote"
+        :disabled="noteIndex >= noteFrequencies.length - 1"
+        class="p-2 px-4 text-white bg-purple rounded disabled:opacity-40"
+      >
+        +
+      </button>
+    </div>
+
+    <button
+      @click="toggleDrone"
+      class="w-full p-2 text-white bg-purple rounded hover:bg-purple-600 transition"
+    >
+      {{
+        drone.isPlaying && drone.currentNote === selectedNote ? "Stop" : "Play"
+      }}
+      {{ selectedNote }}
+    </button>
+  </div>
+</template>
