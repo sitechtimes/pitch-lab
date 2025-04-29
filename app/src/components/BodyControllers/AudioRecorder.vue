@@ -158,7 +158,7 @@ const startRecording = async () => {
     setInterval(() => {
       panValue = panValue === -1 ? 1 : -1; // Alternate between left and right
       stereoPanner.pan.value = panValue;
-    }, 1000); // Adjust panning every second
+    }, 500); // Adjust panning every half a second
 
     // Connect the source to the panner
     source.connect(stereoPanner);
