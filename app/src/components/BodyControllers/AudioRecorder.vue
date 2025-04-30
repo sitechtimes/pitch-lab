@@ -1,109 +1,119 @@
-<template>     
-    <div class="flex flex-row">
-      <div class="flex flex-col items-center w-[30%]">
-   
-  
-     
-      <div class="">
+<template>
+  <div class="flex flex-row">
+    <div class="flex flex-col items-center w-[30%]">
+      <div class="flex flex-row items-center justify-between w-full ">
         <button
-        class="bg-skyblue hover:bg-[#6A0DAD] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
-  
+          class="bg-skyblue hover:bg-[#6A0DAD] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
           @click="startRecording"
           v-if="!isRecording"
         >
-        <img src="@/assets/buttons/microphone.webp" alt="Microphone" class="h-6 w-6" />
-    <span
-      class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-[#000000] rounded opacity-0 group-hover:opacity-100 transition-opacity"
-    >
-      Start Recording
-    </span>
+          <img
+            src="@/assets/buttons/microphone.webp"
+            alt="Microphone"
+            class="h-6 w-6"
+          />
         </button>
         <button
-        class="bg-[#008000] hover:bg-[#4CAF50] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
-        @click="stopRecording"
+          class="bg-[#008000] hover:bg-[#4CAF50] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+          @click="stopRecording"
           v-if="isRecording"
         >
-          <img src="@/assets/buttons/microphone-disabled.webp" alt="Disabled Microphone" class="h-6 w-6 mr-2" />
-          Stop Recording
+          <img
+            src="@/assets/buttons/microphone-disabled.webp"
+            alt="Disabled Microphone"
+            class="h-6 w-6"
+          />
         </button>
         <!-- Timer Display -->
-        <div class="text-white bg-[#424242] text-center py-2 px-4 my-2 rounded-lg text-lg font-mono">
-    Timer: {{ formatTime(timer) }}
+        <div
+          class="text-black bg-white w-[60%] text-center py-2 px-4 my-2 rounded-lg text-lg font-mono"
+        >
+          {{ formatTime(timer) }}
         </div>
       </div>
-        <button
-          type="button"
-          class="text-white text-center font-medium rounded-full text-sm bg-[#7210E3] p-2 w-full"
-          @click="
-            (audioStore.showHistoryModal = true),
-              (saving = null),
-              (audioStore.showDeletedModal = false)
-          "
-        >
-          Saved Recordings
-        </button>
-      </div>
-  
-      <!-- Display recorded audio playback and download link -->
-      <div v-if="audioStore.currentRecording && !isRecording" class="w-full flex items-center justify-center">
-        <div class="flex flex-row justify-between w-[85%]">
-          <div>
-            <div :key="audioStore.currentRecording.id">
-              <audio
-                ref="audioElement"
-                id="audio"
-                controls
-                :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
-              ></audio>
-            </div>
-            <div class="w-[90%] mt-2 flex flex-row justify-between">
-              <input
-                id="name"
-                type="text"
-                class="text-[#000000] w-[full]"
-                v-model="audioStore.fileName"
-                placeholder="Name File"
-              />
-  
-              <div>
-                <a
-                  :href="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
-                  :download="audioStore.fileName ? audioStore.fileName + '.mp4' : 'recorded-audio.mp4'"
-                >
-                  Download
-                </a>
-              </div>
-  
+      <button
+        type="button"
+        class="text-white text-center font-medium rounded-full text-sm bg-[#7210E3] p-2 w-full"
+        @click="
+          (audioStore.showHistoryModal = true),
+            (saving = null),
+            (audioStore.showDeletedModal = false)
+        "
+      >
+        Saved Recordings
+      </button>
+    </div>
+
+    <!-- Display recorded audio playback and download link -->
+    <div
+      v-if="audioStore.currentRecording && !isRecording"
+      class="w-full flex items-center justify-center"
+    >
+      <div class="flex flex-row justify-between w-[85%]">
+        <div>
+          <div :key="audioStore.currentRecording.id">
+            <audio
+              ref="audioElement"
+              id="audio"
+              controls
+              :src="
+                'data:audio/mp4;base64,' + audioStore.currentRecording.audio
+              "
+            ></audio>
+          </div>
+          <div class="w-[90%] mt-2 flex flex-row justify-between">
+            <input
+              id="name"
+              type="text"
+              class="text-[#000000] w-[full]"
+              v-model="audioStore.fileName"
+              placeholder="Name File"
+            />
+
+            <div>
+              <a
+                :href="
+                  'data:audio/mp4;base64,' + audioStore.currentRecording.audio
+                "
+                :download="
+                  audioStore.fileName
+                    ? audioStore.fileName + '.mp4'
+                    : 'recorded-audio.mp4'
+                "
+              >
+                Download
+              </a>
             </div>
           </div>
-          <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1">
-  <a
-    class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
-    @click="saveAudio"
-    >Download
-  </a>
-  <a
-    class="bg-[#5350c6] hover:bg-secondary-600 hover:scale-[1.065] hover:translate-y-[7px] hover:rounded-[23px] hover:rounded-tl-none hover:rounded-tr-none px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg transition-all text-center text-[#d8e5f9] hover:text-[#b3aaee] font-medium cursor-pointer"
-    @click="deleteAudio"
-  >
-  <!-- <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" /> -->
+        </div>
+        <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1">
+          <a
+            class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
+            @click="saveAudio"
+            >Download
+          </a>
+          <a
+            class="bg-[#5350c6] hover:bg-secondary-600 hover:scale-[1.065] hover:translate-y-[7px] hover:rounded-[23px] hover:rounded-tl-none hover:rounded-tr-none px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg transition-all text-center text-[#d8e5f9] hover:text-[#b3aaee] font-medium cursor-pointer"
+            @click="deleteAudio"
+          >
+            <!-- <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" /> -->
 
-   Delete
-  </a>
-</div>
+            Delete
+          </a>
         </div>
       </div>
-  
-      <!-- Placeholder message when there is no recording -->
-      <div v-else class="w-full flex items-center justify-center">
-        <div class="w-[70%]">
-          <p class="text-xl text-center w-full">
-            No recorded audio available. Please start recording to see playback and
-            download options.
-          </p>
-        </div>
+    </div>
+
+    <!-- Placeholder message when there is no recording -->
+    <div v-else class="w-full flex items-center justify-center">
+      <div class="w-[70%]">
+        <p class="text-xl text-center w-full">
+          No recorded audio available. Please start recording to see playback
+          and download options.
+        </p>
       </div>
-      <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
+    </div>
+    <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
       <div
         class="h-[5%] w-[60%] text-lg flex items-center justify-center bg-opacity-60"
         :class="{
@@ -115,8 +125,8 @@
         <p v-if="saving === 'save'">Successfully Saved!</p>
       </div>
     </div>
-    </div>
-  </template>
+  </div>
+</template>
 
 <script setup>
 import { ref } from "vue";
@@ -146,16 +156,16 @@ const startRecording = async () => {
       },
     });
 
-     // Create an audio context for processing
-     const audioContext = new AudioContext();
+    // Create an audio context for processing
+    const audioContext = new AudioContext();
     const source = audioContext.createMediaStreamSource(stream);
 
     // Create a stereo panner for spatial effects
     const stereoPanner = audioContext.createStereoPanner();
 
-       // Simulate immersive sound by panning between left and right channels
-       let panValue = -1; // Start panning from the left
-      setInterval(() => {
+    // Simulate immersive sound by panning between left and right channels
+    let panValue = -1; // Start panning from the left
+    setInterval(() => {
       panValue = panValue === -1 ? 1 : -1; // Alternate between left and right
       stereoPanner.pan.value = panValue;
     }, 1000); // Adjust panning every second
@@ -270,8 +280,6 @@ const autoDisappear = () => {
 </script>
 
 <style scoped>
-
-
 audio {
   margin-top: 10px;
   display: block;
