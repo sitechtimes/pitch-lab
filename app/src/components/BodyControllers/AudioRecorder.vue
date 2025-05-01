@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-row">
+  <div class="flex flex-row items-center">
     <div class="flex flex-col items-center w-[30%]">
-      <div class="flex flex-row items-center justify-between w-full ">
+      <div class="flex flex-row items-center justify-between w-full">
         <button
           class="bg-skyblue hover:bg-[#6A0DAD] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
           @click="startRecording"
@@ -31,16 +31,29 @@
           {{ formatTime(timer) }}
         </div>
       </div>
+
       <button
-        type="button"
-        class="text-white text-center font-medium rounded-full text-sm bg-[#7210E3] p-2 w-full"
+        class="overflow-hidden relative w-full p-2 text-center bg-purple text-white border-none rounded-md text-xl font-bold cursor-pointer z-10 group"
         @click="
           (audioStore.showHistoryModal = true),
             (saving = null),
             (audioStore.showDeletedModal = false)
         "
       >
-        Saved Recordings
+        Recordings
+        <span
+          class="absolute w-36 h-32 -top-8 -left-2 bg-white rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"
+        ></span>
+        <span
+          class="absolute w-36 h-32 -top-8 -left-2 bg-[#2E236C] rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"
+        ></span>
+        <span
+          class="absolute w-36 h-32 -top-8 -left-2 bg-[#17153B] rotate-12 transform scale-x-0 group-hover:scale-x-50 transition-transform group-hover:duration-1000 duration-500 origin-left"
+        ></span>
+        <span
+          class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute top-2.5 left-6 z-10"
+          >View Recordings</span
+        >
       </button>
     </div>
 
