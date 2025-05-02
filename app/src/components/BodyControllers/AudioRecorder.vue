@@ -78,13 +78,12 @@
             <input
               id="name"
               type="text"
-              class="text-[#000000] w-[full]"
-              v-model="audioStore.fileName"
-              placeholder="Name File"
+              class="relative bg-[#F8F8F8] ring-0 outline-none border border-[#808080] text-[#1A1A1A] placeholder-[#8A2BE2] text-sm rounded-lg focus:ring-[#8A2BE2] focus:border-[#8A2BE2] block w-[50%] p-2.5 checked:bg-[#50C878]"
+              placeholder="Name File..."
             />
-
             <div>
               <a
+                class="bg-purple text-white font-bold py-2 px-5 rounded-lg shadow-md transition disabled:opacity-50"
                 :href="
                   'data:audio/mp4;base64,' + audioStore.currentRecording.audio
                 "
@@ -103,7 +102,7 @@
           <a
             class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
             @click="saveAudio"
-            >Download
+            >Save to History
           </a>
           <a
             class="bg-[#5350c6] hover:bg-secondary-600 hover:scale-[1.065] hover:translate-y-[7px] hover:rounded-[23px] hover:rounded-tl-none hover:rounded-tr-none px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg transition-all text-center text-[#d8e5f9] hover:text-[#b3aaee] font-medium cursor-pointer"
