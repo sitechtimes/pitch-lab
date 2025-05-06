@@ -62,7 +62,7 @@
       v-if="audioStore.currentRecording && !isRecording"
       class="w-full flex items-center justify-center"
     >
-      <div class="flex flex-row justify-between w-[85%]">
+      <div class="flex flex-row w-[85%]">
         <div>
           <div :key="audioStore.currentRecording.id">
             <audio
@@ -74,16 +74,17 @@
               "
             ></audio>
           </div>
-          <div class="w-[90%] mt-2 flex flex-row justify-between">
+          <div class="w-full mt-2 flex flex-row justify-between">
             <input
               id="name"
               type="text"
-              class="relative bg-[#F8F8F8] ring-0 outline-none border border-[#808080] text-[#1A1A1A] placeholder-[#8A2BE2] text-sm rounded-lg focus:ring-[#8A2BE2] focus:border-[#8A2BE2] block w-[50%] p-2.5 checked:bg-[#50C878]"
+              class="relative bg-[#F8F8F8] ring-0 outline-none border border-[#808080] text-[#1A1A1A] placeholder-[#8A2BE2] text-sm rounded-lg focus:ring-[#8A2BE2] focus:border-[#8A2BE2] block w-[60%] p-2"
               placeholder="Name File..."
             />
-            <div>
+            <div
+              class="bg-purple text-white font-bold py-2 px-5 rounded-lg shadow-md transition disabled:opacity-50"
+            >
               <a
-                class="bg-purple text-white font-bold py-2 px-5 rounded-lg shadow-md transition disabled:opacity-50"
                 :href="
                   'data:audio/mp4;base64,' + audioStore.currentRecording.audio
                 "
@@ -98,7 +99,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1">
+        <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1 ml-3">
           <a
             class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
             @click="saveAudio"

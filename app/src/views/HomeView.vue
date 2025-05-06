@@ -2,7 +2,7 @@
   <div class="bg-controllers-bg rounded-3xl py-6">
     <div class="w-[95%] p-2 flex-items-center justify-center mx-auto">
       <!-- <h1 class="text-3xl text-[#A3D10A] font-bold text-center">Controllers</h1> -->
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col items-center justify-between md:flex-row">
       <!-- Recorder -->
       <div class="flex w-[35%] flex-col relative">
         <AudioRecorder />
