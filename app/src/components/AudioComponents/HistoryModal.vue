@@ -6,8 +6,18 @@
       class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
     >
       <div class="w-full flex flex-row justify-between mb-[1%]">
-        <h1 class="text-3xl font-semibold mb-2" v-if="!audioStore.showDeletedModal">History</h1>
-        <h1 class="text-3xl font-semibold mb-2" v-if="audioStore.showDeletedModal">Recently Deleted</h1>
+        <h1
+          class="text-3xl font-semibold mb-2"
+          v-if="!audioStore.showDeletedModal"
+        >
+          History
+        </h1>
+        <h1
+          class="text-3xl font-semibold mb-2"
+          v-if="audioStore.showDeletedModal"
+        >
+          Recently Deleted
+        </h1>
         <button
           v-if="!audioStore.showDeletedModal"
           @click="audioStore.showDeletedModal = true"
@@ -24,7 +34,6 @@
         </button>
       </div>
       <div class="w-full flex justify-center">
-
         <div class="flex items-center h-full">
           <AudioHistory v-if="!audioStore.showDeletedModal" />
           <RecentlyDeleted v-if="audioStore.showDeletedModal" />
@@ -32,11 +41,12 @@
         <div v-if="audioStore.currentAudio">
           <AudioPlayback />
         </div>
-
-    </div>
+      </div>
       <button
         @click="
-          (audioStore.showHistoryModal = false), (audioStore.currentAudio = null), (audioStore.showDeletedModal = false)
+          (audioStore.showHistoryModal = false),
+            (audioStore.currentAudio = null),
+            (audioStore.showDeletedModal = false)
         "
         class="text-xl"
       >
@@ -54,6 +64,4 @@ import { audioFilesStore } from "@/stores/audioFiles";
 const audioStore = audioFilesStore();
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
