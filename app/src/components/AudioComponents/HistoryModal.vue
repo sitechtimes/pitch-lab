@@ -3,7 +3,7 @@
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
     <div
-      class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6 w-[40%] relative"
+      class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6  h-[50%] w-[50%] border border-4 border-black rounded-2xl bg-gray-50"
     >
       <div class="w-full flex flex-row justify-between mb-[1%]">
         <h1
@@ -48,7 +48,7 @@
             (audioStore.currentAudio = null),
             (audioStore.showDeletedModal = false)
         "
-        class="text-xl"
+        class="text-xl bg-purple rounded-full p-2 py-2 mb-2"
       >
         Exit History
       </button>
