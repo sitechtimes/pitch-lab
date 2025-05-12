@@ -3,7 +3,7 @@
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
     <div
-      class="bg-[#261b32] rounded-lg border-2 border-black shadow-lg p-6  h-[50%] w-[50%] border border-4 border-black rounded-2xl bg-gray-50"
+      class="bg-[#261b32] rounded-lg shadow-lg p-6 w-[40%] border  border-black bg-gray-50"
     >
       <div class="w-full flex flex-row justify-between mb-[1%]">
         <h1
