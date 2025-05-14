@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import TunerView from "../views/TunerView.vue";
 import LandingView from "@/views/LandingView.vue";
+import ContributionView from "@/views/ContributionView.vue";
 import InitializeApp from "@/views/InitializeApp.vue";
 import { initializeStore } from "@/stores/initialize";
 const router = createRouter({
@@ -24,7 +25,12 @@ const router = createRouter({
       name: "landing",
       component: LandingView,
       meta: { requiresInit: false }
-
+    },
+        {
+      path: "/contribution",
+      name: "contribution",
+      component: ContributionView,
+      meta: { requiresInit: false }
     },
     {
       path: "/initialize",

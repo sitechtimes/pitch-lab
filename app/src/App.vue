@@ -19,6 +19,9 @@
           <router-link to="/tuner" class="text-3xl hover:underline"
             >Tuner</router-link
           >
+          <router-link to="/contribution" class="text-3xl hover:underline"
+            >Contributions</router-link
+          >
         </div>
       </header>
 
