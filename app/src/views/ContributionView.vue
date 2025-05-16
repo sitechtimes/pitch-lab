@@ -8,15 +8,15 @@
       <img
         :src="item.image"
         alt="Card Image"
-        class="w-28 h-28 mt-8 rounded-full border-4 border-[#F8F8F8] z-10 group-hover:scale-150 group-hover:-translate-x-24 group-hover:-translate-y-20 transition-all duration-500"
+        class="w-28 h-28 mt-8 rounded-full border-4 border-[#F8F8F8] z-10 group-hover:scale-120 group-hover:-translate-x-32 group-hover:-translate-y-6 transition-all duration-500"
       />
       <div class="z-10 group-hover:-translate-y-10 transition-all duration-500 text-[#003049]">
         <span class="text-2xl font-semibold">{{ item.title }}</span>
         <p class="text-[#808080] mb-4">{{ item.description }}</p>
         <button
-          class="bg-[#0000FF] px-[8%] py-[3%] text-[#F8F8F8] rounded-md z-10 hover:scale-125 transition-all duration-500 hover:bg-[#4682B4] flex items-center justify-center mx-auto"
+          class=" px-[8%] py-[3%]  rounded-md z-10 transition-all duration-500 flex items-center justify-center mx-auto"
         >
-          <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" class="w-8 hover:scale-125 duration-200 hover:stroke-white">
+          <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" class="w-8 stroke-black duration-200 hover:stroke-white">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
           </svg>
         </button>
