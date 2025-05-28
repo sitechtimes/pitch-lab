@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen min-h-screen bg-entire-bg text-white">
+  <div class=" w-screen  bg-entire-bg text-white">
     <!-- Orientation Warning (only shown if initialized) -->
     <!-- <div
       v-if="initialize.isInitialized && isPortrait"
