@@ -1,5 +1,5 @@
 <template>
-  <div class=" w-screen  bg-entire-bg text-white">
+  <div class="w-screen bg-entire-bg text-white min-h-screen">
     <!-- Orientation Warning (only shown if initialized) -->
     <!-- <div
       v-if="initialize.isInitialized && isPortrait"
@@ -10,15 +10,16 @@
 
     <!-- Main App Content (only shown if initialized and in landscape) -->
     <div >
-      <header class="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 bg-entire-bg">
+      <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
         <HeaderTitle />
-        <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
-          <router-link to="/" class="text-2xl sm:text-3xl hover:underline"
+        <div class="flex items-center gap-4">
+          <router-link to="/" class="text-3xl hover:underline"
             >Home</router-link
           >
-          <router-link to="/tuner" class="text-2xl sm:text-3xl hover:underline"
+          <router-link to="/tuner" class="text-3xl hover:underline"
             >Tuner</router-link
           >
+        
         </div>
       </header>
 

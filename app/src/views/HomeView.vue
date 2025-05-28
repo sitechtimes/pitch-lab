@@ -1,37 +1,33 @@
 <template>
-  <div class="bg-controllers-bg rounded-3xl py-6">
-    <div class="w-[95%] p-2 flex-items-center justify-center mx-auto">
-      <!-- <h1 class="text-3xl text-[#A3D10A] font-bold text-center">Controllers</h1> -->
-      <div class="flex flex-col items-center justify-between md:flex-row">
-        <!-- Recorder -->
-        <div class="flex w-[35%] flex-col relative">
-          <AudioRecorder />
-        </div>
-
+  <div class="bg-controllers-bg rounded-3xl p-6">
+    <div class="flex sm:items-center sm:justify-center sm:flex-col gap-4 md:flex-row ">
+      <!-- Recorder -->
+      <div class="flex sm:w-[35%] w-full flex-col">
+        <AudioRecorder />
         <div
           v-if="audioStore.showHistoryModal"
           class="absolute inset-0 bg-black/30 p-4"
         >
           <HistoryModal />
         </div>
-        <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
+      </div>
+      <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
 
-        <!-- Metronome -->
-        <div class="w-[35%] items-center flex justify-center">
-          <MetronomeController />
-        </div>
-        <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
-        <!-- Tuner -->
-        <div class="w-[20%] flex justify-center">
-          <TunerController />
-        </div>
+      <!-- Metronome -->
+      <div class="w-[35%] items-center flex justify-center">
+        <MetronomeController />
+      </div>
+      <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
+      <!-- Tuner -->
+      <div class="w-[20%] flex justify-center">
+        <TunerController />
       </div>
     </div>
 
     <!-- Tuning Section -->
-  </div>
-  <div class="mt-5 bg-entire-bg">
-    <TunerSection />
+    <div class="mt-5 bg-entire-bg">
+      <TunerSection />
+    </div>
   </div>
 </template>
 
