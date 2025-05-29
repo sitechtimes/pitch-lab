@@ -2,7 +2,7 @@
   <div class="bg-controllers-bg rounded-3xl p-6">
     <div class="flex sm:items-center sm:justify-center sm:flex-col gap-4 md:flex-row ">
       <!-- Recorder -->
-      <div class="flex sm:w-[35%] w-full flex-col">
+      <div class="flex sm:w-full md:w-[35%]  flex-col">
         <AudioRecorder />
         <div
           v-if="audioStore.showHistoryModal"
@@ -11,15 +11,15 @@
           <HistoryModal />
         </div>
       </div>
-      <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
+      <div class="w-0.5 bg-[#A3D10A] self-stretch rounded-md hidden sm:block"></div>
 
       <!-- Metronome -->
-      <div class="w-[35%] items-center flex justify-center">
+      <div class="sm:w-full md:w-[35%]  items-center flex justify-center">
         <MetronomeController />
       </div>
-      <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
+      <div class="w-0.5 bg-[#A3D10A] self-stretch rounded-md hidden sm:block"></div>
       <!-- Tuner -->
-      <div class="w-[20%] flex justify-center">
+      <div class="sm:w-full md:w-[20%] flex justify-center">
         <TunerController />
       </div>
     </div>
