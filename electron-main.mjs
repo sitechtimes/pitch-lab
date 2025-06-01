@@ -2,11 +2,11 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-dotenv.config();
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+const __dirname = dirname(__filename);
+dotenv.config();
 const isDev = process.env.NODE_ENV === 'development';
 
 function createWindow() {
@@ -15,7 +15,7 @@ function createWindow() {
         height: 600,
         show: true,
         webPreferences: {
-            preload: path.join(__dirname, '..', 'preload.mjs'),
+            preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false,
         },
@@ -24,7 +24,7 @@ function createWindow() {
         win.loadURL('http://localhost:5173');
         win.webContents.openDevTools();
     } else {
-        win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
+        win.loadFile(path.join(__dirname, 'dist-frontend', 'index.html'));
     }
 }
 

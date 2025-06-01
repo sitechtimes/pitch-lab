@@ -38,7 +38,7 @@
 <script setup>
 const version = "0.0.0";
 const releaseDate = "April 11, 2025";
-const downloadUrl = "/PitchLab Setup 0.0.0.exe";
+const downloadUrl = "/downloads/PitchLab Setup 0.0.0.exe";
 
 function trackDownload() {
   if (typeof gtag !== "undefined") {

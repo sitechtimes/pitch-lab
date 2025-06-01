@@ -1,17 +1,16 @@
 {
-  "name": "tuner",
+  "name": "pitchlab",
   "description": "All-in-one tuner app: metronome, recorder, and accurate tuner. Fast, simple, and perfect for all musicians!",
-  "author": "Evan Gao",
+  "author": "Evan Gao - SITHS",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "main": "electron-main.mjs",
   "scripts": {
     "dev": "concurrently -k \"cross-env NODE_ENV=development vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron electron-main.mjs\"",
-    "build": "vite build",
     "start": "electron electron-main.mjs",
-    "clean": "rimraf dist dist-electron",
-    "dist": "npm run build && electron-builder",
+    "clean": "rimraf dist dist-electron dist-frontend",
+    "dist": "npm run clean && vite build && electron-builder",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
@@ -20,12 +19,13 @@
     "appId": "com.site.pitchlab",
     "productName": "PitchLab",
     "files": [
-      "app/dist/**/*",
-      "app/src/main.mjs",
-      "app/preload.mjs"
+      "dist-frontend/**",
+      "electron-main.mjs",
+      "preload.js",
+      "package.json"
     ],
     "directories": {
-      "buildResources": "build"
+      "buildResources": "public"
     },
     "win": {
       "target": "nsis",
