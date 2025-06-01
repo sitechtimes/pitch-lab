@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen bg-entire-bg text-white min-h-screen">
+  <div class="bg-entire-bg text-white min-h-screen">
     <div
       v-if="initialize.isInitialized && isPortrait"
       class="fixed inset-0 px-10 flex items-center justify-center text-5xl py-5 text-white bg-gray-800"
