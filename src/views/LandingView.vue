@@ -6,7 +6,7 @@
     <header
       class="w-full p-6 flex items-center justify-between max-w-7xl mx-auto"
     >
-      <h1 class="text-3xl font-bold tracking-tight">PitchLab</h1>
+      <h1 class="text-3xl font-bold tracking-tight">Pitch Lab</h1>
       <router-link
         to="/tuner"
         class="bg-white text-purple-700 font-semibold px-5 py-2 rounded-lg shadow hover:bg-gray-100 transition"
