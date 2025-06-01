@@ -11,18 +11,29 @@
       <header class="flex items-center justify-between px-6 py-4 bg-entire-bg">
         <HeaderTitle />
         <div class="flex items-center gap-4 mr-8">
-          <router-link to="/" class="text-3xl hover:underline"
-            >Home</router-link
+          <router-link
+            v-if="!isElectron"
+            to="/"
+            class="text-3xl hover:underline"
           >
-          <router-link to="/app" class="text-3xl hover:underline"
-            >App</router-link
+            Home
+          </router-link>
+
+          <router-link to="/app" class="text-3xl hover:underline">
+            App
+          </router-link>
+
+          <router-link to="/tuner" class="text-3xl hover:underline">
+            Tuner
+          </router-link>
+
+          <router-link
+            v-if="!isElectron"
+            to="/download"
+            class="text-3xl hover:underline"
           >
-          <router-link to="/tuner" class="text-3xl hover:underline"
-            >Tuner</router-link
-          >
-          <router-link to="/download" class="text-3xl hover:underline"
-            >Download</router-link
-          >
+            Download
+          </router-link>
         </div>
       </header>
 
@@ -40,6 +51,8 @@ import { initializeStore } from "./stores/initialize";
 
 const initialize = initializeStore();
 const isPortrait = ref(window.innerHeight > window.innerWidth);
+const isElectron =
+  typeof window !== "undefined" && window.electronEnv?.isElectron === true;
 const checkOrientation = () => {
   isPortrait.value = window.innerHeight > window.innerWidth;
 };

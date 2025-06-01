@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, screen, BrowserWindow } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -6,14 +6,17 @@ import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config();
+
 const isDev = process.env.NODE_ENV === 'development';
 
+dotenv.config();
 function createWindow() {
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.workAreaSize;
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        show: true,
+        width,
+        height,
+        show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -22,10 +25,14 @@ function createWindow() {
     });
     if (isDev) {
         win.loadURL('http://localhost:5173');
-        win.webContents.openDevTools();
     } else {
         win.loadFile(path.join(__dirname, 'dist-frontend', 'index.html'));
     }
+    win.once('ready-to-show', () => {
+        win.maximize();
+        win.show();
+    });
+
 }
 
 app.whenReady().then(() => {

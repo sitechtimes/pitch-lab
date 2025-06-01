@@ -1,13 +1,44 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 import TunerView from "../views/TunerView.vue";
-import LandingView from "@/views/LandingView.vue";
+import HomeView from "../views/HomeView.vue";
 import InitializeApp from "@/views/InitializeApp.vue";
-import DownloadView from "@/views/DownloadView.vue";
 import { initializeStore } from "@/stores/initialize";
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+
+function isElectron() {
+  return typeof window !== 'undefined' &&
+    window.electronEnv?.isElectron === true;
+}
+console.log("isElectron:", isElectron());
+
+let LandingView, DownloadView;
+if (!isElectron()) {
+  LandingView = () => import("../views/LandingView.vue");
+  DownloadView = () => import("../views/DownloadView.vue");
+}
+
+const routes = [
+  {
+    path: "/app",
+    name: "app",
+    component: HomeView,
+    meta: { requiresInit: true }
+  },
+  {
+    path: "/tuner",
+    name: "tuner",
+    component: TunerView,
+    meta: { requiresInit: true }
+  },
+  {
+    path: "/initialize",
+    name: "initialize",
+    component: InitializeApp,
+    meta: { requiresInit: false }
+  }
+];
+
+if (!isElectron()) {
+  routes.push(
     {
       path: "/",
       name: "landing",
@@ -15,36 +46,26 @@ const router = createRouter({
       meta: { requiresInit: false }
     },
     {
-      path: "/app",
-      name: "app",
-      component: HomeView,
-      meta: { requiresInit: true }
-    },
-    {
-      path: "/tuner",
-      name: "tuner",
-      component: TunerView,
-      meta: { requiresInit: true }
-    },
-    {
       path: "/download",
       name: "download",
       component: DownloadView,
       meta: { requiresInit: false }
-    },
-    {
-      path: "/initialize",
-      name: "initialize",
-      component: InitializeApp,
-      meta: { requiresInit: false }
+    }
+  );
+}
 
-    },
-  ],
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes
 });
+
 router.beforeEach((to, from, next) => {
   const initialize = initializeStore();
   console.log("isInitialized:", initialize.isInitialized, "Route:", to.path);
-
+  if (isElectron() && to.path === '/') {
+    console.log("Redirecting Electron root '/' to '/app'");
+    return next({ path: '/app' });
+  }
   if (to.name === "initialize" && initialize.isInitialized) {
     console.log("Redirecting from /initialize to / because already initialized");
     next({ name: "home" });
