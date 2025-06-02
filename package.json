@@ -1,0 +1,67 @@
+{
+  "name": "pitchlab",
+  "description": "All-in-one tuner app: metronome, recorder, and accurate tuner. Fast, simple, and perfect for all musicians!",
+  "author": "Evan Gao - SITHS",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "electron-main.mjs",
+  "scripts": {
+    "dev": "concurrently -k \"cross-env NODE_ENV=development vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron electron-main.mjs\"",
+    "start": "electron electron-main.mjs",
+    "clean": "rimraf dist dist-electron dist-frontend",
+    "dist": "npm run clean && vite build && electron-builder",
+    "preview": "vite preview",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/"
+  },
+  "build": {
+    "appId": "com.site.pitchlab",
+    "productName": "PitchLab",
+    "files": [
+      "dist-frontend/**",
+      "electron-main.mjs",
+      "preload.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.icns"
+    }
+  },
+  "dependencies": {
+    "daisyui": "^4.12.14",
+    "dotenv": "^16.5.0",
+    "pinia": "^2.2.6",
+    "pinia-plugin-persistedstate": "^4.1.3",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5",
+    "web-audio-api": "^0.2.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/eslint-config-prettier": "^10.1.0",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^36.3.1",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.14.0",
+    "eslint-plugin-vue": "^9.30.0",
+    "postcss": "^8.4.49",
+    "rimraf": "^6.0.1",
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.10",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-vue-devtools": "^7.5.4",
+    "wait-on": "^8.0.3"
+  }
+}
