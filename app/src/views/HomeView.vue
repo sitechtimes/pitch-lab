@@ -1,6 +1,8 @@
 <template>
-  <div class="bg-controllers-bg rounded-3xl p-6">
-    <div class="flex items-center justify-center">
+  <div class="bg-controllers-bg rounded-3xl py-6">
+    <div class="w-[95%] p-2 flex-items-center justify-center mx-auto">
+      <!-- <h1 class="text-3xl text-[#A3D10A] font-bold text-center">Controllers</h1> -->
+      <div class="flex items-center justify-center">
       <!-- Recorder -->
       <div class="flex w-[35%] flex-col relative">
         <AudioRecorder />
@@ -23,12 +25,14 @@
         <TunerController />
       </div>
     </div>
+</div>
 
     <!-- Tuning Section -->
-    <div class="mt-5 bg-entire-bg">
+    
+  </div>
+  <div class="mt-5 bg-entire-bg">
       <TunerSection />
     </div>
-  </div>
 </template>
 
 <script setup>
