@@ -38,8 +38,10 @@ const audio = useTemplateRef("audioElement");
 
 onMounted(() => {
   console.log(audio);
-  audio.value.volume = devices.outputVolume;
-  audio.value.setSinkId(devices.selectedSpeaker);
+  if (audioElement.value) {
+    audio.value.volume = devices.outputVolume;
+    audio.value.setSinkId(devices.selectedSpeaker);  
+  }
 });
 
 watch(

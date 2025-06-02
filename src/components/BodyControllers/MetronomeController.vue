@@ -217,15 +217,19 @@ watch([bpm, selectedSound], () => {
 watch(
   () => devices.selectedSpeaker,
   (newSpeaker) => {
-    audio.setSinkId(newSpeaker);
-    audio.volume = devices.outputVolume;
+    if (audio) {
+      audio.setSinkId(newSpeaker);
+      audio.volume = devices.outputVolume;
+    }
   },
 );
 
 watch(
   () => devices.outputVolume,
   (newVolume) => {
-    audio.volume = newVolume;
+    if (audio) {
+      audio.volume = newVolume;
+    }
   },
 );
 </script>

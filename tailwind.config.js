@@ -7,15 +7,17 @@ export default {
       lg: "976px",
       xl: "1440px",
     },
+    
     colors: {
       black: "#000000",
       white: "#FFFFFF",
       red:"#FF0000",
-      "tuner-bg": "#120E1D",
+      "tuner-bg": "#1a1a2e",
       "entire-bg": "#2A283B",
       "controllers-bg": "#1A1725",
       "darl-blue": "#2A4296",
       "tuner-controller-text": "#A3D10A",
+      "text-white":"#eaeaea",
       purple: "#7210E3",
       blue: "#1fb6ff",
       pink: "#ff49db",

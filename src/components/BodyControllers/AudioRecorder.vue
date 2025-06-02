@@ -27,7 +27,9 @@
         Stop Recording
       </button>
 
-      <div class="text-black bg-white text-center p-2 rounded-full w-full">
+      <div
+        class="text-white bg-[#424242] text-center py-2 px-4 my-2 rounded-lg text-lg font-mono"
+      >
         Timer: {{ formatTime(timer) }}
       </div>
       <button
@@ -144,6 +146,7 @@ const devices = devicesStore();
 const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
+const selectedChannel = ref(1); // Default to stereo
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
@@ -153,11 +156,37 @@ const startRecording = async () => {
   try {
     // Get access to the microphone
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: { deviceID: devices.selectedMicrophone },
+      audio: {
+        deviceId: devices.selectedMicrophone?.deviceId,
+        channelCount: 2, // Uses Stereo on default
+        noiseSuppression: true,
+        echoCancellation: true,
+      },
     });
 
-    mediaRecorder = new MediaRecorder(stream);
+    // Create an audio context for processing
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
 
+    // Create a stereo panner for spatial effects
+    const stereoPanner = audioContext.createStereoPanner();
+
+    // Simulate immersive sound by panning between left and right channels
+    let panValue = -1; // Start panning from the left
+    setInterval(() => {
+      panValue = panValue === -1 ? 1 : -1; // Alternate between left and right
+      stereoPanner.pan.value = panValue;
+    }, 1000); // Adjust panning every second
+
+    // Connect the source to the panner
+    source.connect(stereoPanner);
+
+    // Connect the panner to the destination
+    const destination = audioContext.createMediaStreamDestination();
+    stereoPanner.connect(destination);
+
+    // Use the processed stream for recording
+    mediaRecorder = new MediaRecorder(destination.stream);
     mediaRecorder.ondataavailable = (event) => {
       audioChunks.push(event.data);
     };
@@ -166,13 +195,13 @@ const startRecording = async () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64Audio = reader.result.split(",")[1]; // Extract base64 part
+        const base64Audio = reader.result.split(",")[1];
         audioStore.currentRecording = {
           audio: base64Audio,
           id: audioStore.assignedID,
-        }; // Store base64 string with id
+        };
       };
-      reader.readAsDataURL(audioBlob); // Convert Blob to Base64
+      reader.readAsDataURL(audioBlob);
     };
 
     // Start recording
@@ -220,7 +249,7 @@ const checkName = () => {
 
 const saveAudio = () => {
   let index = audioStore.audioHistory.findIndex(
-    (file) => file.audio === audioStore.currentRecording.audio,
+    (file) => file.audio === audioStore.currentRecording.audio
   );
   if (index !== -1) {
     console.log("Duplicate audio found, not saving.");
@@ -254,17 +283,11 @@ const deleteAudio = () => {
 const autoDisappear = () => {
   setTimeout(() => {
     saving.value = null;
-  }, 3000);
+  }, 1500);
 };
 </script>
 
 <style scoped>
-button {
-  margin: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 audio {
   margin-top: 10px;
   display: block;

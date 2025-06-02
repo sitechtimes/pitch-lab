@@ -13,6 +13,7 @@ export const devicesStore = defineStore(
         const speakersWithDeviceId = ref([]);
 
         const selectedMicrophone = ref(null);
+        const channelCount = ref(2); // Default to stereo
         const selectedSpeaker = ref(null);
         const inputVolume = ref(0.5);
         const outputVolume = ref(1.0);
@@ -20,6 +21,8 @@ export const devicesStore = defineStore(
         const getDevices = async () => {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
+                microphones.value = devices.filter((d) => d.kind === "audioinput");
+                speakers.value = devices.filter((d) => d.kind === "audiooutput");
                 console.log("Devices:", devices);
 
                 // Split by kind
@@ -137,6 +140,7 @@ export const devicesStore = defineStore(
             selectedMicrophone,
             selectedSpeaker,
             cleanupAudio,
+            channelCount
         }
     },
     {
@@ -147,6 +151,7 @@ export const devicesStore = defineStore(
                     storage: localStorage,
                     paths: [
                         "selectedMicrophone",
+                        "channelCount",
                         "selectedSpeaker",
                         "inputVolume",
                         "outputVolume",
