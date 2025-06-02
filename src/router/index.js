@@ -37,7 +37,7 @@ const routes = [
   }
 ];
 
-if (!isElectron()) {
+if (isElectron()) {
   routes.push({
     path: "/",
     redirect: "/app"
