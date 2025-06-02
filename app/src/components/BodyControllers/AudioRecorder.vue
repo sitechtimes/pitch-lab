@@ -293,10 +293,6 @@ const autoDisappear = () => {
 </script>
 
 <style scoped>
-audio {
-  margin-top: 10px;
-  display: block;
-}
 
 a {
   margin-top: 10px;
