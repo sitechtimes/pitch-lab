@@ -146,7 +146,6 @@ const devices = devicesStore();
 const saving = ref(null);
 const isRecording = ref(false);
 const timer = ref(0);
-const selectedChannel = ref(1); // Default to stereo
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
@@ -249,7 +248,7 @@ const checkName = () => {
 
 const saveAudio = () => {
   let index = audioStore.audioHistory.findIndex(
-    (file) => file.audio === audioStore.currentRecording.audio
+    (file) => file.audio === audioStore.currentRecording.audio,
   );
   if (index !== -1) {
     console.log("Duplicate audio found, not saving.");

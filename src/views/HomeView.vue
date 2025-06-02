@@ -23,14 +23,12 @@
         <TunerController />
       </div>
     </div>
-</div>
 
     <!-- Tuning Section -->
-    
-  </div>
-  <div class="mt-5 bg-entire-bg">
+    <div class="mt-5 bg-entire-bg">
       <TunerSection />
     </div>
+  </div>
 </template>
 
 <script setup>
