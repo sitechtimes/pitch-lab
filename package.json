@@ -11,7 +11,7 @@
     "start": "electron electron-main.mjs",
     "clean": "rimraf dist dist-electron dist-frontend",
     "dist": "npm run clean && vite build && electron-builder",
-    "build:web ": "vite build",
+    "build:web": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"

@@ -38,6 +38,12 @@ const routes = [
 ];
 
 if (!isElectron()) {
+  routes.push({
+    path: "/",
+    redirect: "/app"
+  });
+
+} else {
   routes.push(
     {
       path: "/",
@@ -53,6 +59,7 @@ if (!isElectron()) {
     }
   );
 }
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
