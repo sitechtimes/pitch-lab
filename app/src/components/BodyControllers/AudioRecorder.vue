@@ -66,13 +66,12 @@
         <div>
           <div :key="audioStore.currentRecording.id">
             <audio
-              ref="audioElement"
-              id="audio"
-              controls
-              :src="
-                'data:audio/mp4;base64,' + audioStore.currentRecording.audio
-              "
-            ></audio>
+  ref="audioElement"
+  id="audio"
+  controls
+  :src="'data:audio/mp4;base64,' + audioStore.currentRecording.audio"
+  class="mt-2 block"
+></audio>
           </div>
           <div class="w-full mt-2 flex flex-row justify-between">
             <input
@@ -101,12 +100,12 @@
         </div>
         <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-1 ml-3">
           <a
-            class="bg-[#4B0082] hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
+            class="bg-[#4B0082] mt-2 hover:bg-[#2564da] hover:scale-[1.065] hover:translate-y-[-7px] hover:rounded-[23px] hover:rounded-bl-none hover:rounded-br-none px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg transition-all text-center text-[#d8e5f9] hover:text-[#a8c1f0] font-medium cursor-pointer"
             @click="saveAudio"
             >Save to History
           </a>
           <a
-            class="bg-[#5350c6] hover:bg-secondary-600 hover:scale-[1.065] hover:translate-y-[7px] hover:rounded-[23px] hover:rounded-tl-none hover:rounded-tr-none px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg transition-all text-center text-[#d8e5f9] hover:text-[#b3aaee] font-medium cursor-pointer"
+            class="bg-[#5350c6] mt-2 hover:bg-secondary-600 hover:scale-[1.065] hover:translate-y-[7px] hover:rounded-[23px] hover:rounded-tl-none hover:rounded-tr-none px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg transition-all text-center text-[#d8e5f9] hover:text-[#b3aaee] font-medium cursor-pointer"
             @click="deleteAudio"
           >
             <!-- <img src="@/assets/buttons/trash-2.webp" alt="Microphone" class="mr-3" /> -->
@@ -285,6 +284,7 @@ const deleteAudio = () => {
   autoDisappear();
 };
 
+// Automatically hide the saving message after 1.5 seconds
 const autoDisappear = () => {
   setTimeout(() => {
     saving.value = null;
@@ -292,23 +292,3 @@ const autoDisappear = () => {
 };
 </script>
 
-<style scoped>
-
-a {
-  margin-top: 10px;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  font-size: 20px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
-
-.fade-out {
-  opacity: 0;
-}
-</style>
