@@ -2,7 +2,7 @@
   <div class="bg-controllers-bg rounded-3xl p-6">
     <div class="flex sm:items-center sm:justify-center sm:flex-col gap-4 md:flex-row ">
       <!-- Recorder -->
-      <div class="flex sm:w-full md:w-[35%]  flex-col">
+      <div class="flex sm:w-full md:w-[37%]  flex-col">
         <AudioRecorder />
         <div
           v-if="audioStore.showHistoryModal"
