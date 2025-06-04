@@ -3,7 +3,7 @@
     <div class="flex flex-col items-center w-[30%]">
       <div class="flex flex-row items-center justify-between w-full">
         <button
-          class="bg-skyblue hover:bg-[#6A0DAD] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+          class="bg-skyblue text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
           @click="startRecording"
           v-if="!isRecording"
         >
@@ -14,7 +14,7 @@
           />
         </button>
         <button
-          class="bg-[#008000] hover:bg-[#4CAF50] text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+          class="bg-green text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
           @click="stopRecording"
           v-if="isRecording"
         >
@@ -45,10 +45,10 @@
           class="absolute w-36 h-32 -top-8 -left-2 bg-white rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"
         ></span>
         <span
-          class="absolute w-36 h-32 -top-8 -left-2 bg-[#2E236C] rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"
+          class="absolute w-36 h-32 -top-8 -left-2 bg-darl-blue rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"
         ></span>
         <span
-          class="absolute w-36 h-32 -top-8 -left-2 bg-[#17153B] rotate-12 transform scale-x-0 group-hover:scale-x-50 transition-transform group-hover:duration-1000 duration-500 origin-left"
+          class="absolute w-36 h-32 -top-8 -left-2 bg-green rotate-12 transform scale-x-0 group-hover:scale-x-50 transition-transform group-hover:duration-1000 duration-500 origin-left"
         ></span>
         <span
           class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute top-2.5 left-6 z-10"
@@ -102,24 +102,24 @@
         </div>
         <div class="flex flex-col w-[50%] p-2 rounded-3xl gap-2 ml-3">
           <button
-            class="flex items-center justify-center gap-2 bg-[#4B0082] mt-2 px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg text-center text-[#d8e5f9] font-medium cursor-pointer"
+            class="flex items-center justify-center gap-2 bg-purple mt-2 px-6 py-2 rounded-2xl rounded-bl-lg rounded-br-lg text-center text-white font-medium cursor-pointer"
             @click="saveAudio"
             type="button"
           >
             <img src="@/assets/buttons/save.webp" alt="Save" class="w-6 h-6" />
-            Save
+            <span class="hidden sm:inline">Save</span>
           </button>
           <button
-            class="flex items-center justify-center gap-2 bg-[#5350c6] mt-2 px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg text-center text-[#d8e5f9] font-medium cursor-pointer"
+            class="flex items-center justify-center gap-2 bg-darl-blue mt-2 px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg text-center text-white font-medium cursor-pointer"
             @click="deleteAudio"
             type="button"
           >
             <img
               src="@/assets/buttons/trash-2.webp"
               alt="Delete"
-              class="w-6 h-6"
+              class="w-6 h-6 sm:rounded-full md:rounded-none"
             />
-            Delete
+    <span class="sm:hidden md:inline">Delete</span>
           </button>
         </div>
       </div>

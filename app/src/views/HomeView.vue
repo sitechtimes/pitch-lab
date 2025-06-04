@@ -11,13 +11,21 @@
           <HistoryModal />
         </div>
       </div>
-      <div class="w-0.5 bg-[#A3D10A] self-stretch rounded-md hidden sm:block"></div>
-
+<div
+  class="self-stretch rounded-md"
+  :class="[
+    'hidden',
+    'sm:block',
+    'bg-tuner-controller-text',
+    'sm:w-full sm:h-0.5 sm:my-4',
+    'md:w-0.5 md:h-full md:my-0'
+  ]"
+></div>
       <!-- Metronome -->
       <div class="sm:w-full md:w-[35%]  items-center flex justify-center">
         <MetronomeController />
       </div>
-      <div class="w-0.5 bg-[#A3D10A] self-stretch rounded-md hidden sm:block"></div>
+      <div class="w-0.5 bg-tuner-controller-text self-stretch rounded-md hidden sm:block"></div>
       <!-- Tuner -->
       <div class="sm:w-full md:w-[20%] flex justify-center">
         <TunerController />
