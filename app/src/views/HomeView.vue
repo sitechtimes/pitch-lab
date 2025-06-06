@@ -1,8 +1,10 @@
 <template>
   <div class="bg-controllers-bg rounded-3xl p-6">
-    <div class="flex sm:items-center sm:justify-center sm:flex-col gap-4 md:flex-row ">
+    <div
+      class="flex sm:items-center sm:justify-center sm:flex-col gap-4 md:flex-row"
+    >
       <!-- Recorder -->
-      <div class="flex sm:w-full md:w-[37%]  flex-col">
+      <div class="flex sm:w-full md:w-[37%] flex-col">
         <AudioRecorder />
         <div
           v-if="audioStore.showHistoryModal"
@@ -11,21 +13,16 @@
           <HistoryModal />
         </div>
       </div>
-<div
-  class="self-stretch rounded-md"
-  :class="[
-    'hidden',
-    'sm:block',
-    'bg-tuner-controller-text',
-    'sm:w-full sm:h-0.5 sm:my-4',
-    'md:w-0.5 md:h-full md:my-0'
-  ]"
-></div>
+      <div
+        class="w-0.5 bg-tuner-controller-text self-stretch rounded-md hidden sm:block"
+      ></div>
       <!-- Metronome -->
-      <div class="sm:w-full md:w-[35%]  items-center flex justify-center">
+      <div class="sm:w-full md:w-[35%] items-center flex justify-center">
         <MetronomeController />
       </div>
-      <div class="w-0.5 bg-tuner-controller-text self-stretch rounded-md hidden sm:block"></div>
+      <div
+        class="w-0.5 bg-tuner-controller-text self-stretch rounded-md hidden sm:block"
+      ></div>
       <!-- Tuner -->
       <div class="sm:w-full md:w-[20%] flex justify-center">
         <TunerController />

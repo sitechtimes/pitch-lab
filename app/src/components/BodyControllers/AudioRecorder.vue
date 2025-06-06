@@ -3,7 +3,7 @@
     <div class="flex flex-col items-center w-[30%]">
       <div class="flex flex-row items-center justify-between w-full">
         <button
-          class="bg-skyblue text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all"
+          class="bg-skyblue text-white font-bold py-2 px-3 rounded-lg shadow-md transition-all"
           @click="startRecording"
           v-if="!isRecording"
         >
@@ -107,10 +107,10 @@
             type="button"
           >
             <img src="@/assets/buttons/save.webp" alt="Save" class="w-6 h-6" />
-            <span class="hidden sm:inline">Save</span>
+            <span class="hidden md:inline">Save</span>
           </button>
           <button
-            class="flex items-center justify-center gap-2 bg-darl-blue mt-2 px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg text-center text-white font-medium cursor-pointer"
+            class="flex items-center justify-center gap-2 bg-light-blue mt-2 px-6 py-2 rounded-2xl rounded-tl-lg rounded-tr-lg text-center text-white font-medium cursor-pointer"
             @click="deleteAudio"
             type="button"
           >
@@ -119,7 +119,7 @@
               alt="Delete"
               class="w-6 h-6 sm:rounded-full md:rounded-none"
             />
-    <span class="sm:hidden md:inline">Delete</span>
+          <span class="sm:hidden md:inline">Delete</span>
           </button>
         </div>
       </div>
