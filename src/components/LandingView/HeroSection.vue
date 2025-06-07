@@ -2,14 +2,14 @@
   <section
     class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16"
   >
-    <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6">
-      Tune. Play. Perfect.
-    </h2>
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6">
+      Pitch Lab – Free Tuner App for Musicians
+    </h1>
     <p class="text-2xl text-gray-light max-w-2xl mb-10 leading-relaxed">
-      A precision tuner, powerful metronome, and drone generator — all in one
-      beautifully simple tool for musicians.
+      Tune your instrument with precision, keep time with a customizable
+      metronome, and strengthen your pitch with drone tones — all in one simple,
+      powerful tool designed for musicians of all levels.
     </p>
-
     <!-- Top two buttons side-by-side -->
     <div class="flex flex-wrap justify-center gap-6 mb-6">
       <router-link
