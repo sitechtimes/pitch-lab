@@ -75,7 +75,7 @@ router.beforeEach((to, from, next) => {
   }
   if (to.name === "initialize" && initialize.isInitialized) {
     console.log("Redirecting from /initialize to / because already initialized");
-    next({ name: "home" });
+    next({ name: "app" });
   }
   else if (to.meta.requiresInit && !initialize.isInitialized) {
     console.log("Redirecting to /initialize because initialization is required");

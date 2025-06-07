@@ -33,7 +33,7 @@
     </div>
 
     <footer
-      class="text-ml sm:text-base text-gray-light mt-10 pt-6 border-t border-gray-dark"
+      class="text-base sm:text-base text-gray-light mt-10 pt-6 border-t border-gray-dark"
     >
       © 2025 <span class="text-white font-semibold">Pitch Lab</span>. All
       rights reserved.

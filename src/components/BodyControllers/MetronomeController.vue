@@ -9,7 +9,7 @@
         <select
           v-model="timeSignature"
           @change="updateTempo"
-          class="bg-purple text-white px-3 py-2 text-ml rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="bg-purple text-white px-3 py-2 text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option value="3">3</option>
           <option value="4">4</option>
@@ -18,7 +18,7 @@
         <select
           v-model="timeSignatureDenominator"
           @change="updateTempo"
-          class="bg-purple text-white px-3 py-2 text-ml rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="bg-purple text-white px-3 py-2 text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option value="4">4</option>
         </select>
@@ -29,7 +29,7 @@
         <select
           v-model="selectedSound"
           @change="loadSound"
-          class="bg-purple text-white px-3 py-2 text-ml rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="bg-purple text-white px-3 py-2 text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option v-for="sound in availableSounds" :key="sound" :value="sound">
             {{ sound }}
@@ -45,7 +45,7 @@
         <button
           @click="decreaseBPM"
           :disabled="bpm <= 40"
-          class="w-10 h-10 bg-purple hover:bg-purple text-white font-bold text-ml rounded-lg bg-purple hover:bg-purple/90 text-white shadow disabled:opacity-50"
+          class="w-10 h-10 bg-purple hover:bg-purple text-white font-bold text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow disabled:opacity-50"
         >
           -
         </button>
@@ -59,7 +59,7 @@
         <button
           @click="increaseBPM"
           :disabled="bpm >= 240"
-          class="w-10 h-10 bg-purple text-white font-bold text-ml rounded-lg bg-purple hover:bg-purple/90 text-white shadowdisabled:opacity-50"
+          class="w-10 h-10 bg-purple text-white font-bold text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadowdisabled:opacity-50"
         >
           +
         </button>
@@ -72,7 +72,7 @@
       <button
         @click="toggleMetronome"
         :disabled="isLoading"
-        class="bg-purple text-white font-normal text-ml rounded-lg hover:bg-purple/90 text-white shadow py-2 px-5 rounded-xl"
+        class="bg-purple text-white font-normal text-base rounded-lg hover:bg-purple/90 text-white shadow py-2 px-5 rounded-xl"
       >
         {{ isPlaying ? "Stop" : "Start" }}
       </button>
