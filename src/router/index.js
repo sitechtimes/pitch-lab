@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, createWebHashHistory } from "vue-router";
 import TunerView from "../views/TunerView.vue";
 import HomeView from "../views/HomeView.vue";
 import InitializeApp from "@/views/InitializeApp.vue";
@@ -38,11 +38,16 @@ const routes = [
 ];
 
 if (isElectron()) {
-  routes.push({
-    path: "/",
-    redirect: "/app"
-  });
-
+  routes.push(
+    {
+      path: "/",
+      redirect: "/app",
+    },
+    {
+      path: "/dist-frontend/index.html",
+      redirect: "/app",
+    }
+  );
 } else {
   routes.push(
     {
@@ -62,15 +67,17 @@ if (isElectron()) {
 
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: isElectron()
+    ? createWebHashHistory(import.meta.env.BASE_URL)
+    : createWebHistory(import.meta.env.BASE_URL),
   routes
 });
 
 router.beforeEach((to, from, next) => {
   const initialize = initializeStore();
   console.log("isInitialized:", initialize.isInitialized, "Route:", to.path);
-  if (isElectron() && to.path === '/') {
-    console.log("Redirecting Electron root '/' to '/app'");
+  if (isElectron() && (to.path === '/' || to.path === '/index.html')) {
+    console.log("Redirecting Electron root to '/app'");
     return next({ path: '/app' });
   }
   if (to.name === "initialize" && initialize.isInitialized) {

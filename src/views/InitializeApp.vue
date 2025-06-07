@@ -51,7 +51,7 @@ watch(
   () => initialize.isInitialized,
   (newVal) => {
     if (newVal) {
-      router.push("/");
+      router.push("/app");
     }
   },
 );

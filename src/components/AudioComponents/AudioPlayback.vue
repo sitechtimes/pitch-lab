@@ -29,33 +29,41 @@
 </template>
 
 <script setup>
-import { watch, onMounted, useTemplateRef } from "vue";
+import { watch, onMounted, ref } from "vue";
 import { audioFilesStore } from "@/stores/audioFiles";
 import { devicesStore } from "@/stores/devices";
 const audioStore = audioFilesStore();
 const devices = devicesStore();
-const audio = useTemplateRef("audioElement");
+const audioElement = ref(null);
 
 onMounted(() => {
-  console.log(audio);
+  console.log(audioElement);
   if (audioElement.value) {
-    audio.value.volume = devices.outputVolume;
-    audio.value.setSinkId(devices.selectedSpeaker);  
+    audioElement.value.volume = devices.outputVolume;
+    if (typeof audioElement.value.setSinkId === "function") {
+      audioElement.value.setSinkId(devices.selectedSpeaker);
+    }
   }
 });
 
 watch(
   () => devices.selectedSpeaker,
   (newSpeaker) => {
-    audio.value.setSinkId(newSpeaker);
-    audio.value.volume = devices.outputVolume;
+    if (typeof audioElement.value?.setSinkId === "function") {
+      audioElement.value.setSinkId(newSpeaker);
+    }
+    if (audioElement.value) {
+      audioElement.value.volume = devices.outputVolume;
+    }
   },
 );
 
 watch(
   () => devices.outputVolume,
   (newVolume) => {
-    audio.value.volume = newVolume;
+    if (audioElement.value) {
+      audioElement.value.volume = newVolume;
+    }
   },
 );
 </script>

@@ -217,8 +217,8 @@ watch([bpm, selectedSound], () => {
 watch(
   () => devices.selectedSpeaker,
   (newSpeaker) => {
-    if (audio) {
-      audio.setSinkId(newSpeaker);
+    if (audio && newSpeaker) {
+      audio.setSinkId(newSpeaker.deviceId);
       audio.volume = devices.outputVolume;
     }
   },

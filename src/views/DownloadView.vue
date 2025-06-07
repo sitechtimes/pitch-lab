@@ -29,7 +29,7 @@
         download
         class="block bg-purple hover:bg-purple/80 transition text-white text-lg font-medium px-6 py-3 rounded-lg shadow mb-2"
       >
-        Download for Windows (.exe)
+        Download for Windows (.zip)
       </a>
 
       <p class="text-xs text-gray-400">File size: ~90MB</p>
