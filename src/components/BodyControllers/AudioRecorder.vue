@@ -1,137 +1,126 @@
 <template>
-  <div class="flex flex-row">
-    <div class="flex flex-col items-center w-[30%]">
-      <!-- Timer display -->
+  <div class="flex flex-col lg:flex-row gap-6 p-4">
+    <!-- Left panel -->
+    <div
+      class="flex flex-col items-center lg:items-start w-full lg:w-1/3 space-y-4 min-w-0"
+    >
+      <!-- Start/Stop -->
       <button
-        class="bg-[#36C4E4] rounded-full p-2 w-full flex items-center justify-center"
-        @click="startRecording"
         v-if="!isRecording"
+        @click="startRecording"
+        class="w-full md:w-48 px-4 py-2 bg-[#36C4E4] rounded-full flex items-center justify-center text-xl font-mono"
       >
-        <img
-          src="@/assets/buttons/microphone.webp"
-          alt="Microphone"
-          class="h-6 w-6 mr-2"
-        />
+        <img src="@/assets/buttons/microphone.webp" class="h-5 w-5 mr-2" />
         Start Recording
       </button>
       <button
-        class="bg-[#A3D10A] rounded-full p-2 w-full flex items-center justify-center"
+        v-else
         @click="stopRecording"
-        v-if="isRecording"
+        class="w-full md:w-48 px-4 py-2 bg-[#A3D10A] rounded-full flex items-center justify-center text-xl font-mono"
       >
         <img
           src="@/assets/buttons/microphone-disabled.webp"
-          alt="Disabled Microphone"
-          class="h-6 w-6 mr-2"
+          class="h-5 w-5 mr-2"
         />
         Stop Recording
       </button>
 
+      <!-- Timer -->
       <div
-        class="text-white bg-[#424242] text-center py-2 px-4 my-2 rounded-lg text-lg font-mono"
+        class="w-full md:w-48 text-center bg-[#424242] py-2 px-4 rounded-lg font-mono text-lg md:text-xl flex items-center justify-center"
       >
         Timer: {{ formatTime(timer) }}
       </div>
+
+      <!-- Saved recordings -->
       <button
-        type="button"
-        class="text-white text-center bg-gold font-medium rounded-full text-sm bg-purple p-2 w-full"
         @click="
           (audioStore.showHistoryModal = true),
             (saving = null),
             (audioStore.showDeletedModal = false)
         "
+        class="w-full md:w-48 px-4 py-2 bg-purple rounded-full text-white text-base md:text-xl font-mono"
       >
         Saved Recordings
       </button>
     </div>
 
-    <!-- Display recorded audio playback and download link -->
-    <div
-      v-if="audioStore.currentRecording && !isRecording"
-      class="w-full flex items-center justify-center"
-    >
-      <div class="flex flex-row justify-between w-[85%]">
-        <div>
-          <div>
-            <h3>Recorded Audio:</h3>
-          </div>
+    <!-- Right panel -->
 
-          <div :key="audioStore.currentRecording.id">
-            <audio
-              ref="audioElement"
-              id="audio"
-              controls
-              :src="
-                'data:audio/mp4;base64,' + audioStore.currentRecording.audio
-              "
-            ></audio>
-          </div>
-          <div class="w-[90%] mt-2 flex flex-row justify-between">
+    <div class="flex flex-col lg:flex-row flex-wrap gap-6 p-4">
+      <!-- Playback & controls -->
+      <div
+        v-if="audioStore.currentRecording && !isRecording"
+        class="flex flex-col md:flex-row gap-6"
+      >
+        <!-- Audio + download -->
+        <div class="flex-1 min-w-0 flex flex-col space-y-3">
+          <h3 class="text-xl md:text-2xl font-semibold">Recorded Audio:</h3>
+
+          <audio
+            ref="audioElement"
+            controls
+            :src="`data:audio/mp4;base64,${audioStore.currentRecording.audio}`"
+            class="w-full"
+          ></audio>
+
+          <div class="flex flex-col sm:flex-row gap-2 items-center">
             <input
               id="name"
               type="text"
-              class="text-black w-[full]"
               v-model="audioStore.fileName"
               placeholder="Name File"
+              class="flex-1 min-w-0 p-2 rounded text-black text-base"
             />
-
-            <div>
-              <a
-                :href="
-                  'data:audio/mp4;base64,' + audioStore.currentRecording.audio
-                "
-                :download="
-                  audioStore.fileName
-                    ? audioStore.fileName + '.mp4'
-                    : 'recorded-audio.mp4'
-                "
-              >
-                Download
-              </a>
-            </div>
+            <a
+              :href="`data:audio/mp4;base64,${audioStore.currentRecording.audio}`"
+              :download="
+                audioStore.fileName
+                  ? `${audioStore.fileName}.mp4`
+                  : 'recorded-audio.mp4'
+              "
+              class="text-blue-400 underline text-base md:text-lg"
+            >
+              Download
+            </a>
           </div>
         </div>
 
-        <div class="flex flex-col justify-between">
+        <!-- Save/Delete buttons -->
+        <div class="flex flex-col space-y-3 w-full sm:w-auto">
           <button
-            class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
             @click="saveAudio"
+            class="w-full px-4 py-2 bg-[#2A4296] text-[#A3D10A] rounded-full flex items-center justify-center text-base md:text-lg"
           >
-            <img
-              src="@/assets/buttons/save.webp"
-              alt="Microphone"
-              class="mr-1"
-            />
+            <img src="@/assets/buttons/save.webp" class="h-5 w-5 mr-2" />
             Save to history
           </button>
           <button
-            class="bg-[#2A4296] rounded-full p-2 text-[#A3D10A] w-full flex items-center justify-center"
             @click="deleteAudio"
+            class="w-full px-4 py-2 bg-[#2A4296] text-[#A3D10A] rounded-full flex items-center justify-center text-base md:text-lg"
           >
-            <img
-              src="@/assets/buttons/trash-2.webp"
-              alt="Microphone"
-              class="mr-3"
-            />
+            <img src="@/assets/buttons/trash-2.webp" class="h-5 w-5 mr-2" />
             Delete
           </button>
         </div>
       </div>
-    </div>
 
-    <!-- Placeholder message when there is no recording -->
-    <div v-else class="w-full flex items-center justify-center">
-      <div class="w-[70%]">
-        <p class="text-xl text-center w-full">
+      <!-- Placeholder when empty -->
+      <div v-else class="flex-1 flex items-center justify-center">
+        <p class="text-center text-base md:text-lg px-4">
           No recorded audio available. Please start recording to see playback
           and download options.
         </p>
       </div>
-    </div>
-    <div v-if="saving" class="w-full">
-      <button @click="saving = null">x</button>
-      <p v-if="saving === 'delete'">Successfully Deleted!</p>
-      <p v-if="saving === 'save'">Successfully Saved!</p>
+
+      <!-- Save/Delete notifications -->
+      <div
+        v-if="saving"
+        class="text-center text-base md:text-lg text-green-400"
+      >
+        <p v-if="saving === 'delete'">Successfully Deleted!</p>
+        <p v-if="saving === 'save'">Successfully Saved!</p>
+      </div>
     </div>
   </div>
 </template>

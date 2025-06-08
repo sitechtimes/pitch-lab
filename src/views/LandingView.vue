@@ -19,7 +19,7 @@
         />
       </div>
     </section>
-
+    <FeedbackSection />
     <CreditsSection />
   </div>
 </template>
@@ -28,6 +28,7 @@
 import FeatureCard from "@/components/LandingView/FeaturesCard.vue";
 import HeroSection from "@/components/LandingView/HeroSection.vue";
 import CreditsSection from "@/components/LandingView/CreditsSection.vue";
+import FeedbackSection from "@/components/LandingView/FeedbackSection.vue";
 const features = [
   {
     icon: "🎵",

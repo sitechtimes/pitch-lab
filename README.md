@@ -13,8 +13,6 @@ This will create a new `dist` folder and `dist-frontend` folder with the latest 
 Then, open the dist folder and drag and drop the .exe file into Cloudflare's R2 Object Storage so the new version is available for download.
 --> Contact me for permissions to upload to the R2 bucket for www.pitchlab.site or use your own R2 bucket and host the app on a local server or put the .exe file in public/downloads if using Netlify.
 
-- convert the .exe file to .zip
-
 Will make read.me more detailed later.
 
 Website is hosted on: https://pitchlab.site/

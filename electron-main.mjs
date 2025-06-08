@@ -32,7 +32,6 @@ function createWindow() {
         win.maximize();
         win.show();
     });
-
 }
 
 app.whenReady().then(() => {

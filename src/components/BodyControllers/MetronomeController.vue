@@ -1,35 +1,39 @@
 <template>
   <div
-    class="w-full max-w-4xl mx-auto rounded-xl shadow-xl p-6 flex flex-col xl:flex-row flex-wrap items-center justify-between gap-8"
+    class="w-full max-w-4xl mx-auto rounded-xl p-4 sm:p-6 flex flex-col xl:flex-row flex-wrap items-center justify-between gap-6 sm:gap-8"
   >
     <!-- Time Signature & Sound -->
-    <div class="flex flex-col gap-4 w-full sm:w-auto">
+    <div class="flex flex-col gap-2 sm:gap-4 w-full sm:w-auto">
       <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
-        <label class="text-gray-700 text-xl font-normal">Time Signature:</label>
+        <label class="text-gray-700 text-base md:text-xl font-normal">
+          Time Signature:
+        </label>
         <select
           v-model="timeSignature"
           @change="updateTempo"
-          class="bg-purple text-white px-3 py-2 text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="bg-purple text-white px-2 py-1 md:px-3 md:py-2 text-sm md:text-base rounded-lg hover:bg-purple/90 shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option value="3">3</option>
           <option value="4">4</option>
         </select>
-        <span class="text-gray-500 text-xl">/</span>
+        <span class="text-gray-500 text-base md:text-xl">/</span>
         <select
           v-model="timeSignatureDenominator"
           @change="updateTempo"
-          class="bg-purple text-white px-3 py-2 text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="bg-purple text-white px-2 py-1 md:px-3 md:py-2 text-sm md:text-base rounded-lg hover:bg-purple/90 shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option value="4">4</option>
         </select>
       </div>
 
       <div class="flex flex-col">
-        <label class="text-gray-700 text-xl font-normal mb-1">Sound</label>
+        <label class="text-gray-700 text-base md:text-xl font-normal mb-1">
+          Sound
+        </label>
         <select
           v-model="selectedSound"
           @change="loadSound"
-          class="bg-purple text-white px-3 py-2 text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow text-normal cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="bg-purple text-white px-2 py-1 md:px-3 md:py-2 text-sm md:text-base rounded-lg hover:bg-purple/90 shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <option v-for="sound in availableSounds" :key="sound" :value="sound">
             {{ sound }}
@@ -39,13 +43,15 @@
     </div>
 
     <!-- BPM Controls -->
-    <div class="flex flex-col items-center gap-3 w-full sm:w-auto">
-      <label class="text-gray-700 text-xl font-normal">Tempo (BPM)</label>
-      <div class="flex items-center gap-3">
+    <div class="flex flex-col items-center gap-2 sm:gap-3 w-full sm:w-auto">
+      <label class="text-base md:text-xl text-gray-700 font-normal">
+        Tempo (BPM)
+      </label>
+      <div class="flex items-center gap-2 sm:gap-3">
         <button
           @click="decreaseBPM"
           :disabled="bpm <= 40"
-          class="w-10 h-10 bg-purple hover:bg-purple text-white font-bold text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadow disabled:opacity-50"
+          class="w-8 h-8 sm:w-10 sm:h-10 bg-purple hover:bg-purple/90 text-white font-bold text-base sm:text-lg rounded-lg shadow disabled:opacity-50"
         >
           -
         </button>
@@ -54,35 +60,36 @@
           v-model.number="bpm"
           min="40"
           max="240"
-          class="w-20 border border-gray-300 rounded-md px-2 py-1 text-xl text-center text-black bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          class="w-16 sm:w-20 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 text-base sm:text-xl text-center bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <button
           @click="increaseBPM"
           :disabled="bpm >= 240"
-          class="w-10 h-10 bg-purple text-white font-bold text-base rounded-lg bg-purple hover:bg-purple/90 text-white shadowdisabled:opacity-50"
+          class="w-8 h-8 sm:w-10 sm:h-10 bg-purple hover:bg-purple/90 text-white font-bold text-base sm:text-lg rounded-lg shadow disabled:opacity-50"
         >
           +
         </button>
       </div>
-      <p class="text-xl text-gray-500">Range: 40–240 BPM</p>
+      <p class="text-base md:text-xl text-gray-500">Range: 40–240 BPM</p>
     </div>
 
     <!-- Play/Stop + Beat Circle -->
-    <div class="flex flex-col items-center gap-4 w-full sm:w-auto">
+    <div class="flex flex-col items-center gap-3 sm:gap-4 w-full sm:w-auto">
       <button
         @click="toggleMetronome"
         :disabled="isLoading"
-        class="bg-purple text-white font-normal text-base rounded-lg hover:bg-purple/90 text-white shadow py-2 px-5 rounded-xl"
+        class="px-3 py-1.5 sm:px-5 sm:py-2 bg-purple hover:bg-purple/90 text-white font-normal text-base sm:text-lg rounded-xl shadow"
       >
         {{ isPlaying ? "Stop" : "Start" }}
       </button>
       <div
-        class="w-12 h-12 bg-purple rounded-full transition-transform duration-100"
+        class="w-10 h-10 sm:w-12 sm:h-12 bg-purple rounded-full transition-transform duration-100"
         :class="{ 'scale-150': isBeating }"
       ></div>
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { devicesStore } from "@/stores/devices";

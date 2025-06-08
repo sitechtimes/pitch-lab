@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-controllers-bg rounded-3xl">
-    <div class="flex items-center justify-center">
+  <div>
+    <div class="bg-controllers-bg rounded-3xl flex items-center justify-center">
       <!-- Recorder -->
       <div class="flex w-[35%] flex-col relative">
         <AudioRecorder />
@@ -11,15 +11,15 @@
           <HistoryModal />
         </div>
       </div>
-      <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
+      <div class="w-1 bg-[#A3D10A] self-stretch rounded-3xl"></div>
 
       <!-- Metronome -->
       <div class="w-[35%] items-center flex justify-center">
         <MetronomeController />
       </div>
-      <div class="w-0.5 bg-[#A3D10A] self-stretch hidden sm:block"></div>
+      <div class="w-1 bg-[#A3D10A] self-stretch rounded-3xl"></div>
       <!-- Tuner -->
-      <div class="w-[20%] flex justify-center">
+      <div class="w-[20%] flex items-center justify-center">
         <TunerController />
       </div>
     </div>
