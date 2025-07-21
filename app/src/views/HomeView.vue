@@ -6,10 +6,7 @@
       <!-- Recorder -->
       <div class="flex sm:w-full md:w-[37%] flex-col">
         <AudioRecorder />
-        <div
-          v-if="audioStore.showHistoryModal"
-          class="absolute inset-0 bg-black/30 p-4"
-        >
+        <div>
           <HistoryModal />
         </div>
       </div>

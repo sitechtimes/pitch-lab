@@ -37,8 +37,8 @@ const devices = devicesStore();
 const audio = useTemplateRef("audioElement");
 
 onMounted(() => {
-  console.log(audio);
-  if (audioElement.value) {
+  console.log(audio.value);
+  if (audio.value) {
     audio.value.volume = devices.outputVolume;
     audio.value.setSinkId(devices.selectedSpeaker);  
   }

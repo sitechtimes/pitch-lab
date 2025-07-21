@@ -1,6 +1,6 @@
 <template>
-  <div
-    class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
+  <div v-if="audioStore.showHistoryModal"
+    class=" flex items-center justify-center bg-opacity-50 z-50 absolute inset-0 bg-black/30 p-4"
   >
     <div
       class="bg-[#261b32] rounded-lg shadow-lg p-6 w-[40%] border  border-black bg-gray-50"

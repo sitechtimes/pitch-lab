@@ -45,6 +45,7 @@
       <label class="text-gray-700 font-semibold">Tempo (BPM)</label>
       <div class="flex items-center gap-3">
         <button
+        @mousedown="holdDecreaseBPM"
           @click="decreaseBPM"
           :disabled="bpm <= 40"
           class="w-10 h-10 bg-purple hover:bg-purple text-white font-bold rounded disabled:opacity-50"
@@ -59,6 +60,7 @@
           class="w-20 border border-gray-300 rounded-md px-2 py-1 text-lg text-center text-black bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <button
+        @mousedown="holdIncreaseBPM"
           @click="increaseBPM"
           :disabled="bpm >= 240"
           class="w-10 h-10 bg-purple text-white font-bold rounded disabled:opacity-50"
@@ -203,6 +205,36 @@ const decreaseBPM = () => {
       startMetronome();
     }
   }
+};
+
+const holdIncreaseBPM = () => {
+  setTimeout(() => {
+    let interval = setInterval(() => {
+    if (bpm.value < 240) {
+      bpm.value += 1;
+      if (isPlaying.value) {
+        stopMetronome();
+        startMetronome();
+      }
+    }
+  }, 100);
+  document.addEventListener("mouseup", () => clearInterval(interval), { once: true });
+  },500)
+};
+
+const holdDecreaseBPM = () => {
+  setTimeout(() => {
+    let interval = setInterval(() => {
+    if (bpm.value > 40) {
+      bpm.value -= 1;
+      if (isPlaying.value) {
+        stopMetronome();
+        startMetronome();
+      }
+    }
+  }, 100);
+  document.addEventListener("mouseup", () => clearInterval(interval), { once: true });
+  },500)
 };
 
 onMounted(() => {

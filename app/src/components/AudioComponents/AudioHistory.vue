@@ -22,12 +22,12 @@
           type="text"
           class="text-black w-1/2 mt-3"
           v-model="audioStore.fileName"
-          :disabled="!isEditing"
+      
         />
-        <button @click="handleSave">
+        <button class="text-md bg-purple rounded-full p-2 py-2 mb-2" @click="handleSave">
           {{ isEditing ? "Save File" : "Rename File" }}
         </button>
-        <button @click="deleteAudio">Delete</button>
+        <button class="text-md bg-purple rounded-full p-2 py-2 mb-2" @click="deleteAudio">Delete</button>
       </div>
     </div>
     <div v-if="saving" class="fixed inset-0 flex justify-center mt-4 z-50">
@@ -75,6 +75,7 @@ const saving = ref(null);
 const isEditing = ref(false);
 
 const handleSave = () => {
+  console.log(isEditing.value)
   if (isEditing.value) {
     saveAudio();
   }

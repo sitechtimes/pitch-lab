@@ -28,12 +28,14 @@
         Restore to History
       </button>
       <button
+      class="text-md bg-purple rounded-full p-1 mb-2"
         @click="(audioStore.warning = true), (audioStore.deleteFunc = 'single')"
         :disabled="audioStore.recentlyDeleted.length === 0"
       >
         Delete
       </button>
       <button
+      class="text-md bg-purple rounded-full p-1 mb-2"
         @click="
           (audioStore.warning = true),
             (showAlert = true),
